@@ -24,6 +24,7 @@ import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.presentation.ui.directions.common.UiState
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.progress.MyCircularProgressBar
+import com.example.mynotes.presentation.utils.components.text.MyText
 
 class SignInScreen : AppScreen() {
     @Composable
@@ -67,7 +68,7 @@ fun SignIn(
                 login = it
             },
             //  placeholder = { Text(text = "Login") },
-            label = { Text(text = "Login") },
+            label = { MyText(text = "Login") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -80,7 +81,7 @@ fun SignIn(
                 password = it
             },
             // placeholder = { Text(text = "Parol") },
-            label = { Text(text = "Parol") },
+            label = { MyText(text = "Parol") },
             trailingIcon = {
                 IconButton(onClick = {
                     passwordVisibility = !passwordVisibility
@@ -103,10 +104,10 @@ fun SignIn(
             signIn(login, password)
 
         }) {
-            Text(text = "Tasdiqlash", fontSize = 18.sp)
+            MyText(text = "Tasdiqlash", fontSize = 18.sp)
         }
         Spacer(modifier = Modifier.height(25.dp))
-        Text(
+        MyText(
             modifier = Modifier.clickable {
                 signUp()
             },

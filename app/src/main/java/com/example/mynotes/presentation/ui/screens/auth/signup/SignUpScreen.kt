@@ -20,6 +20,7 @@ import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.presentation.ui.directions.common.UiState
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.progress.MyCircularProgressBar
+import com.example.mynotes.presentation.utils.components.text.MyText
 
 class SignUpScreen : AppScreen() {
     @Composable
@@ -50,7 +51,7 @@ fun SignUp(
 
     }
     Scaffold(modifier = Modifier.fillMaxSize(),
-        topBar = { Text(text = "Sign Up") }
+        topBar = { MyText(text = "Sign Up") }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -64,7 +65,7 @@ fun SignUp(
                     login = it
                 },
                 //  placeholder = { Text(text = "Login") },
-                label = { Text(text = "Login") },
+                label = { MyText(text = "Login") },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
@@ -76,7 +77,7 @@ fun SignUp(
                 onValueChange = { it ->
                     password1 = it
                 },
-                label = { Text(text = "Parol") },
+                label = { MyText(text = "Parol") },
                 trailingIcon = {
                     IconButton(onClick = {
                         passwordVisibility = !passwordVisibility
@@ -99,7 +100,7 @@ fun SignUp(
                 onValueChange = { it ->
                     password2 = it
                 },
-                label = { Text(text = "Parol") },
+                label = { MyText(text = "Parol") },
                 trailingIcon = {
                     IconButton(onClick = {
                         passwordVisibility = !passwordVisibility
@@ -126,7 +127,7 @@ fun SignUp(
 
 
             }) {
-                Text(text = "Registraciya", fontSize = 18.sp)
+                MyText(text = "Registraciya", fontSize = 18.sp)
             }
         }
     }
