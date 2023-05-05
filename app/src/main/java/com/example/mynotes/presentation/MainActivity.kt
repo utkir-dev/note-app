@@ -3,16 +3,14 @@ package com.example.mynotes.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.*
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.mynotes.presentation.ui.dispatcher.NavigationHandler
-import com.example.mynotes.presentation.ui.screens.auth.signin.SignInScreen
 import com.example.mynotes.presentation.ui.screens.splash.SplashScreen
 import com.example.mynotes.presentation.utils.components.image.MyNotesTheme
+import com.example.mynotes.presentation.utils.theme.ThemeState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -24,8 +22,12 @@ class MainActivity : ComponentActivity() {
     lateinit var navigationHandler: NavigationHandler
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeState.darkModeState.value = when (AppCompatDelegate.getDefaultNightMode()) {
+            AppCompatDelegate.MODE_NIGHT_YES -> true
+            else -> false
+        }
         setContent {
-            MyNotesTheme {
+            MyNotesTheme(darkTheme = ThemeState.darkModeState.value) {
                 Navigator(SplashScreen()) { navigator ->
                     LaunchedEffect(key1 = navigator) {
                         navigationHandler.navigationBuffer
@@ -36,19 +38,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    MyNotesTheme {
-        Greeting("Android")
     }
 }

@@ -17,7 +17,7 @@ import javax.inject.Inject
 class HomeViewModelImp @Inject constructor(
     private val navigator: AppNavigator,
     private val appScreens: AppScreens,
-    private val useCase: com.example.mynotes.domain.use_cases.auth_use_case.SignOutUseCase
+    private val useCase: SignOutUseCase
 ) : ViewModel(), HomeViewModel {
     override fun onEventDispatcher(type: DirectionType) {
         viewModelScope.launch {
