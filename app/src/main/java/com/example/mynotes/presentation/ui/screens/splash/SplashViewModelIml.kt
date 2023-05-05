@@ -3,9 +3,6 @@ package com.example.mynotes.presentation.ui.screens.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mynotes.domain.use_cases.auth_use_case.CheckUserUseCase
-import com.example.mynotes.domain.use_cases.auth_use_case.SignInUseCase
-import com.example.mynotes.presentation.ui.directions.common.DirectionType
-import com.example.mynotes.presentation.ui.screens.auth.signin.SignInDirection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

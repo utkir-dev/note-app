@@ -1,8 +1,7 @@
 package com.example.mynotes.data.repositories.imp
 
+import com.example.common.ResponseResult
 import com.example.mynotes.data.repositories.*
-import com.example.mynotes.domain.models.Response
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
@@ -25,18 +24,18 @@ class AuthRepositoryImp @Inject constructor(
     ): SignUpResponse {
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
-            Response.Success(true)
+            com.example.common.ResponseResult.Success(true)
         } catch (e: Exception) {
-            Response.Failure(e)
+            com.example.common.ResponseResult.Failure(e)
         }
     }
 
     override suspend fun sendEmailVerification(): SendEmailVerificationResponse {
         return try {
             auth.currentUser?.sendEmailVerification()?.await()
-            Response.Success(true)
+            com.example.common.ResponseResult.Success(true)
         } catch (e: Exception) {
-            Response.Failure(e)
+            com.example.common.ResponseResult.Failure(e)
         }
     }
 
@@ -46,27 +45,27 @@ class AuthRepositoryImp @Inject constructor(
     ): SignInResponse {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
-            Response.Success(true)
+            com.example.common.ResponseResult.Success(true)
         } catch (e: Exception) {
-            Response.Failure(e)
+            com.example.common.ResponseResult.Failure(e)
         }
     }
 
     override suspend fun reloadFirebaseUser(): ReloadUserResponse {
         return try {
             auth.currentUser?.reload()?.await()
-            Response.Success(true)
+            com.example.common.ResponseResult.Success(true)
         } catch (e: Exception) {
-            Response.Failure(e)
+            com.example.common.ResponseResult.Failure(e)
         }
     }
 
     override suspend fun sendPasswordResetEmail(email: String): SendPasswordResetEmailResponse {
         return try {
             auth.sendPasswordResetEmail(email).await()
-            Response.Success(true)
+            com.example.common.ResponseResult.Success(true)
         } catch (e: Exception) {
-            Response.Failure(e)
+            com.example.common.ResponseResult.Failure(e)
         }
     }
 
@@ -76,9 +75,9 @@ class AuthRepositoryImp @Inject constructor(
     override suspend fun revokeAccess(): RevokeAccessResponse {
         return try {
             auth.currentUser?.delete()?.await()
-            Response.Success(true)
+            com.example.common.ResponseResult.Success(true)
         } catch (e: Exception) {
-            Response.Failure(e)
+            com.example.common.ResponseResult.Failure(e)
         }
     }
 

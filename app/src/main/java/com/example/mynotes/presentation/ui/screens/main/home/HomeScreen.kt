@@ -1,25 +1,34 @@
 package com.example.mynotes.presentation.ui.screens.main.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.image.*
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.theme.background1
 
 class HomeScreen() : AppScreen() {
 
@@ -53,7 +62,8 @@ fun ShowHome(dispatcher: (DirectionType) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary),
+            // .background(color = MaterialTheme.colorScheme.primary),
+            .background(brush = background1()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
@@ -146,12 +156,14 @@ fun MenuBig(
         modifier = Modifier
             .fillMaxWidth(widthPercent)
             .padding(vertical = verticalPadding, horizontal = horizontalPadding)
+            .clip(RoundedCornerShape(18.dp))
+            .border(width = 2.dp, color = Border_color, shape = RoundedCornerShape(18.dp))
             .clickable {
                 dispatcher(DirectionType.BALANCE)
             },
         // shape = RoundedCornerShape(15.dp),
         shadowElevation = 6.dp,
-        color = MaterialTheme.colorScheme.background
+        color = Background_item
     ) {
         Text(
             text = text,
@@ -160,7 +172,8 @@ fun MenuBig(
                 .padding(vertical = verticalPadding)
                 .padding(vertical = verticalPadding),
             textAlign = TextAlign.Center,
-            fontSize = 18.sp
+            fontSize = 18.sp,
+            color = Text_color
         )
 
     }

@@ -2,7 +2,7 @@ package com.example.mynotes.presentation.ui.screens.auth.signin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mynotes.domain.models.Response
+import com.example.common.ResponseResult
 import com.example.mynotes.domain.use_cases.auth_use_case.SignInUseCase
 import com.example.mynotes.presentation.ui.directions.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,13 +21,13 @@ class SignInViewModelImp @Inject constructor(
         uiState.value = UiState.Progress
         viewModelScope.launch {
             when (useCase.invoke(login, password)) {
-                is Response.Loading -> {
+                is ResponseResult.Loading -> {
                     uiState.value = UiState.Progress
                 }
-                is Response.Failure -> {
+                is ResponseResult.Failure -> {
                     uiState.value = UiState.Error("Xatolik")
                 }
-                is Response.Success -> {
+                is ResponseResult.Success<*> -> {
                     direction.replaceToHome()
                 }
             }

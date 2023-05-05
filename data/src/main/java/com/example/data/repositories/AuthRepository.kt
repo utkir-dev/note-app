@@ -1,16 +1,16 @@
 package com.example.mynotes.data.repositories
 
-import com.example.mynotes.domain.models.Response
+import com.example.common.ResponseResult
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
-typealias SignUpResponse = Response<Boolean>
-typealias SendEmailVerificationResponse = Response<Boolean>
-typealias SignInResponse = Response<Boolean>
-typealias ReloadUserResponse = Response<Boolean>
-typealias SendPasswordResetEmailResponse = Response<Boolean>
-typealias RevokeAccessResponse = Response<Boolean>
+typealias SignUpResponse = ResponseResult<Boolean>
+typealias SendEmailVerificationResponse = ResponseResult<Boolean>
+typealias SignInResponse = ResponseResult<Boolean>
+typealias ReloadUserResponse = ResponseResult<Boolean>
+typealias SendPasswordResetEmailResponse = ResponseResult<Boolean>
+typealias RevokeAccessResponse = ResponseResult<Boolean>
 typealias AuthStateResponse = StateFlow<Boolean>
 
 interface AuthRepository {
