@@ -15,6 +15,16 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation": "$projectDir/schemas".toString(),
+                        "room.incremental"   : "true"
+                ]
+            }
+        }
     }
 
     buildTypes {
@@ -42,12 +52,15 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
 
     // Firebase
-    implementation 'com.google.firebase:firebase-auth-ktx:21.3.0'
+    implementation 'com.google.firebase:firebase-auth-ktx:22.0.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.6.0'
 
 
     // Room components
     implementation "androidx.room:room-ktx:2.5.1"
+    implementation "androidx.room:room-runtime:2.5.1"
     kapt "androidx.room:room-compiler:2.5.1"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.20"
     androidTestImplementation "androidx.room:room-testing:2.5.1"
 
 }

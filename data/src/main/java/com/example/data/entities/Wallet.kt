@@ -1,4 +1,4 @@
-package com.example.mynotes.data.entities
+package com.example.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 data class Wallet(
     @PrimaryKey
     val id: String,
-    val ownerId: String,
-    val currencyId: String,
+    var ownerId: String,
+    var currencyId: String,
     var balance: Double,
     var date: Long,
     var uploaded: Boolean = false

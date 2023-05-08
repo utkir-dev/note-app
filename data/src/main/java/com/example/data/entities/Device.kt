@@ -1,4 +1,4 @@
-package com.example.mynotes.data.entities
+package com.example.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -8,6 +8,6 @@ data class Device(
     @PrimaryKey
     val id: String,
     var name: String,
-    val model: String,
+    var model: String,
     var date: Long
 )

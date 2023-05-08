@@ -1,4 +1,4 @@
-package com.example.mynotes.data.entities
+package com.example.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 data class Person(
     @PrimaryKey
     val id: String,
-    val name: String,
-    val surname: String,
+    var name: String,
+    var surname: String,
     var address: String,
     var date: Long,
     var uploaded: Boolean = false

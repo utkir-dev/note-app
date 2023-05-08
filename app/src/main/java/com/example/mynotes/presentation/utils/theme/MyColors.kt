@@ -11,6 +11,7 @@ data class MyColors(
     val backgroundBrush: Brush = Brush.verticalGradient(
         colors = listOf(Color(0xFFD9D9D9), Color(0xFFD9D9D9))
     ),
+    val backgroundDialog: Color = Color.Unspecified,
     val backgroundItem: Color = Color.Unspecified,
     val backgroundEditText: Color = Color.Unspecified,
     val borderColor: Color = Color.Unspecified,

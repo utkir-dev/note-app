@@ -44,7 +44,7 @@ class HomeDirectionImpl @Inject constructor(
     }
 
     override suspend fun navigateToCurrencies() {
-
+        navigator.navigateTo(appScreens.currencyScreen())
     }
 
     override suspend fun navigateToHistory() {

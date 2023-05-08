@@ -1,7 +1,6 @@
-package com.example.mynotes.data.repositories.imp
+package com.example.data.repositories.impl
 
-import com.example.common.ResponseResult
-import com.example.mynotes.data.repositories.*
+import com.example.data.repositories.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope

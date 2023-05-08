@@ -29,10 +29,11 @@ private val LocalCustomColors = staticCompositionLocalOf { MyColors() }
 
 private val LightCustomColors = MyColors(
     textColor = Color(0xFF000000),
-    subTextColor = Color(0xFF696969),
+    subTextColor = Color(0xFF9E9E9E),
     backgroundBrush = Brush.verticalGradient(
         colors = listOf(Color(0xFFD9D9D9), Color(0xFFD9D9D9))
     ),
+    backgroundDialog = Color(0xFFFFFFFF),
     backgroundItem = Color(0xFFFFFFFF),
     backgroundEditText = Color(0xFFD9D9D9),
     borderColor = Color(0xFF948888),
@@ -45,7 +46,7 @@ private val LightCustomColors = MyColors(
 
 private val DarkCustomColors = MyColors(
     textColor = Color(0xFFFFFFFF),
-    subTextColor = Color(0xFFE4E4E4),
+    subTextColor = Color(0xFFCFCFCF),
     backgroundBrush = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF4F7FA3),
@@ -53,6 +54,7 @@ private val DarkCustomColors = MyColors(
             Color(0xFF333940)
         )
     ),
+    backgroundDialog = Color(0xFF4F7FA3),
     backgroundItem = Color(0xFF405C72),
     backgroundEditText = Color(0xFFD9D9D9),
     borderColor = Color(0xFF807575),

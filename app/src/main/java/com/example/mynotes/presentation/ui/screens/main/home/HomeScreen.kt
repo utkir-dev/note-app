@@ -1,10 +1,8 @@
 package com.example.mynotes.presentation.ui.screens.main.home
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -14,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +22,7 @@ import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.DialogCurrency
 import com.example.mynotes.presentation.utils.components.image.*
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.theme.ThemeState
@@ -41,6 +39,7 @@ class HomeScreen() : AppScreen() {
 
 @Composable
 fun ShowHome(dispatcher: (DirectionType) -> Unit) {
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -53,7 +52,11 @@ fun ShowHome(dispatcher: (DirectionType) -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { dispatcher(DirectionType.SIGNOUT) }) {
+                IconButton(onClick = {
+                    dispatcher(DirectionType.SIGNOUT)
+
+
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_menu),
                         contentDescription = "menu icon",
@@ -116,7 +119,7 @@ fun ShowHome(dispatcher: (DirectionType) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 MenuBig("Hamyonlar", dispatcher, 0.5f)
-                MenuBig("Valyutalar", dispatcher)
+                MenuBig("Valyutalar", dispatcher, directionType = DirectionType.CURRENCIES)
             }
         }
         item {
@@ -157,6 +160,7 @@ fun MenuBig(
     widthPercent: Float = 1f,
     verticalPadding: Dp = 10.dp,
     horizontalPadding: Dp = 10.dp,
+    directionType: DirectionType = DirectionType.BALANCE,
 ) {
     Surface(
         modifier = Modifier
@@ -169,9 +173,8 @@ fun MenuBig(
                 shape = RoundedCornerShape(18.dp)
             )
             .clickable {
-                dispatcher(DirectionType.BALANCE)
+                dispatcher(directionType)
             },
-        // shape = RoundedCornerShape(15.dp),
         shadowElevation = 6.dp,
         color = MaterialTheme.customColors.backgroundItem
     ) {

@@ -21,7 +21,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
     @Provides
     fun provideSignUpDirection(
         navigator: AppNavigator
@@ -30,7 +29,6 @@ object AppModule {
             navigator
         )
     }
-
 
     @Provides
     fun provideSplashDirection(

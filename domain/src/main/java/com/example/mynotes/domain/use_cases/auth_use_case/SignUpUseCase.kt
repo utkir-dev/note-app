@@ -1,6 +1,6 @@
 package com.example.mynotes.domain.use_cases.auth_use_case
 
-import com.example.mynotes.data.repositories.AuthRepository
+import com.example.data.repositories.AuthRepository
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(

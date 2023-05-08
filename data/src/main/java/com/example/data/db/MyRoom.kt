@@ -1,18 +1,18 @@
-package com.example.mynotes.data.db.room
+package com.example.data.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.mynotes.data.db.dao.CurrencyDao
-import com.example.mynotes.data.db.dao.WalletDao
-import com.example.mynotes.data.entities.Currency
+import androidx.room.TypeConverters
+import com.example.data.entities.Currency
+import com.google.common.base.Converter
 
-@Database(entities = [Currency::class], version = 1, exportSchema = false)
+@Database(entities = [Currency::class], version = 1, exportSchema = true)
 abstract class MyRoom : RoomDatabase() {
 
     abstract fun CurrencyDao(): CurrencyDao
-    abstract fun WalletDao(): WalletDao
+    // abstract fun WalletDao(): WalletDao
 
     companion object {
         @Volatile

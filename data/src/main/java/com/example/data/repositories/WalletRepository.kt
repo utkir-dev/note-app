@@ -1,4 +1,4 @@
-package com.example.mynotes.data.repositories
+package com.example.data.repositories
 
 interface WalletRepository {
 }

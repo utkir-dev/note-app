@@ -3,6 +3,7 @@ package com.example.mynotes.presentation.ui.screens.auth.signup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.ResponseResult
+import com.example.mynotes.domain.use_cases.auth_use_case.SignUpUseCase
 import com.example.mynotes.presentation.ui.directions.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModelImp @Inject constructor(
     private val direction: SignUpDirection,
-    private val useCase: com.example.mynotes.domain.use_cases.auth_use_case.SignUpUseCase
+    private val useCase: SignUpUseCase
 ) : ViewModel(), SignUpViewModel {
 
     override val uiState = MutableStateFlow<UiState>(UiState.Default)

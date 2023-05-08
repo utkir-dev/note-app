@@ -1,4 +1,4 @@
-package com.example.mynotes.data.db.dao
+package com.example.data.db
 
 import androidx.room.Dao
 

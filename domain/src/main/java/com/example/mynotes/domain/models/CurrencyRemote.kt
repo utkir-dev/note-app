@@ -6,3 +6,4 @@ data class CurrencyRemote(
     var rate: Double,
     var date: Long
 )
+

@@ -1,4 +1,4 @@
-package com.example.mynotes.data.repositories
+package com.example.data.repositories
 
 import com.example.common.ResponseResult
 import com.google.firebase.auth.FirebaseUser

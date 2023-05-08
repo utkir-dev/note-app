@@ -30,7 +30,6 @@ class SignUpScreen : AppScreen() {
         val state = viewModel.uiState.collectAsState()
         SignUp(dispatcher,state)
     }
-
 }
 
 @Composable

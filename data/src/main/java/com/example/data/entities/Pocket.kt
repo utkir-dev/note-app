@@ -1,4 +1,4 @@
-package com.example.mynotes.data.entities
+package com.example.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class Pocket(
     @PrimaryKey
     val id: String,
-    val personId: String,
+    var personId: String,
     var name: String,
     var date: Long,
     var uploaded: Boolean = false

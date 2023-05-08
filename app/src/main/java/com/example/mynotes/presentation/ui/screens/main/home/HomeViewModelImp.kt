@@ -36,7 +36,9 @@ class HomeViewModelImp @Inject constructor(
                 DirectionType.CREDITORS -> {}
                 DirectionType.DEBETORS -> {}
                 DirectionType.POCKETS -> {}
-                DirectionType.CURRENCIES -> {}
+                DirectionType.CURRENCIES -> {
+                    navigator.navigateTo(appScreens.currencyScreen())
+                }
                 DirectionType.HISTORY -> {}
 
                 DirectionType.BACK -> {
