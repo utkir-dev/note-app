@@ -1,8 +1,7 @@
 package com.example.mynotes.presentation.utils.items
 
 
-import android.util.Log
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -14,21 +13,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mynotes.R
+import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 
 @Composable
-fun ItemCommon(
-    text: String,
+fun ItemCurrency(
+    currency: CurrencyDomain,
     color: Color = MaterialTheme.customColors.textColor,
     onItemClicked: () -> Unit,
     onMenuMoreClicked: (Offset) -> Unit,
@@ -47,30 +47,32 @@ fun ItemCommon(
             contentDescription = "item common",
             tint = color
         )
-        MyText(
+        Column(modifier = Modifier.padding(5.dp)) {
+            MyText(
+                text = currency.name,
+                modifier = Modifier.padding(bottom = 3.dp),
+                textAlign = TextAlign.Start,
+                fontSize = 20.sp,
+                color = color,
+                fontWeight = FontWeight.Bold
+            )
+            MyText(
+                text = "1$ = ${currency.rate}",
+                textAlign = TextAlign.Start,
+                fontSize = 16.sp,
+                color = color
+            )
+        }
 
-            text = text,
-            modifier = Modifier
-                .padding(5.dp),
-            textAlign = TextAlign.Center,
-            fontSize = 18.sp,
-            color = color
-        )
         Spacer(modifier = Modifier.weight(1.0f))
         IconButton(
             modifier = Modifier
                 .onGloballyPositioned { layoutCoordinates ->
                     val rect = layoutCoordinates.boundsInRoot()
                     offset = rect.bottomRight
-                    Log.d(
-                        "offset",
-                        "onGloballyPositioned : top= ${rect.topLeft}  bottom= ${rect.bottomRight}"
-                    )
-
                 }
                 .padding(start = 5.dp),
             onClick = {
-                Log.d("offset", "offset : x= ${offset.x}  y= ${offset.y}")
                 onMenuMoreClicked(offset)
             }) {
             Icon(
@@ -80,5 +82,4 @@ fun ItemCommon(
             )
         }
     }
-
 }

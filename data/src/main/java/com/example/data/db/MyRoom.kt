@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.data.entities.Currency
+import com.example.data.db.entities.Currency
 import com.google.common.base.Converter
 
 @Database(entities = [Currency::class], version = 1, exportSchema = true)

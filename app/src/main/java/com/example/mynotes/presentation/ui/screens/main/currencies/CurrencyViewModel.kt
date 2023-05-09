@@ -1,8 +1,10 @@
 package com.example.mynotes.presentation.ui.screens.main.currencies
 
+import com.example.mynotes.domain.models.CurrencyDomain
+
 
 interface CurrencyViewModel {
-    fun add(name: String, rate: Double)
+    fun add(currency: CurrencyDomain)
     fun update()
-    fun delete()
+    fun delete(currency: CurrencyDomain)
 }

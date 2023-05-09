@@ -1,6 +1,6 @@
 package com.example.mynotes.domain.models
 
-data class TranzactionRemote(
+data class TranzactionDomain(
     val id: String,
     var fromId: String,
     var toId: String,

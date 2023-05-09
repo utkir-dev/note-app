@@ -4,7 +4,6 @@ import javax.inject.Inject
 
 class CurrencyUseCases @Inject constructor(
     var add: CurrencyAdd,
-    var update: CurrencyUpdate,
     var delete: CurrencyDelete,
     var getOne: CurrencyGet,
     var getAll: CurrencyGetAll

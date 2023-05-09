@@ -1,15 +1,18 @@
 package com.example.data.repositories.impl
 
+import android.util.Log
 import com.example.data.constants.Const.CURRENCIES
 import com.example.data.db.CurrencyDao
-import com.example.data.entities.Currency
+import com.example.data.db.entities.Currency
 import com.example.data.repositories.CurrencyRepository
 import com.example.data.repositories.RemoteDatabase
 import com.google.firebase.firestore.ktx.firestore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CurrencyRepositoryImp @Inject constructor(
@@ -17,28 +20,26 @@ class CurrencyRepositoryImp @Inject constructor(
     private val local: CurrencyDao
 ) : CurrencyRepository {
 
-    override suspend fun add(name: String, rate: Double): Long {
-        val currency = Currency(
-            id = UUID.randomUUID().toString(),
-            name = name,
-            rate = rate,
-            date = System.currentTimeMillis()
-        )
-
+    override suspend fun add(currency: Currency): Long {
+        var result = local.add(currency)
         val dbRemote = remote.storageRef.firestore.collection(CURRENCIES)
         var remoteTask = false
+        Log.d("aaa", "remoteTask1 = $remoteTask")
+
         coroutineScope {
-            val task1 = async {
-                dbRemote.document(currency.id).set(currency).addOnCompleteListener {
+            val job1 = async {
+                dbRemote.document(currency.id).set(currency.toRemote()).addOnCompleteListener {
                     if (it.isSuccessful) {
                         remoteTask = true
-                    }
-                }
-            }
-            task1.await()
-        }
 
-        return local.add(currency)
+                    }
+                }.await()
+                local.add(currency.copy(uploaded = true))
+                Log.d("aaa", "remoteTask2 = $remoteTask")
+            }
+            return@coroutineScope
+        }
+        return result
     }
 
     override suspend fun update(currency: Currency): Int {
@@ -46,7 +47,7 @@ class CurrencyRepositoryImp @Inject constructor(
         var remoteTask = false
         coroutineScope {
             val task1 = async {
-                dbRemote.document(currency.id).set(currency).addOnCompleteListener {
+                dbRemote.document(currency.id).set(currency.toRemote()).addOnCompleteListener {
                     if (it.isSuccessful) {
                         remoteTask = true
                     }
@@ -60,7 +61,19 @@ class CurrencyRepositoryImp @Inject constructor(
     }
 
     override suspend fun delete(currency: Currency): Int {
-        return local.delete(currency)
+        val dbRemote = remote.storageRef.firestore.collection(CURRENCIES)
+        var remoteTask = false
+        coroutineScope {
+            val task1 = async {
+                dbRemote.document(currency.id)
+                    .delete().addOnSuccessListener {
+                        remoteTask = true
+                    }
+            }
+            task1.await()
+
+        }
+        return local.delete(currency.id)
 
     }
 

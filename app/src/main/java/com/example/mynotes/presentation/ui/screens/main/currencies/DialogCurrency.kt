@@ -1,7 +1,6 @@
 package com.example.mynotes.presentation.utils.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -19,28 +17,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.presentation.utils.components.buttons.MyButton
 import com.example.mynotes.presentation.utils.components.image.*
 import com.example.mynotes.presentation.utils.components.text.MyText
+import java.util.*
 
 @Composable
-fun DialogCurrency(onDismiss: (String, Double, Boolean) -> Unit) {
+fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Unit) {
     //val context = LocalContext.current
     var textValue by rememberSaveable {
-        mutableStateOf("")
+        mutableStateOf(currency.name)
     }
     var textValidation by rememberSaveable {
         mutableStateOf(false)
     }
     var rateValue by rememberSaveable {
-        mutableStateOf("")
+        mutableStateOf(currency.rate.toString())
     }
     var rateValidation by rememberSaveable {
         mutableStateOf(false)
     }
+
     Dialog(
         onDismissRequest = {
-            onDismiss(textValue, rateValue.toDouble(), false)
+            onDismiss(null)
         }, properties = DialogProperties(
             dismissOnBackPress = false,
             dismissOnClickOutside = false
@@ -139,7 +140,7 @@ fun DialogCurrency(onDismiss: (String, Double, Boolean) -> Unit) {
                 )
                 Row(modifier = Modifier.fillMaxWidth()) {
                     MyButton(
-                        onClick = { onDismiss("", 0.0, false) },
+                        onClick = { onDismiss(null) },
                         text = "Bekor",
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -157,7 +158,15 @@ fun DialogCurrency(onDismiss: (String, Double, Boolean) -> Unit) {
                             textValidation = validateName(textValue)
                             rateValidation = validateRate(rateValue)
                             if (!textValidation && !rateValidation) {
-                                onDismiss(textValue, rateValue.toDouble(), true)
+                                val currencyNew = if (currency.isValid()) {
+                                    currency.copy(name = textValue, rate = rateValue.toDouble())
+                                } else CurrencyDomain(
+                                    id = UUID.randomUUID().toString(),
+                                    name = textValue,
+                                    rate = rateValue.toDouble(),
+                                    date = System.currentTimeMillis()
+                                )
+                                onDismiss(currencyNew)
                             }
                         },
                         text = "Tasdiq",

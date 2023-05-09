@@ -1,6 +1,5 @@
 package com.example.mynotes.presentation.ui.screens.main.currencies
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -18,22 +17,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
-import com.example.mynotes.domain.models.CurrencyRemote
+import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.DialogCurrency
 import com.example.mynotes.presentation.utils.components.buttons.ButtonAdd
+import com.example.mynotes.presentation.utils.components.dialogs.DialogConfirm
 import com.example.mynotes.presentation.utils.components.dialogs.PopupDialog
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
-import com.example.mynotes.presentation.utils.items.ItemCommon
+import com.example.mynotes.presentation.utils.items.ItemCurrency
+import com.example.mynotes.presentation.utils.types.PopupType
 
 class CurrencyScreen : AppScreen() {
     @Composable
@@ -47,7 +46,7 @@ class CurrencyScreen : AppScreen() {
 @Composable
 fun ShowCurrencies(
     viewModel: CurrencyViewModelImp,
-    list: State<List<CurrencyRemote>>
+    list: State<List<CurrencyDomain>>
 ) {
     var visibilityPopup by remember {
         mutableStateOf(false)
@@ -55,21 +54,46 @@ fun ShowCurrencies(
     var offsetPopup by remember {
         mutableStateOf(Offset(0f, 0f))
     }
-    var visibilityDialog by rememberSaveable {
+    var visibilityDialog by remember {
         mutableStateOf(false)
     }
-    var textPopup by remember {
-        mutableStateOf("")
+    var visibilityConfirm by remember {
+        mutableStateOf(false)
     }
+    var currency by remember { mutableStateOf(CurrencyDomain("")) }
+
     if (visibilityPopup) {
-        PopupDialog(textPopup, offsetPopup)
+        PopupDialog(currency.name, offsetPopup) { type ->
+            when (type) {
+                PopupType.EDIT -> {
+                    visibilityDialog = true
+                }
+                PopupType.DELETE -> {
+                    visibilityConfirm = true
+                }
+                PopupType.CANCEL -> {
+                    visibilityPopup = false
+                }
+            }
+            visibilityPopup = false
+        }
     }
     if (visibilityDialog) {
-        DialogCurrency { currencyName, currencyRate, isValid ->
-            if (isValid) {
-                viewModel.add(currencyName, currencyRate)
+        DialogCurrency(currency) { cur ->
+            cur?.let { currency = it }
+            if (currency.isValid()) {
+                viewModel.add(currency)
             }
             visibilityDialog = false
+        }
+    }
+    if (visibilityConfirm) {
+        DialogConfirm(clazz = currency) { boo, clazz ->
+            val cur = clazz as CurrencyDomain
+            if (boo && cur.isValid()) {
+                viewModel.delete(cur)
+            }
+            visibilityConfirm = false
         }
     }
     LazyColumn(
@@ -78,6 +102,9 @@ fun ShowCurrencies(
             .pointerInput("screenToutch") {
                 detectTapGestures(
                     onPress = {
+                        visibilityPopup = false
+                    },
+                    onTap = {
                         visibilityPopup = false
                     }
                 )
@@ -119,18 +146,16 @@ fun ShowCurrencies(
             }
         }
 
-        item { ItemCommon(text = "Dollar US", onItemClicked = {}, onMenuMoreClicked = {}) }
-
         itemsIndexed(list.value) { index, value ->
-            ItemCommon(text = value.name, onItemClicked = {}, onMenuMoreClicked = {
-                offsetPopup = it //Offset(x = it.x, y = it.y * (index + 1))
-                textPopup = value.name
-                visibilityPopup = !visibilityPopup
-
+            ItemCurrency(currency = value, onItemClicked = {}, onMenuMoreClicked = { offset ->
+                offsetPopup = offset
+                currency = value
+                visibilityPopup = true
             })
         }
         item {
             ButtonAdd(text = "Yangi valyuta qo'shish", onClicked = {
+                currency = CurrencyDomain("")
                 visibilityDialog = true
             })
         }

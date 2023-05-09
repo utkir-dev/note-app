@@ -5,25 +5,30 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.example.mynotes.R
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.types.PopupType
 
 @Composable
-fun PopupDialog(text: String, offset: Offset) {
-    val popupWidth = 180.dp
-    val popupHeight = 150.dp
+fun PopupDialog(text: String, offset: Offset, onSelected: (PopupType) -> Unit) {
+    val popupWidth = 220.dp
+    val popupHeight = 230.dp
     val pxValue = LocalDensity.current.run { popupWidth.toPx() }
     Popup(
         offset = IntOffset((offset.x - pxValue).toInt(), offset.y.toInt()),
@@ -33,10 +38,13 @@ fun PopupDialog(text: String, offset: Offset) {
         Box(
             Modifier
                 .size(popupWidth, popupHeight)
-                .padding(top = 5.dp)
-                .background(MaterialTheme.customColors.backgroundDialog, RoundedCornerShape(10.dp))
+                .padding(5.dp)
+                .background(
+                    MaterialTheme.customColors.backgroundDialog,
+                    RoundedCornerShape(10.dp)
+                )
                 .border(
-                    1.dp,
+                    2.dp,
                     color = MaterialTheme.customColors.borderColor,
                     RoundedCornerShape(10.dp)
                 )
@@ -44,43 +52,91 @@ fun PopupDialog(text: String, offset: Offset) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp),
-                horizontalAlignment = Alignment.Start,
+                    .size(popupWidth, popupHeight)
+                    .padding(5.dp)
+                    .background(
+                        MaterialTheme.customColors.backgroundDialog,
+                        RoundedCornerShape(10.dp)
+                    )
+                    .padding(horizontal = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 MyText(
                     text = text,
                     color = MaterialTheme.customColors.textColor,
-                    modifier = Modifier.padding(vertical = 5.dp),
-                    fontSize = 16.sp
+                    modifier = Modifier
+                        .padding(7.dp),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp)
+                        .padding(vertical = 3.dp)
+                        .height(2.dp)
                         .background(MaterialTheme.customColors.borderColor)
                 )
-                MyText(
-
-                    text = "O'zgartirish",
-                    color = MaterialTheme.customColors.textColor,
+                Row(
                     modifier = Modifier
-                        .padding(vertical = 5.dp)
+                        .fillMaxWidth()
+                        .clip(shape = RoundedCornerShape(10.dp))
                         .clickable {
-
+                            onSelected(PopupType.EDIT)
                         },
-                    fontSize = 16.sp
-                )
-                MyText(
-                    text = "O'chirish",
-                    color = MaterialTheme.customColors.textColor,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_edit),
+                        contentDescription = "edit icon",
+                        tint = MaterialTheme.customColors.iconColor
+                    )
+                    MyText(
+                        text = "O'zgartirish",
+                        color = MaterialTheme.customColors.textColor,
+                        modifier = Modifier
+                            .padding(7.dp),
+                        fontSize = 16.sp
+                    )
+                }
+                Row(
                     modifier = Modifier
-                        .padding(vertical = 5.dp)
+                        .fillMaxWidth()
+                        .clip(shape = RoundedCornerShape(10.dp))
                         .clickable {
-
+                            onSelected(PopupType.DELETE)
                         },
-                    fontSize = 16.sp
-                )
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_delete),
+                        contentDescription = "edit icon",
+                        tint = MaterialTheme.customColors.iconColor
+                    )
+                    MyText(
+                        text = "O'chirish",
+                        color = MaterialTheme.customColors.textColor,
+                        modifier = Modifier.padding(7.dp),
+                        fontSize = 16.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    MyText(
+                        modifier = Modifier
+                            .clickable {
+                                onSelected(PopupType.CANCEL)
+                            }
+                            .padding(horizontal = 3.dp),
+                        text = "Bekor",
+                        color = MaterialTheme.customColors.subTextColor,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
 
             }
         }

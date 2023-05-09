@@ -2,7 +2,7 @@ package com.example.data.db
 
 import androidx.room.*
 import com.example.common.ResponseResult
-import com.example.data.entities.Currency
+import com.example.data.db.entities.Currency
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -13,8 +13,8 @@ interface CurrencyDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(currency: Currency): Int
 
-    @Delete
-    suspend fun delete(currency: Currency): Int
+    @Query("DELETE FROM currencies WHERE id=:id")
+    suspend fun delete(id: String): Int
 
     @Query("SELECT * FROM currencies WHERE name=:name")
     fun getCurrency(name: String): Flow<Currency>

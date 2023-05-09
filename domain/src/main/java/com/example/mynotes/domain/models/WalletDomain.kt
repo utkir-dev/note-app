@@ -1,6 +1,6 @@
 package com.example.mynotes.domain.models
 
-data class WalletRemote(
+data class WalletDomain(
     val id: String,
     val ownerId: String,
     val currencyId: String,
