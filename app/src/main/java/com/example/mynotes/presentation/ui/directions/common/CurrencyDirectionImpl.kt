@@ -9,8 +9,7 @@ import javax.inject.Inject
 
 @ViewModelScoped
 class CurrencyDirectionImpl @Inject constructor(
-    private val navigator: AppNavigator,
-    private val appScreens: AppScreens
+    private val navigator: AppNavigator
 ) : CurrencyDirection {
     override suspend fun back() {
         navigator.back()

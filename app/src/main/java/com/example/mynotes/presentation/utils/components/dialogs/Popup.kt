@@ -1,5 +1,10 @@
 package com.example.mynotes.presentation.utils.components.dialogs
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,11 +36,15 @@ fun PopupDialog(text: String, offset: Offset, onSelected: (PopupType) -> Unit) {
     val popupWidth = 220.dp
     val popupHeight = 230.dp
     val pxValue = LocalDensity.current.run { popupWidth.toPx() }
+    var visible by remember { mutableStateOf(true) }
+    val density = LocalDensity.current
+
     Popup(
         offset = IntOffset((offset.x - pxValue).toInt(), offset.y.toInt()),
         // alignment = Alignment.CenterEnd,
         properties = PopupProperties()
     ) {
+
         Box(
             Modifier
                 .size(popupWidth, popupHeight)
@@ -47,6 +57,12 @@ fun PopupDialog(text: String, offset: Offset, onSelected: (PopupType) -> Unit) {
                     2.dp,
                     color = MaterialTheme.customColors.borderColor,
                     RoundedCornerShape(10.dp)
+                )
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
                 )
         ) {
             Column(

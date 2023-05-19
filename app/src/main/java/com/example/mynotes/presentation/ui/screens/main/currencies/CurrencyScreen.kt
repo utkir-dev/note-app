@@ -1,5 +1,6 @@
 package com.example.mynotes.presentation.ui.screens.main.currencies
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -7,12 +8,14 @@ import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -21,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.domain.models.CurrencyDomain
@@ -38,16 +42,17 @@ class CurrencyScreen : AppScreen() {
     @Composable
     override fun Content() {
         val viewModel: CurrencyViewModelImp = getViewModel()
-        val list = viewModel.currencies.collectAsState(initial = emptyList())
-        ShowCurrencies(viewModel, list)
+        ShowCurrencies(viewModel)
     }
 }
 
 @Composable
 fun ShowCurrencies(
-    viewModel: CurrencyViewModelImp,
-    list: State<List<CurrencyDomain>>
+    viewModel: CurrencyViewModelImp
+
 ) {
+    val listCurrency by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+
     var visibilityPopup by remember {
         mutableStateOf(false)
     }
@@ -60,7 +65,9 @@ fun ShowCurrencies(
     var visibilityConfirm by remember {
         mutableStateOf(false)
     }
-    var currency by remember { mutableStateOf(CurrencyDomain("")) }
+    var currency by remember {
+        mutableStateOf(CurrencyDomain(""))
+    }
 
     if (visibilityPopup) {
         PopupDialog(currency.name, offsetPopup) { type ->
@@ -79,35 +86,39 @@ fun ShowCurrencies(
         }
     }
     if (visibilityDialog) {
+        visibilityPopup = false
         DialogCurrency(currency) { cur ->
-            cur?.let { currency = it }
-            if (currency.isValid()) {
-                viewModel.add(currency)
+            cur?.let {
+                currency = it
+                if (currency.isValid()) {
+                    // notes.add(currency)
+                    viewModel.add(currency)
+                }
             }
             visibilityDialog = false
         }
     }
     if (visibilityConfirm) {
+        visibilityPopup = false
         DialogConfirm(clazz = currency) { boo, clazz ->
             val cur = clazz as CurrencyDomain
             if (boo && cur.isValid()) {
+                // notes.remove(currency)
                 viewModel.delete(cur)
             }
             visibilityConfirm = false
         }
     }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput("screenToutch") {
-                detectTapGestures(
-                    onPress = {
-                        visibilityPopup = false
-                    },
-                    onTap = {
-                        visibilityPopup = false
-                    }
-                )
+                detectTapGestures(onPress = {
+                    visibilityPopup = false
+                }, onTap = {
+                    visibilityPopup = false
+                })
             }
             .scrollable(
                 orientation = Orientation.Vertical,
@@ -115,11 +126,10 @@ fun ShowCurrencies(
                     visibilityPopup = false
                     //offset += delta
                     delta
-                }
-            )
+                })
             .background(brush = MaterialTheme.customColors.backgroundBrush)
     ) {
-        item {
+        item(key = R.drawable.ic_arrow_back) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,7 +138,7 @@ fun ShowCurrencies(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
-
+                    viewModel.back()
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_back),
@@ -145,15 +155,23 @@ fun ShowCurrencies(
                 )
             }
         }
+        items(items = listCurrency, key = {
+            it.id
+        }) { currencyDomain ->
+            ItemCurrency(
+                currency = currencyDomain,
+                onItemClicked = {
+                    visibilityPopup = false
+                }, onMenuMoreClicked = { offset ->
+                    currency = currencyDomain
+                    offsetPopup = offset
+                    visibilityPopup =
+                        !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true
 
-        itemsIndexed(list.value) { index, value ->
-            ItemCurrency(currency = value, onItemClicked = {}, onMenuMoreClicked = { offset ->
-                offsetPopup = offset
-                currency = value
-                visibilityPopup = true
-            })
+                })
         }
-        item {
+
+        item(key = "add new currency") {
             ButtonAdd(text = "Yangi valyuta qo'shish", onClicked = {
                 currency = CurrencyDomain("")
                 visibilityDialog = true
@@ -161,3 +179,4 @@ fun ShowCurrencies(
         }
     }
 }
+

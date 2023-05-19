@@ -8,7 +8,7 @@ data class CurrencyRemote(
     var rate: Double = 0.0,
     var date: Long = 0
 ) {
-    fun toCurrency() = Currency(
+    fun toLocal() = Currency(
         id = this.id,
         name = this.name,
         rate = this.rate,

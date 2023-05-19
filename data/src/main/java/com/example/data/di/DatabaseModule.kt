@@ -1,20 +1,19 @@
 package com.example.data.di
 
 import android.app.Application
-import com.example.data.db.CurrencyDao
-import com.example.data.db.MyRoom
-import com.example.data.repositories.AuthRepository
-import com.example.data.repositories.CurrencyRepository
-import com.example.data.repositories.RemoteDatabase
+import com.example.data.db.dao.*
+import com.example.data.repositories.impl.*
 import com.example.data.repositories.impl.AuthRepositoryImp
 import com.example.data.repositories.impl.CurrencyRepositoryImp
+import com.example.data.repositories.impl.PocketRepositoryImp
 import com.example.data.repositories.impl.RemoteDatabaseImpl
+import com.example.data.repositories.impl.WalletRepositoryImp
+import com.example.data.repositories.intrefaces.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -32,10 +31,48 @@ object DatabaseModule {
     @Singleton
     fun provideCurrencyRepository(
         remote: RemoteDatabase,
-        db: MyRoom
+        db: MyRoom,
+        auth: AuthRepository
     ): CurrencyRepository = CurrencyRepositoryImp(
         remote = remote,
-        local = db.CurrencyDao()
+        local = db.CurrencyDao(),
+        auth = auth
+    )
+
+    @Provides
+    @Singleton
+    fun providePocketRepository(
+        remote: RemoteDatabase,
+        db: MyRoom,
+        auth: AuthRepository
+    ): PocketRepository = PocketRepositoryImp(
+        remote = remote,
+        local = db.PocketDao(),
+        auth = auth
+    )
+
+    @Provides
+    @Singleton
+    fun provideWalletRepository(
+        remote: RemoteDatabase,
+        db: MyRoom,
+        auth: AuthRepository
+    ): WalletRepository = WalletRepositoryImp(
+        remote = remote,
+        local = db.WalletDao(),
+        auth = auth
+    )
+
+    @Provides
+    @Singleton
+    fun provideTransactionRepository(
+        remote: RemoteDatabase,
+        db: MyRoom,
+        auth: AuthRepository
+    ): TransactionRepository = TransactionRepositoryImp(
+        remote = remote,
+        local = db.TransactionDao(),
+        auth = auth
     )
 
     @Provides
@@ -52,8 +89,16 @@ object DatabaseModule {
     @Singleton
     fun provideDaoCurrency(db: MyRoom): CurrencyDao = db.CurrencyDao()
 
-//    @Provides
-//    @Singleton
-//    fun provideDaoWallet(db: MyRoom): WalletDao = db.WalletDao()
+    @Provides
+    @Singleton
+    fun provideDaoPocket(db: MyRoom): PocketDao = db.PocketDao()
+
+    @Provides
+    @Singleton
+    fun provideDaoWallet(db: MyRoom): WalletDao = db.WalletDao()
+
+    @Provides
+    @Singleton
+    fun provideDaoTransaction(db: MyRoom): TransactionDao = db.TransactionDao()
 
 }

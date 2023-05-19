@@ -1,5 +1,8 @@
 package com.example.mynotes.presentation.utils.components
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,18 +16,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.presentation.utils.components.buttons.MyButton
+import com.example.mynotes.presentation.utils.components.buttons.buttonColors
 import com.example.mynotes.presentation.utils.components.image.*
 import com.example.mynotes.presentation.utils.components.text.MyText
 import java.util.*
 
 @Composable
 fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Unit) {
+
     //val context = LocalContext.current
     var textValue by rememberSaveable {
         mutableStateOf(currency.name)
@@ -49,17 +55,28 @@ fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Uni
     ) {
         Card(
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier
+                .padding(8.dp)
+
         ) {
             Column(
                 Modifier
                     .background(MaterialTheme.customColors.backgroundDialog)
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 MyText(
-                    text = "Yangi valyuta qo'shish",
-                    modifier = Modifier.padding(8.dp),
+                    text = if (currency.name.isEmpty()) "Yangi valyuta qo'shish"
+                    else "${currency.name} valyutani o'zgartirish",
+                    modifier = Modifier
+                        .padding(8.dp),
+                    textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.customColors.textColor
@@ -83,13 +100,7 @@ fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Uni
                         imeAction = ImeAction.Next
                     ),
                     shape = RoundedCornerShape(15.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.customColors.textColor,
-                        focusedBorderColor = MaterialTheme.customColors.subTextColor,
-                        focusedLabelColor = MaterialTheme.customColors.subTextColor,
-                        unfocusedBorderColor = MaterialTheme.customColors.subTextColor,
-                        cursorColor = MaterialTheme.customColors.textColor
-                    )
+                    colors = buttonColors()
                 )
                 MyText(
                     text = if (textValidation) "Valyuta nomini kiriting" else "",
@@ -124,13 +135,7 @@ fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Uni
                             imeAction = ImeAction.Done
                         ),
                         shape = RoundedCornerShape(8.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.customColors.textColor,
-                            focusedBorderColor = MaterialTheme.customColors.subTextColor,
-                            focusedLabelColor = MaterialTheme.customColors.subTextColor,
-                            unfocusedBorderColor = MaterialTheme.customColors.subTextColor,
-                            cursorColor = MaterialTheme.customColors.textColor
-                        )
+                        colors = buttonColors()
                     )
                 }
                 MyText(
@@ -159,7 +164,10 @@ fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Uni
                             rateValidation = validateRate(rateValue)
                             if (!textValidation && !rateValidation) {
                                 val currencyNew = if (currency.isValid()) {
-                                    currency.copy(name = textValue, rate = rateValue.toDouble())
+                                    currency.copy(
+                                        name = textValue,
+                                        rate = rateValue.toDouble()
+                                    )
                                 } else CurrencyDomain(
                                     id = UUID.randomUUID().toString(),
                                     name = textValue,

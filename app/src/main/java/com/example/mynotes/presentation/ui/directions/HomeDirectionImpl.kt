@@ -16,11 +16,11 @@ class HomeDirectionImpl @Inject constructor(
     }
 
     override suspend fun navigateToIncome() {
-
+        navigator.navigateTo(appScreens.incomeScreen())
     }
 
-    override suspend fun navigateToOutIncome() {
-
+    override suspend fun navigateToOutcome() {
+        navigator.navigateTo(appScreens.outcomePocketScreen())
     }
 
     override suspend fun navigateToGetCredit() {
@@ -40,7 +40,7 @@ class HomeDirectionImpl @Inject constructor(
     }
 
     override suspend fun navigateToPockets() {
-
+        navigator.navigateTo(appScreens.pocketScreen())
     }
 
     override suspend fun navigateToCurrencies() {
@@ -48,6 +48,10 @@ class HomeDirectionImpl @Inject constructor(
     }
 
     override suspend fun navigateToHistory() {
+        navigator.navigateTo(appScreens.historyScreen())
+    }
 
+    override suspend fun navigateToSignIn() {
+        navigator.replaceAll(appScreens.signInScreen())
     }
 }

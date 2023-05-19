@@ -1,26 +1,62 @@
 package com.example.mynotes.presentation.ui.screens.main.balance
 
+import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mynotes.presentation.ui.directions.common.DirectionType
-import com.example.mynotes.presentation.ui.dispatcher.AppNavigator
-import com.example.mynotes.presentation.ui.screens.AppScreens
+import com.example.mynotes.domain.models.CurrencyDomain
+import com.example.mynotes.domain.models.WalletDomain
+import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
+import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
+import com.example.mynotes.models.BalanceItem
+import com.example.mynotes.models.PocketItem
+import com.example.mynotes.models.WalletItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class BalanceViewModelImp @Inject constructor(
-    private val navigator: AppNavigator,
-    private val appScreens: AppScreens
+    private val direction: BalanceDirection,
+    private val walletUseCases: WalletUseCases,
+    private val currencyUseCases: CurrencyUseCases
 ) : BalanceViewModel, ViewModel() {
-    override fun onEventDispatcher(type: DirectionType) {
+
+    override val currencies: Flow<List<CurrencyDomain>> = flow {
+        emitAll(currencyUseCases.getAll.invoke())
+    }
+
+    override val wallets: Flow<List<WalletDomain>> = flow {
+        emitAll(walletUseCases.getAll.invoke())
+    }
+    var balance: MutableState<Double> = mutableStateOf(0.0)
+    val flowBalance: Flow<List<BalanceItem>> = flow {
+        combine(wallets, currencies) { w, c ->
+            balance.value = w.sumOf { wallet ->
+                wallet.balance * (1 / c.first { it.id == wallet.currencyId }.rate)
+            }
+            val list = mutableListOf<BalanceItem>()
+            c.forEach { currency ->
+                list.add(BalanceItem(
+                    name = currency.name,
+                    amount = w.filter { it.currencyId == currency.id }.sumOf { it.balance }
+                )
+                )
+            }
+            emit(list)
+        }.collect()
+    }
+
+    override fun back() {
         viewModelScope.launch {
-//            when (type) {
-//                is DirectionType.HOME -> {
-//                    navigator.navigateTo(appScreens.homeScreen())
-//                }
-//                else -> {}
-//            }
+            direction.back()
         }
     }
 }

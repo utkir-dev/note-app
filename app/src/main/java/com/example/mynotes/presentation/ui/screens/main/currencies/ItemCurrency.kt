@@ -1,9 +1,14 @@
 package com.example.mynotes.presentation.utils.items
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.More
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,20 +42,25 @@ fun ItemCurrency(
     iconEndVisibility: Boolean = false,
     directionType: DirectionType = DirectionType.BALANCE,
 ) {
+    Log.d("Item", "ItemCurrency ${currency.name}")
     var offset by remember {
         mutableStateOf(Offset.Infinite)
     }
-    ItemEmptyRow(onItemClicked = {}) {
-        Icon(
-            modifier = Modifier.padding(horizontal = 5.dp),
-            painter = painterResource(id = iconId),
-            contentDescription = "item common",
-            tint = color
-        )
-        Column(modifier = Modifier.padding(5.dp)) {
+    ItemEmptyRow(onItemClicked = {
+        onItemClicked()
+    }) {
+//        Icon(
+//            modifier = Modifier.padding(horizontal = 5.dp),
+//            imageVector = Icons.Default.Person,// painterResource(id = iconId),
+//            contentDescription = "item common",
+//            tint = color
+//        )
+        Column(
+            modifier = Modifier.padding(5.dp)
+        ) {
             MyText(
                 text = currency.name,
-                modifier = Modifier.padding(bottom = 3.dp),
+                modifier = Modifier.padding(bottom = 2.dp),
                 textAlign = TextAlign.Start,
                 fontSize = 20.sp,
                 color = color,
@@ -76,7 +86,7 @@ fun ItemCurrency(
                 onMenuMoreClicked(offset)
             }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_more),
+                painter = painterResource(id = R.drawable.ic_more), //imageVector = Icons.Filled.Menu,
                 contentDescription = "menu more",
                 tint = color
             )

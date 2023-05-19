@@ -6,40 +6,90 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
-import com.example.mynotes.presentation.utils.components.DialogCurrency
-import com.example.mynotes.presentation.utils.components.image.*
+import com.example.mynotes.presentation.ui.screens.block.BlockScreen
+import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.extensions.huminize
+import com.example.mynotes.presentation.utils.items.ItemHistory
 import com.example.mynotes.presentation.utils.theme.ThemeState
+import kotlinx.coroutines.launch
 
 class HomeScreen() : AppScreen() {
 
     @Composable
     override fun Content() {
         val viewModel: HomeViewModelImp = getViewModel()
-        val dispatcher = viewModel::onEventDispatcher
-        ShowHome(dispatcher)
+        ShowDrawer(viewModel)
     }
 }
 
 @Composable
-fun ShowHome(dispatcher: (DirectionType) -> Unit) {
+fun ShowDrawer(viewModel: HomeViewModelImp) {
 
+    val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var width by remember {
+        mutableStateOf(0f)
+    }
+    if (drawerState.isClosed) width = 0f else width = 0.7f
+    // deal, click, drama, cross, have, home, beyond, remind, flat, stand, buffalo, garage
+    val scope = rememberCoroutineScope()
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+                    .fillMaxHeight()
+                    .fillMaxWidth(width)
+            ) {
+                DrawerHeader()
+                DrawerMenuItem(
+                    iconDrawableId = R.drawable.ic_home,
+                    text = "Home",
+                    onItemClick = {
+                        scope.launch { drawerState.close() }
+
+                    }
+                )
+                DrawerMenuItem(
+                    iconDrawableId = R.drawable.ic_settings,
+                    text = "Settings",
+                    onItemClick = {
+                        scope.launch { drawerState.close() }
+                    }
+                )
+            }
+        },
+        content = {
+            ShowHome(viewModel)
+        }
+    )
+}
+
+@Composable
+fun ShowHome(viewModel: HomeViewModelImp) {
+    val dispatcher = viewModel::onEventDispatcher
+    val balance by viewModel.balance.collectAsStateWithLifecycle(0.0)
+    val historyList by viewModel.historyList.collectAsStateWithLifecycle(emptyList())
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -53,9 +103,8 @@ fun ShowHome(dispatcher: (DirectionType) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
-                    dispatcher(DirectionType.SIGNOUT)
-
-
+                    BlockScreen()
+                    //dispatcher(DirectionType.SIGNOUT)
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_menu),
@@ -84,15 +133,15 @@ fun ShowHome(dispatcher: (DirectionType) -> Unit) {
             }
         }
         item {
-            MenuBig("Balans: 5000 $", dispatcher)
+            MenuBig("Balans: ${balance.huminize()} $", dispatcher)
         }
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                MenuBig("Kirim", dispatcher, 0.5f)
-                MenuBig("Chiqim", dispatcher)
+                MenuBig("Kirim", dispatcher, 0.5f, directionType = DirectionType.INCOME)
+                MenuBig("Chiqim", dispatcher, directionType = DirectionType.OUTCOME)
             }
         }
         item {
@@ -106,7 +155,8 @@ fun ShowHome(dispatcher: (DirectionType) -> Unit) {
         }
         item {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 MenuBig("Qarzdorlar", dispatcher, 0.5f)
@@ -118,35 +168,44 @@ fun ShowHome(dispatcher: (DirectionType) -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                MenuBig("Hamyonlar", dispatcher, 0.5f)
+                MenuBig(
+                    "Hamyonlar",
+                    dispatcher,
+                    widthPercent = 0.5f,
+                    directionType = DirectionType.POCKETS
+                )
                 MenuBig("Valyutalar", dispatcher, directionType = DirectionType.CURRENCIES)
             }
         }
         item {
-            Text(
+            MyText(
                 text = "Tarix :  ",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
-                    .background(color = MaterialTheme.colorScheme.background)
                     .padding(horizontal = 10.dp),
-
+                color = MaterialTheme.customColors.textColor,
                 textAlign = TextAlign.Start
             )
         }
-        HistoryList()
+
+        items(items = historyList, key = { it.hashCode() }) { historyItem ->
+            ItemHistory(
+                item = historyItem,
+                onItemClicked = { })
+        }
+
         item {
-            Text(
+            MyText(
                 text = "Hammasini ko'rish  >>",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
-                    .background(color = MaterialTheme.colorScheme.background)
-                    .padding(horizontal = 10.dp)
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
                     .clickable {
-
+                        dispatcher(DirectionType.HISTORY)
                     },
-
+                color = MaterialTheme.customColors.textColor,
                 textAlign = TextAlign.Start
             )
         }
@@ -192,17 +251,42 @@ fun MenuBig(
     }
 }
 
-fun LazyListScope.HistoryList() {
-    items(10) {
+
+@Composable
+fun DrawerHeader() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 64.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
         Text(
-            text = "12.02.2023   Ravshanga   -100$",
-            fontSize = 14.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp)
-                .background(color = MaterialTheme.colorScheme.background)
-                .padding(horizontal = 10.dp),
-            textAlign = TextAlign.End
+            text = "Header",
+            fontSize = 40.sp,
+            color = MaterialTheme.customColors.textColor
         )
     }
 }
+
+
+@Composable
+private fun DrawerMenuItem(
+    iconDrawableId: Int,
+    text: String,
+    onItemClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onItemClick() },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconDrawableId),
+            contentDescription = null,
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = text)
+    }
+}
+

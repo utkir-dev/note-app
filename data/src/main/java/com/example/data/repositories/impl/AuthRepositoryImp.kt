@@ -1,6 +1,6 @@
 package com.example.data.repositories.impl
 
-import com.example.data.repositories.*
+import com.example.data.repositories.intrefaces.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
@@ -10,8 +10,9 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
-class AuthRepositoryImp @Inject constructor(
+internal class AuthRepositoryImp @Inject constructor(
     private val auth: FirebaseAuth
 ) : AuthRepository {
     override val currentUser: FirebaseUser?

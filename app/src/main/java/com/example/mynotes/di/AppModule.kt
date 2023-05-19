@@ -1,13 +1,22 @@
 package com.example.mynotes.di
 
-import android.app.Application
+import com.example.mynotes.presentation.ui.directions.HomeDirectionImpl
 import com.example.mynotes.presentation.ui.directions.SignInDirectionImpl
 import com.example.mynotes.presentation.ui.directions.SignUpDirectionImpl
 import com.example.mynotes.presentation.ui.directions.SplashDirectionImpl
+import com.example.mynotes.presentation.ui.directions.common.*
 import com.example.mynotes.presentation.ui.dispatcher.AppNavigator
 import com.example.mynotes.presentation.ui.screens.AppScreens
 import com.example.mynotes.presentation.ui.screens.auth.signin.SignInDirection
 import com.example.mynotes.presentation.ui.screens.auth.signup.SignUpDirection
+import com.example.mynotes.presentation.ui.screens.main.balance.BalanceDirection
+import com.example.mynotes.presentation.ui.screens.main.currencies.CurrencyDirection
+import com.example.mynotes.presentation.ui.screens.main.history.HistoryDirection
+import com.example.mynotes.presentation.ui.screens.main.home.HomeDirection
+import com.example.mynotes.presentation.ui.screens.main.income.IncomeDirection
+import com.example.mynotes.presentation.ui.screens.main.outcome_currency.OutcomeCurrencyDirection
+import com.example.mynotes.presentation.ui.screens.main.outcome_pocket.OutcomePocketDirection
+import com.example.mynotes.presentation.ui.screens.main.pockets.PocketDirection
 import com.example.mynotes.presentation.ui.screens.splash.SplashDirection
 import dagger.Module
 import dagger.Provides
@@ -31,6 +40,26 @@ object AppModule {
     }
 
     @Provides
+    fun provideHomeDirection(
+        navigator: AppNavigator,
+        appScreens: AppScreens
+    ): HomeDirection {
+        return HomeDirectionImpl(
+            navigator,
+            appScreens
+        )
+    }
+
+    @Provides
+    fun provideBalanceDirection(
+        navigator: AppNavigator,
+    ): BalanceDirection {
+        return BalanceDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
     fun provideSplashDirection(
         navigator: AppNavigator,
         appScreens: AppScreens
@@ -49,6 +78,62 @@ object AppModule {
         return SignInDirectionImpl(
             navigator,
             appScreens
+        )
+    }
+
+    @Provides
+    fun provideCurrencyDirection(
+        navigator: AppNavigator
+    ): CurrencyDirection {
+        return CurrencyDirectionImpl(
+            navigator,
+        )
+    }
+
+    @Provides
+    fun provideIncomeDirection(
+        navigator: AppNavigator
+    ): IncomeDirection {
+        return IncomeDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
+    fun provideOutcomePocketDirection(
+        navigator: AppNavigator,
+        appScreens: AppScreens
+    ): OutcomePocketDirection {
+        return OutcomePocketDirectionImpl(
+            navigator,
+            appScreens
+        )
+    }
+
+    @Provides
+    fun provideOutcomeCurrencyDirection(
+        navigator: AppNavigator
+    ): OutcomeCurrencyDirection {
+        return OutcomeCurrencyDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
+    fun providePocketDirection(
+        navigator: AppNavigator
+    ): PocketDirection {
+        return PocketDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
+    fun provideHistoryDirectionImpl(
+        navigator: AppNavigator
+    ): HistoryDirection {
+        return HistoryDirectionImpl(
+            navigator
         )
     }
 

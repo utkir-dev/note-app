@@ -17,5 +17,6 @@ data class CurrencyDomain(
     )
 
     fun isValid(): Boolean = id.trim().isNotEmpty() && name.trim().isNotEmpty() && rate > 0
+
 }
 

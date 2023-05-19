@@ -1,5 +1,8 @@
 package com.example.mynotes.presentation.utils.components.dialogs
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +13,7 @@ import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,12 +34,22 @@ import com.example.mynotes.presentation.utils.types.PopupType
 @Composable
 fun DialogConfirm(
     clazz: ModelDomain,
+    message: String = "",
     onDismiss: (Boolean, clazz: ModelDomain) -> Unit
 ) {
-    Dialog(onDismissRequest = { onDismiss(false, clazz) }) {
+    Dialog(onDismissRequest = {
+        onDismiss(false, clazz)
+    }) {
         Card(
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier
+                .padding(8.dp)
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
         ) {
             Column(
                 Modifier
@@ -81,7 +95,10 @@ fun DialogConfirm(
                         MyButton(
                             text = "HA",
                             background = Green,
-                            onClick = { onDismiss(true, clazz) }) {
+                            onClick = {
+                                onDismiss(true, clazz)
+                            })
+                        {
                         }
                     }
                 }

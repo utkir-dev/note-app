@@ -5,6 +5,6 @@ import javax.inject.Inject
 class CurrencyUseCases @Inject constructor(
     var add: CurrencyAdd,
     var delete: CurrencyDelete,
-    var getOne: CurrencyGet,
+    var getByWalletIds: CurrencyGetByWalletIds,
     var getAll: CurrencyGetAll
 )

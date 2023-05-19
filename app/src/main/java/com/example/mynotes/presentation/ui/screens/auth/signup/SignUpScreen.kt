@@ -66,7 +66,7 @@ fun SignUp(
                 //  placeholder = { Text(text = "Login") },
                 label = { MyText(text = "Login") },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
                 )
             )

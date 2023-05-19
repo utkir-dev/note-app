@@ -1,9 +1,11 @@
 package com.example.mynotes.presentation
 
 import android.os.Bundle
+import android.transition.Slide
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.navigator.CurrentScreen
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
                             .onEach { it.invoke(navigator) }
                             .collect()
                     }
+
                     CurrentScreen()
                 }
             }

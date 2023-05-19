@@ -10,31 +10,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mynotes.presentation.utils.components.image.customColors
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun ItemEmptyRow(
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    horizontalPading: Dp = 10.dp,
+    verticalPading: Dp = 5.dp,
+    background: Color = MaterialTheme.customColors.backgroundItem,
     onItemClicked: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp, horizontal = 10.dp)
+            .padding(vertical = verticalPading, horizontal = horizontalPading)
             .clip(RoundedCornerShape(18.dp))
-            .background(color = MaterialTheme.customColors.backgroundItem)
+            .background(color = background)
             .border(
                 width = 2.dp,
                 color = MaterialTheme.customColors.borderColor,
                 shape = RoundedCornerShape(18.dp)
             )
             .clickable {
-                //  onItemClicked()
+                onItemClicked()
             }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
+        horizontalArrangement = horizontalArrangement,
         content = content
     )
 }
