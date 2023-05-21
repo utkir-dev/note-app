@@ -40,12 +40,11 @@ fun DialogIncome(
     viewModel: IncomeViewModel, onDismiss: () -> Unit
 ) {
     val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
-
-    val pocket by remember { viewModel.pocket }
-
     val curency by remember {
         viewModel.currency
     }
+    val pocket by remember { viewModel.pocket }
+
 
     var amountTransaction by rememberSaveable {
         mutableStateOf("")
@@ -140,6 +139,9 @@ fun DialogIncome(
                                 onItemClicked = {
                                     visibilityDropDownMenu = !visibilityDropDownMenu
                                 }) {
+                                if (curency.name.isEmpty() && currencies.isNotEmpty()) {
+                                    viewModel.setCurrency(currencies[0])
+                                }
                                 MyText(
                                     text = if (curency.name.isNotEmpty()) curency.name else if (currencies.isNotEmpty()) currencies[0].name else "Dollar",
                                     color = MaterialTheme.customColors.textColor,

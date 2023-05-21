@@ -4,13 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.data.db.entities.Currency
-import com.example.data.db.entities.Pocket
-import com.example.data.db.entities.Transaction
-import com.example.data.db.entities.Wallet
+import com.example.data.db.entities.*
 
 @Database(
-    entities = [Currency::class, Pocket::class, Wallet::class, Transaction::class],
+    entities = [Currency::class, Pocket::class, Person::class, Wallet::class, Transaction::class],
     version = 1,
     exportSchema = true
 )
@@ -18,6 +15,7 @@ abstract class MyRoom : RoomDatabase() {
 
     abstract fun CurrencyDao(): CurrencyDao
     abstract fun PocketDao(): PocketDao
+    abstract fun PersonDao(): PersonDao
     abstract fun WalletDao(): WalletDao
     abstract fun TransactionDao(): TransactionDao
 

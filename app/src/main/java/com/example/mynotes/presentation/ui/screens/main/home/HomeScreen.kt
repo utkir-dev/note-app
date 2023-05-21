@@ -31,6 +31,7 @@ import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.extensions.huminize
 import com.example.mynotes.presentation.utils.items.ItemHistory
 import com.example.mynotes.presentation.utils.theme.ThemeState
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 class HomeScreen() : AppScreen() {
@@ -149,8 +150,8 @@ fun ShowHome(viewModel: HomeViewModelImp) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                MenuBig("Qarz olish", dispatcher, 0.5f)
-                MenuBig("Qarz berish", dispatcher)
+                MenuBig("Qarz olish", dispatcher, 0.5f, directionType = DirectionType.GETCREDIT)
+                MenuBig("Qarz berish", dispatcher, directionType = DirectionType.GIVECREDIT)
             }
         }
         item {
@@ -159,8 +160,13 @@ fun ShowHome(viewModel: HomeViewModelImp) {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                MenuBig("Qarzdorlar", dispatcher, 0.5f)
-                MenuBig("Haqdorlar", dispatcher)
+                MenuBig(
+                    "Ayirboshlash",
+                    dispatcher,
+                    0.5f,
+                    directionType = DirectionType.CONVERTATION
+                )
+                MenuBig("Shaxslar", dispatcher, directionType = DirectionType.PERSONS)
             }
         }
         item {
@@ -177,7 +183,7 @@ fun ShowHome(viewModel: HomeViewModelImp) {
                 MenuBig("Valyutalar", dispatcher, directionType = DirectionType.CURRENCIES)
             }
         }
-        item {
+        if (historyList.isNotEmpty()) item {
             MyText(
                 text = "Tarix :  ",
                 modifier = Modifier
@@ -195,7 +201,7 @@ fun ShowHome(viewModel: HomeViewModelImp) {
                 onItemClicked = { })
         }
 
-        item {
+        if (historyList.isNotEmpty()) item {
             MyText(
                 text = "Hammasini ko'rish  >>",
                 modifier = Modifier

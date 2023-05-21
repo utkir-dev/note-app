@@ -4,14 +4,11 @@ import com.example.data.db.entities.Wallet
 import com.example.data.repositories.intrefaces.TransactionRepository
 import com.example.data.repositories.intrefaces.WalletRepository
 import com.example.mynotes.domain.models.TransactionDomain
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.zip
 import java.util.UUID
 import javax.inject.Inject
 
-class TransactionAdd @Inject constructor(
-    private val repository: TransactionRepository,
-    private val repWallet: WalletRepository
+class TransactionIncomeOutcome @Inject constructor(
+    private val repository: TransactionRepository, private val repWallet: WalletRepository
 ) {
     suspend operator fun invoke(trans: TransactionDomain): Long {
         val fromWallet = repWallet.getByOwnerAndCurrencyId(trans.fromId, trans.currencyId)
@@ -26,20 +23,12 @@ class TransactionAdd @Inject constructor(
                 if (fromWallet.balance >= trans.amount) {
                     transactionFrom(fromWallet, trans)
                 }
-            } else
-            // otkazma
-                if (trans.fromId.isNotEmpty() && trans.toId.isNotEmpty()) {
-                    if (fromWallet.balance >= trans.amount) {
-                        transactionFrom(fromWallet, trans)
-                        transactionTo(toWallet, trans)
-                    }
-                }
+            }
         return repository.add(trans.toLocal())
     }
 
     private suspend fun transactionFrom(
-        wallet: Wallet,
-        trans: TransactionDomain
+        wallet: Wallet, trans: TransactionDomain
     ): Boolean {
         val newWallet = wallet.copy(
             balance = wallet.balance - trans.amount, date = trans.date
@@ -48,8 +37,7 @@ class TransactionAdd @Inject constructor(
     }
 
     private suspend fun transactionTo(
-        wallet: Wallet,
-        trans: TransactionDomain
+        wallet: Wallet, trans: TransactionDomain
     ): Boolean {
         val newWallet = if (wallet == null) {
             Wallet(

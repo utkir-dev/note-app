@@ -86,7 +86,7 @@ fun ShowCurrencies(
         visibilityPopup = false
         DialogPocket(pocket) { cur ->
             cur?.let {
-                pocket = it
+                pocket = it as PocketDomain
                 if (pocket.isValid()) {
                     // notes.add(currency)
                     viewModel.add(pocket)

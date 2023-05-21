@@ -1,6 +1,5 @@
 package com.example.mynotes.presentation.ui.screens.main.outcome_currency
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,7 +12,7 @@ import com.example.mynotes.domain.models.TransactionDomain
 import com.example.mynotes.domain.models.WalletDomain
 import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
 import com.example.mynotes.domain.use_cases.pocket_use_case.PocketUseCases
-import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionAdd
+import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionIncomeOutcome
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +28,7 @@ class OutcomeCurrencyViewModelImp @Inject constructor(
     private val pocketCases: PocketUseCases,
     private val walletUseCases: WalletUseCases,
     private val currencyUseCases: CurrencyUseCases,
-    private val transactionUseCase: TransactionAdd,
+    private val transactionUseCase: TransactionIncomeOutcome,
     private val direction: OutcomeCurrencyDirection
 ) : ViewModel(), OutcomeCurrencyViewModel {
 

@@ -128,13 +128,6 @@ fun ShowIncomes(
                             .padding(horizontal = 10.dp)
                     )
                 }
-//                itemsIndexed(pockets) { index, value ->
-//                    ItemInOutPocket(text = value.name, onItemClicked = {
-//                        viewModel.setPocket(list[index])
-//                        visibilityIncomeDialog = true
-//                    })
-//                }
-
                 itemsIndexed(pockets) { index, pocket ->
                     val chips = pocketItems[pocket.id]?.wallets?.filter { it.balance >= 0.01 }
                         ?: emptyList()

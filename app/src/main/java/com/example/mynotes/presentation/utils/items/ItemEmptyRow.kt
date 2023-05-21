@@ -10,7 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mynotes.presentation.utils.components.image.customColors
@@ -21,23 +24,30 @@ fun ItemEmptyRow(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     horizontalPading: Dp = 10.dp,
     verticalPading: Dp = 5.dp,
+    widthBorder: Dp = 2.dp,
+    colorBoreder: Color = MaterialTheme.customColors.borderColor,
     background: Color = MaterialTheme.customColors.backgroundItem,
-    onItemClicked: () -> Unit,
+    onItemClicked: (Offset) -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
+    var offset = Offset.Infinite
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = verticalPading, horizontal = horizontalPading)
             .clip(RoundedCornerShape(18.dp))
             .background(color = background)
+            .onGloballyPositioned { layoutCoordinates ->
+                val rect = layoutCoordinates.boundsInRoot()
+                offset = rect.topRight
+            }
             .border(
-                width = 2.dp,
-                color = MaterialTheme.customColors.borderColor,
+                width = widthBorder,
+                color = colorBoreder,
                 shape = RoundedCornerShape(18.dp)
             )
             .clickable {
-                onItemClicked()
+                onItemClicked(offset)
             }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,

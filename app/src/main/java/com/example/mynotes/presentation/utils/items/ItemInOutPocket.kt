@@ -27,7 +27,6 @@ import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.extensions.huminize
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ItemInOutPocket(
     text: String,
@@ -55,7 +54,7 @@ fun ItemInOutPocket(
                 text = text,
                 modifier = Modifier
                     .padding(bottom = 3.dp)
-                    .basicMarquee(),
+                ,
                 textAlign = TextAlign.Start,
                 fontSize = 20.sp,
                 color = color,

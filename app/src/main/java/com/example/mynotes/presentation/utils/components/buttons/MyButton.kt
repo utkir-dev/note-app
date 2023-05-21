@@ -10,6 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import com.example.mynotes.presentation.utils.components.image.Gray
 import com.example.mynotes.presentation.utils.components.image.White
 import com.example.mynotes.presentation.utils.components.image.customColors
@@ -20,6 +22,7 @@ fun MyButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = "Button",
+    textSize: TextUnit = 18.sp,
     background: Color = Gray,
     enabled: Boolean = true,
     shape: Shape = ButtonDefaults.shape,
@@ -44,7 +47,7 @@ fun MyButton(
         contentPadding = contentPadding,
         interactionSource = interactionSource,
     ) {
-        MyText(text = text)
+        MyText(text = text, fontSize = textSize)
         content()
     }
 

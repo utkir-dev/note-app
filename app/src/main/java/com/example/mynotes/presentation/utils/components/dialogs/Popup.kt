@@ -47,7 +47,8 @@ fun PopupDialog(text: String, offset: Offset, onSelected: (PopupType) -> Unit) {
 
         Box(
             Modifier
-                .size(popupWidth, popupHeight)
+                .width(popupWidth)
+                //.size(width = popupWidth, height =  popupHeight)
                 .padding(5.dp)
                 .background(
                     MaterialTheme.customColors.backgroundDialog,
@@ -67,8 +68,8 @@ fun PopupDialog(text: String, offset: Offset, onSelected: (PopupType) -> Unit) {
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .size(popupWidth, popupHeight)
+                    .width(popupWidth)
+                    // .size(popupWidth, popupHeight)
                     .padding(5.dp)
                     .background(
                         MaterialTheme.customColors.backgroundDialog,

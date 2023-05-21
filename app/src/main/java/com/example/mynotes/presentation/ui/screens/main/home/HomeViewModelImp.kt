@@ -5,12 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.getTypeText
-import com.example.mynotes.domain.models.CurrencyDomain
-import com.example.mynotes.domain.models.PocketDomain
-import com.example.mynotes.domain.models.TransactionDomain
-import com.example.mynotes.domain.models.WalletDomain
+import com.example.mynotes.domain.models.*
 import com.example.mynotes.domain.use_cases.auth_use_case.SignOutUseCase
 import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
+import com.example.mynotes.domain.use_cases.person_use_case.PersonUseCases
 import com.example.mynotes.domain.use_cases.pocket_use_case.PocketUseCases
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionGetForHome
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionUseCases
@@ -30,6 +28,7 @@ class HomeViewModelImp @Inject constructor(
     private val direction: HomeDirection,
     private val signOutUseCase: SignOutUseCase,
     private val currencyUseCase: CurrencyUseCases,
+    private val personUseCases: PersonUseCases,
     private val walletUseCases: WalletUseCases,
     private val historyUseCase: TransactionGetForHome,
     private val pocketUseCases: PocketUseCases
@@ -38,10 +37,13 @@ class HomeViewModelImp @Inject constructor(
     private val wallets: Flow<List<WalletDomain>> = flow {
         emitAll(walletUseCases.getAll.invoke())
     }
-    private val pockets: Flow<List<PocketDomain>> = flow {
+    val pockets: Flow<List<PocketDomain>> = flow {
         emitAll(pocketUseCases.getAll.invoke())
     }
-    private val currencies: Flow<List<CurrencyDomain>> = flow {
+    val persons: Flow<List<PersonDomain>> = flow {
+        emitAll(personUseCases.getAll.invoke())
+    }
+    val currencies: Flow<List<CurrencyDomain>> = flow {
         emitAll(currencyUseCase.getAll.invoke())
     }
     private val transactions: Flow<List<TransactionDomain>> = flow {
@@ -49,16 +51,28 @@ class HomeViewModelImp @Inject constructor(
     }
 
     val historyList: Flow<List<HistoryItem>> = flow {
-        combine(transactions, pockets, currencies) { t, p, c ->
+        combine(transactions, persons, pockets, currencies) { t, personList, pocketList, c ->
             val list = mutableListOf<HistoryItem>()
             t.forEach { trans ->
+                var nameFrom = ""
+                if (trans.fromId.isNotEmpty()) {
+                    val from = pocketList.filter { it.id == trans.fromId }
+                    nameFrom =
+                        if (from.size > 0) from.first().name + " hamyondan" else personList.first { it.id == trans.fromId }.name + "dan"
+                }
+                var nameTo = ""
+                if (trans.toId.isNotEmpty()) {
+                    val to = pocketList.filter { it.id == trans.toId }
+                    nameTo =
+                        if (to.size > 0) to.first().name + " hamyonga" else personList.first { it.id == trans.toId }.name + "ga"
+                }
                 list.add(
                     HistoryItem(
                         title = getTypeText(trans.type),
                         amount = trans.amount,
                         currency = c.first { it.id == trans.currencyId }.name,
-                        from = if (trans.fromId.isEmpty()) "" else p.first { it.id == trans.fromId }.name + " hamyondan",
-                        to = if (trans.toId.isEmpty()) "" else p.first { it.id == trans.toId }.name + " hamyonga",
+                        from = nameFrom,
+                        to = nameTo,
                         comment = trans.comment,
                         date = trans.date,
                     )
@@ -70,7 +84,7 @@ class HomeViewModelImp @Inject constructor(
     }
 
     var balance: Flow<Double> = flow {
-        combine(wallets, currencies) { w, c ->
+        combine(pockets, wallets, currencies) { p, w, c ->
             if (c.isEmpty()) {
                 val currency = CurrencyDomain(
                     id = UUID.randomUUID().toString(),
@@ -80,7 +94,10 @@ class HomeViewModelImp @Inject constructor(
                 )
                 currencyUseCase.add.invoke(currency)
             }
-            emit(w.sumOf { wallet ->
+
+
+            val pocketIds = p.map { it.id }
+            emit(w.filter { pocketIds.contains(it.ownerId) }.sumOf { wallet ->
                 wallet.balance * (1 / c.first { it.id == wallet.currencyId }.rate)
             })
         } //.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
@@ -103,12 +120,21 @@ class HomeViewModelImp @Inject constructor(
                 DirectionType.OUTCOME -> {
                     direction.navigateToOutcome()
                 }
-                DirectionType.GETCREDIT -> {}
-                DirectionType.GIVECREDIT -> {}
-                DirectionType.CREDITORS -> {}
-                DirectionType.DEBETORS -> {}
+                DirectionType.GETCREDIT -> {
+                    direction.navigateToGetCredit()
+                }
+                DirectionType.GIVECREDIT -> {
+                    direction.navigateToGiveCredit()
+                }
                 DirectionType.POCKETS -> {
                     direction.navigateToPockets()
+                }
+
+                DirectionType.PERSONS -> {
+                    direction.navigateToPersons()
+                }
+                DirectionType.CONVERTATION -> {
+                    direction.navigateToConvertation()
                 }
                 DirectionType.CURRENCIES -> {
                     direction.navigateToCurrencies()
@@ -118,12 +144,9 @@ class HomeViewModelImp @Inject constructor(
                 }
 
                 DirectionType.BACK -> {
-
                 }
                 else -> {}
             }
         }
     }
-
-
 }

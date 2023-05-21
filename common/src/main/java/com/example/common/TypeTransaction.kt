@@ -11,8 +11,8 @@ fun getTypeNumber(type: Type): Int = when (type) {
 fun getTypeText(type: Type) = when (type) {
     Type.INCOME -> "Kirim"
     Type.OUTCOME -> "Chiqim"
-    Type.CREDIT -> "Qarz olish"
-    Type.DEBET -> "Qarz berish"
+    Type.CREDIT -> "Qarz olindi"
+    Type.DEBET -> "Qarz berildi"
     Type.CONVERTATION -> "Konvertaciya"
 }
 

@@ -12,7 +12,7 @@ import com.example.mynotes.domain.models.TransactionDomain
 import com.example.mynotes.domain.models.WalletDomain
 import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
 import com.example.mynotes.domain.use_cases.pocket_use_case.PocketUseCases
-import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionAdd
+import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionIncomeOutcome
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
 import com.example.mynotes.models.PocketItem
 import com.example.mynotes.models.WalletItem
@@ -28,7 +28,7 @@ class IncomeViewModelImp @Inject constructor(
     private val pocketUseCases: PocketUseCases,
     private val currencyUseCases: CurrencyUseCases,
     private val walletUseCases: WalletUseCases,
-    private val transactionAdd: TransactionAdd,
+    private val transactionAdd: TransactionIncomeOutcome,
     private val direction: IncomeDirection
 ) : ViewModel(), IncomeViewModel {
 

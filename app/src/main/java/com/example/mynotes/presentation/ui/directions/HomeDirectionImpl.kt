@@ -24,23 +24,23 @@ class HomeDirectionImpl @Inject constructor(
     }
 
     override suspend fun navigateToGetCredit() {
-
+        navigator.navigateTo(appScreens.getCreditScreen())
     }
 
     override suspend fun navigateToGiveCredit() {
-
+        navigator.navigateTo(appScreens.giveCreditScreen())
     }
 
-    override suspend fun navigateToCreditors() {
-
+    override suspend fun navigateToPersons() {
+        navigator.navigateTo(appScreens.getPersonsScreen())
     }
 
-    override suspend fun navigateToDebetors() {
-
+    override suspend fun navigateToConvertation() {
+        // navigator.navigateTo(appScreens.)
     }
 
     override suspend fun navigateToPockets() {
-        navigator.navigateTo(appScreens.pocketScreen())
+        navigator.navigateTo(appScreens.getPocketScreen())
     }
 
     override suspend fun navigateToCurrencies() {

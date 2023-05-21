@@ -53,6 +53,18 @@ object DatabaseModule {
 
     @Provides
     @Singleton
+    fun providePersonRepository(
+        remote: RemoteDatabase,
+        db: MyRoom,
+        auth: AuthRepository
+    ): PersonRepository = PersonRepositoryImp(
+        remote = remote,
+        local = db.PersonDao(),
+        auth = auth
+    )
+
+    @Provides
+    @Singleton
     fun provideWalletRepository(
         remote: RemoteDatabase,
         db: MyRoom,

@@ -13,7 +13,7 @@ data class PocketDomain(
         date = this.date
     )
 
-    fun isValid(): Boolean =
-        id.trim().isNotEmpty() && name.trim().isNotEmpty() /*&& ownerId.isNotEmpty()*/
+     fun isValid(): Boolean =
+         id.trim().isNotEmpty() && name.trim().isNotEmpty() /*&& ownerId.isNotEmpty()*/
 
 }
