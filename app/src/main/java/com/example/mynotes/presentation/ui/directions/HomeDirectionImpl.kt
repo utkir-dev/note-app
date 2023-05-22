@@ -36,7 +36,7 @@ class HomeDirectionImpl @Inject constructor(
     }
 
     override suspend fun navigateToConvertation() {
-        // navigator.navigateTo(appScreens.)
+         navigator.navigateTo(appScreens.convertationScreen())
     }
 
     override suspend fun navigateToPockets() {

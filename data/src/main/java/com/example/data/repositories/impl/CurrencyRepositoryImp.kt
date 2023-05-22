@@ -80,6 +80,10 @@ internal class CurrencyRepositoryImp @Inject constructor(
 
     }
 
+    override suspend fun getById(id: String): Currency {
+        return local.getById(id)
+    }
+
 
     override suspend fun getByWalletIds(ids: List<String>): Flow<List<Currency>> {
         return local.getCurrencies(ids)

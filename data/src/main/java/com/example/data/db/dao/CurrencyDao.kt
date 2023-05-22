@@ -16,6 +16,9 @@ interface CurrencyDao {
     @Query("DELETE FROM currencies WHERE id=:id")
     suspend fun delete(id: String): Int
 
+    @Query("SELECT * FROM currencies WHERE id=:id limit 1")
+    fun getById(id: String): Currency
+
     @Query("SELECT * FROM currencies WHERE id IN (:ids)")
     fun getCurrencies(ids: List<String>): Flow<List<Currency>>
 

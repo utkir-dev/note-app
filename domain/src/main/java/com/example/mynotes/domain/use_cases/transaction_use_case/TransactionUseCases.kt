@@ -6,5 +6,7 @@ class TransactionUseCases @Inject constructor(
     var add: TransactionIncomeOutcome,
     var getByOwner: TransactionGetByOwner,
     var getForHome: TransactionGetForHome,
-    var getAll: TransactionGetAll
+    var getAll: TransactionGetAll,
+    var getDebetCredit: TransactionDebetCredit,
+    var getConvertation: TransactionConvertation
 )

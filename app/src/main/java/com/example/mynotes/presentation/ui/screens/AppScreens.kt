@@ -4,6 +4,7 @@ package com.example.mynotes.presentation.ui.screens
 import com.example.mynotes.presentation.ui.screens.auth.signin.SignInScreen
 import com.example.mynotes.presentation.ui.screens.auth.signup.SignUpScreen
 import com.example.mynotes.presentation.ui.screens.main.balance.BalanceScreen
+import com.example.mynotes.presentation.ui.screens.main.convertation.ConvertationScreen
 import com.example.mynotes.presentation.ui.screens.main.currencies.CurrencyScreen
 import com.example.mynotes.presentation.ui.screens.main.getcredit.GetCreditScreen
 import com.example.mynotes.presentation.ui.screens.main.givecredit.GiveCreditScreen
@@ -28,6 +29,7 @@ class AppScreens @Inject constructor() {
     fun getCreditScreen(): GetCreditScreen = GetCreditScreen()
     fun giveCreditScreen(): GiveCreditScreen = GiveCreditScreen()
     fun getPersonsScreen(): PersonsScreen = PersonsScreen()
+    fun convertationScreen(): ConvertationScreen = ConvertationScreen()
     fun getPocketScreen(): PocketScreen = PocketScreen()
     fun outcomePocketScreen(): OutcomePocketScreen = OutcomePocketScreen()
     fun outcomeCurrencyScreen(pocketId: String): OutcomeCurrencyScreen =

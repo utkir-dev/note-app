@@ -6,5 +6,6 @@ class CurrencyUseCases @Inject constructor(
     var add: CurrencyAdd,
     var delete: CurrencyDelete,
     var getByWalletIds: CurrencyGetByWalletIds,
-    var getAll: CurrencyGetAll
+    var getAll: CurrencyGetAll,
+    var getById: CurrencyGetById
 )

@@ -10,12 +10,16 @@ import com.example.mynotes.presentation.ui.screens.AppScreens
 import com.example.mynotes.presentation.ui.screens.auth.signin.SignInDirection
 import com.example.mynotes.presentation.ui.screens.auth.signup.SignUpDirection
 import com.example.mynotes.presentation.ui.screens.main.balance.BalanceDirection
+import com.example.mynotes.presentation.ui.screens.main.convertation.ConvertationDirection
 import com.example.mynotes.presentation.ui.screens.main.currencies.CurrencyDirection
+import com.example.mynotes.presentation.ui.screens.main.getcredit.GetCreditDirection
+import com.example.mynotes.presentation.ui.screens.main.givecredit.GiveCreditDirection
 import com.example.mynotes.presentation.ui.screens.main.history.HistoryDirection
 import com.example.mynotes.presentation.ui.screens.main.home.HomeDirection
 import com.example.mynotes.presentation.ui.screens.main.income.IncomeDirection
 import com.example.mynotes.presentation.ui.screens.main.outcome_currency.OutcomeCurrencyDirection
 import com.example.mynotes.presentation.ui.screens.main.outcome_pocket.OutcomePocketDirection
+import com.example.mynotes.presentation.ui.screens.main.persons.PersonsDirection
 import com.example.mynotes.presentation.ui.screens.main.pockets.PocketDirection
 import com.example.mynotes.presentation.ui.screens.splash.SplashDirection
 import dagger.Module
@@ -124,6 +128,42 @@ object AppModule {
         navigator: AppNavigator
     ): PocketDirection {
         return PocketDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
+    fun provideGetCreditDirection(
+        navigator: AppNavigator
+    ): GetCreditDirection {
+        return GetCreditDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
+    fun provideGiveCreditDirection(
+        navigator: AppNavigator
+    ): GiveCreditDirection {
+        return GiveCreditDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
+    fun provideConvertationDirection(
+        navigator: AppNavigator
+    ): ConvertationDirection {
+        return ConvertationDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
+    fun providePersonsDirection(
+        navigator: AppNavigator
+    ): PersonsDirection {
+        return PersonsDirectionImpl(
             navigator
         )
     }
