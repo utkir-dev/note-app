@@ -11,8 +11,8 @@ data class Wallet(
     var type: Int = 0,
     var ownerId: String,
     var currencyId: String,
-    var balance: Double,
-    var date: Long,
+    var balance: Double = 0.0,
+    var date: Long = 0,
     var uploaded: Boolean = false
 ) {
     fun toRemote() = WalletRemote(

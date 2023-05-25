@@ -7,5 +7,6 @@ class PersonUseCases @Inject constructor(
     var delete: PersonDelete,
     var update: PersonUpdate,
     var getOne: PersonGet,
-    var getAll: PersonGetAll
+    var getAll: PersonGetAll,
+    var getPersonsWithWallets: GetPersonsWithWallets
 )

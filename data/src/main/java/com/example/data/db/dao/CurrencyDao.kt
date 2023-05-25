@@ -24,4 +24,6 @@ interface CurrencyDao {
 
     @Query("SELECT * FROM currencies order by date asc")
     fun getAll(): Flow<List<Currency>>
+
+
 }

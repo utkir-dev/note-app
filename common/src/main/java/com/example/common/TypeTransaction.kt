@@ -31,3 +31,11 @@ fun getTypeEnum(n: Int) = when (n) {
     4 -> Type.DEBET
     else -> Type.CONVERTATION
 }
+
+fun getTypeEnum(text: String) = when (text) {
+    "Kirim" -> Type.INCOME
+    "Chiqim" -> Type.OUTCOME
+    "Qarz olindi" -> Type.CREDIT
+    "Qarz berildi" -> Type.DEBET
+    else -> Type.CONVERTATION
+}

@@ -30,7 +30,6 @@ class TransactionDebetCredit @Inject constructor(
             )
         }
 
-
         val newWalletTo = if (toWallet == null) {
             Wallet(
                 id = UUID.randomUUID().toString(),
@@ -38,18 +37,15 @@ class TransactionDebetCredit @Inject constructor(
                 currencyId = trans.currencyId,
                 balance = trans.amount,
                 date = trans.date,
-
-                )
+            )
         } else {
             toWallet.copy(
                 balance = toWallet.balance + trans.amount, date = trans.date
             )
         }
-        repWallet.add(newWalletFrom)
-        repWallet.add(newWalletTo)
+        val resultConvertation = repository.add(trans.toLocal())
+        repWallet.addWallets(listOf(newWalletFrom, newWalletTo))
 
-        return repository.add(trans.toLocal())
+        return resultConvertation
     }
-
-
 }

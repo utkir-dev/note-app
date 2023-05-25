@@ -1,5 +1,6 @@
 package com.example.mynotes.presentation.ui.screens.main.convertation
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -80,6 +81,8 @@ class ConvertationViewModelImp @Inject constructor(
                 toId = pocketTo.value.id,
                 currencyId = currency.value.id,
                 amount = amountTransaction,
+                currencyFrom = currencyFrom.value.id,
+                currencyTo = currencyTo.value.id,
                 date = System.currentTimeMillis(),
                 comment = comment
             )

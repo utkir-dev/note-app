@@ -36,8 +36,8 @@ class OutcomePocketScreen : AppScreen() {
 fun ShowIncomes(
     viewModel: OutcomePocketViewModelImp
 ) {
+    val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
     val pockets by viewModel.pockets.collectAsStateWithLifecycle(emptyList())
-    val pocketItems by viewModel.mapPocket.collectAsStateWithLifecycle(emptyMap())
     val toolBarHeight = 56.dp
     Scaffold(modifier = Modifier
         .fillMaxSize(),
@@ -89,8 +89,7 @@ fun ShowIncomes(
                     )
                 }
                 itemsIndexed(pockets) { index, pocket ->
-                    val chips = pocketItems[pocket.id]?.wallets?.filter { it.balance >= 0.01 }
-                        ?: emptyList()
+                    val chips = walletsByOwners.filter { it.ownerId == pocket.id }
                     ItemInOutPocket(
                         text = pocket.name,
                         chipsVisibility = true,

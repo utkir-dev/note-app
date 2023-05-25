@@ -4,6 +4,8 @@ import com.example.data.constants.Const.USERS
 import com.example.data.constants.Const.WALLETS
 import com.example.data.db.dao.WalletDao
 import com.example.data.db.entities.Wallet
+import com.example.data.db.models.Balance
+import com.example.data.db.models.WalletOwner
 import com.example.data.repositories.intrefaces.AuthRepository
 import com.example.data.repositories.intrefaces.RemoteDatabase
 import com.example.data.repositories.intrefaces.WalletRepository
@@ -33,6 +35,26 @@ internal class WalletRepositoryImp @Inject constructor(
                 }
             }
             job1.await()
+        }
+        return result
+    }
+
+    override suspend fun addWallets(wallets: List<Wallet>): List<Long> {
+        val result = local.addWallets(wallets)
+        val dbRemote = remote.storageRef.firestore.collection(USERS)
+            .document(auth.currentUser?.uid ?: "").collection(WALLETS)
+        var remoteTask = false
+        coroutineScope {
+            wallets.forEach { wallet ->
+                val job1 = async {
+                    dbRemote.document(wallet.id).set(wallet.toRemote()).addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            remoteTask = true
+                        }
+                    }
+                }
+                job1.await()
+            }
         }
         return result
     }
@@ -86,5 +108,13 @@ internal class WalletRepositoryImp @Inject constructor(
 
     override suspend fun getAll(): Flow<List<Wallet>> {
         return local.getAll()
+    }
+
+    override suspend fun getBalabce(): Flow<List<Balance>> {
+        return local.getBalances()
+    }
+
+    override suspend fun getWalletsByOwnes(): Flow<List<WalletOwner>> {
+        return local.getWalletsByOwnerGroup()
     }
 }

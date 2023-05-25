@@ -4,6 +4,7 @@ import com.example.data.constants.Const.TRANSACTIONS
 import com.example.data.constants.Const.USERS
 import com.example.data.db.dao.TransactionDao
 import com.example.data.db.entities.Transaction
+import com.example.data.db.models.History
 import com.example.data.repositories.intrefaces.AuthRepository
 import com.example.data.repositories.intrefaces.RemoteDatabase
 import com.example.data.repositories.intrefaces.TransactionRepository
@@ -68,4 +69,7 @@ internal class TransactionRepositoryImp @Inject constructor(
     }
 
     override suspend fun getAll() = local.getAll()
+    override suspend fun getHistory(): Flow<List<History>> {
+        return local.getHistory()
+    }
 }

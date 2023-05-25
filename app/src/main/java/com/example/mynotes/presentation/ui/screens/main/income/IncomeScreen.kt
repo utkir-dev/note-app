@@ -40,7 +40,7 @@ fun ShowIncomes(
     viewModel: IncomeViewModelImp
 ) {
     val pockets by viewModel.pockets.collectAsStateWithLifecycle(emptyList())
-    val pocketItems by viewModel.mapPocket.collectAsStateWithLifecycle(emptyMap())
+    val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
 
     var visibilityAddDialog by remember {
         mutableStateOf(false)
@@ -129,8 +129,9 @@ fun ShowIncomes(
                     )
                 }
                 itemsIndexed(pockets) { index, pocket ->
-                    val chips = pocketItems[pocket.id]?.wallets?.filter { it.balance >= 0.01 }
-                        ?: emptyList()
+                    val chips =
+                        walletsByOwners.filter { pocket.id == it.ownerId }
+
                     ItemInOutPocket(
                         text = pocket.name,
                         chipsVisibility = true,

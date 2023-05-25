@@ -456,7 +456,6 @@ fun Show(
                             MyButton(
                                 onClick = { viewModel.back() },
                                 text = "Bekor",
-                                shape = RoundedCornerShape(20.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Gray, contentColor = White
                                 ),

@@ -9,6 +9,8 @@ data class TransactionRemote(
     var toId: String,
     var currencyId: String,
     var amount: Double,
+    var currencyFrom: String = "",
+    var currencyTo: String = "",
     var date: Long,
     var comment: String = "",
 ) {
@@ -19,6 +21,8 @@ data class TransactionRemote(
         toId = this.toId,
         currencyId = this.currencyId,
         amount = this.amount,
+        currencyFrom = this.currencyFrom,
+        currencyTo = this.currencyTo,
         date = this.date,
         comment = this.comment
     )

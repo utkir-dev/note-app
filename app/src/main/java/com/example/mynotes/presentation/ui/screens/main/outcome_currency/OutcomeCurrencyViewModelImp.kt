@@ -6,10 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.Type
 import com.example.common.getTypeNumber
-import com.example.mynotes.domain.models.CurrencyDomain
-import com.example.mynotes.domain.models.PocketDomain
-import com.example.mynotes.domain.models.TransactionDomain
-import com.example.mynotes.domain.models.WalletDomain
+import com.example.mynotes.domain.models.*
 import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
 import com.example.mynotes.domain.use_cases.pocket_use_case.PocketUseCases
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionIncomeOutcome

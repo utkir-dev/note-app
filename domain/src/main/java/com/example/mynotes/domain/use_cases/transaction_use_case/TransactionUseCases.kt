@@ -5,8 +5,7 @@ import javax.inject.Inject
 class TransactionUseCases @Inject constructor(
     var add: TransactionIncomeOutcome,
     var getByOwner: TransactionGetByOwner,
-    var getForHome: TransactionGetForHome,
     var getAll: TransactionGetAll,
-    var getDebetCredit: TransactionDebetCredit,
+    var getHistory: TransactionGetHistory,
     var getConvertation: TransactionConvertation
 )

@@ -35,7 +35,7 @@ class HistoryScreen() : AppScreen() {
 
 @Composable
 fun Show(viewModel: HistoryViewModelImp) {
-    val historyList by viewModel.historyList.collectAsStateWithLifecycle(emptyList())
+    val historyList by viewModel.history.collectAsStateWithLifecycle(emptyList())
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

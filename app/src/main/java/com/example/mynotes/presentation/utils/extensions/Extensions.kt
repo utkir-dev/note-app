@@ -8,7 +8,7 @@ import java.util.*
 
 fun Double.huminize(): String {
     val diff = this - this.toLong()
-    val dec = if (diff >= 0.0099 && this <= 999_999_999)
+    val dec = if (diff >= 0.01 && this <= 9_999_999)
         DecimalFormat("###,###,###,###,###.00", DecimalFormatSymbols(Locale.ENGLISH))
     else
         DecimalFormat("###,###,###,###,###", DecimalFormatSymbols(Locale.ENGLISH))

@@ -21,6 +21,8 @@ fun Transaction.toDomain() = TransactionDomain(
     toId = this.toId,
     currencyId = this.currencyId,
     amount = this.amount,
+    currencyFrom = this.currencyFrom,
+    currencyTo = this.currencyTo,
     date = this.date,
     comment = this.comment
 )

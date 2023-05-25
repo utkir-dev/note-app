@@ -1,5 +1,6 @@
 package com.example.mynotes.presentation.ui.screens.main.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,12 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
+import com.example.common.getTypeText
 import com.example.mynotes.R
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.ui.screens.block.BlockScreen
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.contstants.HISTORY_LIMIT
 import com.example.mynotes.presentation.utils.extensions.huminize
 import com.example.mynotes.presentation.utils.items.ItemHistory
 import com.example.mynotes.presentation.utils.theme.ThemeState
@@ -89,8 +92,10 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
 @Composable
 fun ShowHome(viewModel: HomeViewModelImp) {
     val dispatcher = viewModel::onEventDispatcher
-    val balance by viewModel.balance.collectAsStateWithLifecycle(0.0)
-    val historyList by viewModel.historyList.collectAsStateWithLifecycle(emptyList())
+    val balanceList by viewModel.balances.collectAsStateWithLifecycle(emptyList())
+    val history by viewModel.history.collectAsStateWithLifecycle(emptyList())
+
+    Log.d("history", "history : $history")
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -134,7 +139,10 @@ fun ShowHome(viewModel: HomeViewModelImp) {
             }
         }
         item {
-            MenuBig("Balans: ${balance.huminize()} $", dispatcher)
+            MenuBig(
+                "Balans: ${balanceList.sumOf { it.amount * (1 / it.rate) }.huminize()} $",
+                dispatcher
+            )
         }
         item {
             Row(
@@ -183,7 +191,7 @@ fun ShowHome(viewModel: HomeViewModelImp) {
                 MenuBig("Valyutalar", dispatcher, directionType = DirectionType.CURRENCIES)
             }
         }
-        if (historyList.isNotEmpty()) item {
+        if (history.isNotEmpty()) item {
             MyText(
                 text = "Tarix :  ",
                 modifier = Modifier
@@ -195,13 +203,13 @@ fun ShowHome(viewModel: HomeViewModelImp) {
             )
         }
 
-        items(items = historyList, key = { it.hashCode() }) { historyItem ->
+        items(items = history.take(HISTORY_LIMIT), key = { it.hashCode() }) { historyItem ->
             ItemHistory(
                 item = historyItem,
                 onItemClicked = { })
         }
 
-        if (historyList.isNotEmpty()) item {
+        if (history.isNotEmpty()) item {
             MyText(
                 text = "Hammasini ko'rish  >>",
                 modifier = Modifier

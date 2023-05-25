@@ -35,8 +35,7 @@ class BalanceScreen : AppScreen() {
 
 @Composable
 fun ShowBalance(viewModel: BalanceViewModelImp) {
-    val balance by remember { viewModel.balance }
-    val list = viewModel.flowBalance.collectAsStateWithLifecycle(emptyList())
+    val balanceList by viewModel.balances.collectAsStateWithLifecycle(emptyList())
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -74,18 +73,18 @@ fun ShowBalance(viewModel: BalanceViewModelImp) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                text = "Jami: ${balance.huminize()} $",
+                text = "Jami: ${balanceList.sumOf { it.amount * (1 / it.rate) }.huminize()} $",
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.customColors.textColor
             )
         }
-        items(items = list.value, key = {
-            it.hashCode()
-        }) { balanceItem ->
+        items(items = balanceList, key = {
+            it.hashCode() + 1000
+        }) { balanceDomain ->
             ItemInOutPocket(
-                text = "${balanceItem.name}: ${balanceItem.amount.huminize()}",
+                text = "${balanceDomain.currencyName}: ${balanceDomain.amount.huminize()}",
                 onItemClicked = {})
         }
     }

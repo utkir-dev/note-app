@@ -3,12 +3,11 @@ package com.example.mynotes.presentation.ui.screens.main.persons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,16 +21,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
-import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.domain.models.PersonDomain
-import com.example.mynotes.domain.models.PocketDomain
+import com.example.mynotes.domain.models.WalletDomain
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.buttons.ButtonAdd
+import com.example.mynotes.presentation.utils.components.buttons.MyButton
 import com.example.mynotes.presentation.utils.components.dialogs.DialogConfirm
 import com.example.mynotes.presentation.utils.components.dialogs.PopupDialog
+import com.example.mynotes.presentation.utils.components.image.Gray
+import com.example.mynotes.presentation.utils.components.image.Green
+import com.example.mynotes.presentation.utils.components.image.White
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
-import com.example.mynotes.presentation.utils.items.ItemInOutPocket
 import com.example.mynotes.presentation.utils.items.ItemPerson
 import com.example.mynotes.presentation.utils.types.PopupType
 
@@ -47,9 +48,22 @@ class PersonsScreen : AppScreen() {
 fun Show(
     viewModel: PersonsViewModelImp
 ) {
-    val persons by viewModel.persons.collectAsStateWithLifecycle(emptyList())
+    // val radioOptions = listOf("hamma", "qarzdor", "haqdor")
+    //  val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+    var menu by remember {
+        mutableStateOf(0)
+    }
 
-    val personItems by viewModel.mapPerson.collectAsStateWithLifecycle(emptyMap())
+    val personsWithWallets by viewModel.personsWithWallets.collectAsStateWithLifecycle(emptyList())
+
+    val list = if (menu == 1)
+        personsWithWallets.filter { it.wallets.filter { it.balance >= 0 }.isNotEmpty() }
+    else if (menu == 2) personsWithWallets.filter {
+        it.wallets.filter { it.balance <= 0 }.isNotEmpty()
+    }
+    else personsWithWallets
+
+    val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
 
     var visibilityAddDialog by remember {
         mutableStateOf(false)
@@ -57,6 +71,7 @@ fun Show(
     var visibilityIncomeDialog by remember {
         mutableStateOf(false)
     }
+
     var visibilityConfirm by remember {
         mutableStateOf(false)
     }
@@ -96,44 +111,92 @@ fun Show(
 
     if (visibilityConfirm) {
         DialogConfirm(clazz = currentPerson) { boo, clazz ->
-            val pock = clazz as PocketDomain
-            if (boo && pock.isValid()) {
-                // viewModel.delete(pock)
+            val person = clazz as PersonDomain
+            if (boo && person.isValid()) {
+                //viewModel.delete(person)
             }
             visibilityConfirm = false
         }
     }
 
-    val toolBarHeight = 56.dp
+    val toolBarHeight = 94.dp
     Scaffold(modifier = Modifier
         .fillMaxSize(),
         topBar = {
-            Row(
+            Column(
                 modifier = Modifier
-                    .background(MaterialTheme.customColors.backgroundBrush)
                     .fillMaxWidth()
                     .height(toolBarHeight)
-                    .padding(horizontal = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = {
-                    viewModel.back()
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_back),
-                        contentDescription = "back arrow",
-                        tint = MaterialTheme.customColors.textColor
+                Row(
+                    modifier = Modifier
+                        .background(MaterialTheme.customColors.backgroundBrush)
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = {
+                        viewModel.back()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_arrow_back),
+                            contentDescription = "back arrow",
+                            tint = MaterialTheme.customColors.textColor
+                        )
+                    }
+                    MyText(
+                        modifier = Modifier.weight(1.0f),
+                        text = "Shaxslar",
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.customColors.textColor,
+                        fontWeight = FontWeight.Bold
                     )
                 }
-                MyText(
-                    modifier = Modifier.weight(1.0f),
-                    text = "Shaxslar",
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.customColors.textColor,
-                    fontWeight = FontWeight.Bold
-                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    MyButton(
+                        onClick = {
+                            menu = 0
+                        },
+                        text = "hamma",
+                        textSize = 14.sp,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (menu == 0) Green else Gray,
+                            contentColor = White
+                        )
+                    ) {}
+                    MyButton(
+                        onClick = {
+                            menu = 1
+                        },
+                        text = "qarzdor",
+                        textSize = 14.sp,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (menu == 1) Green else Gray,
+                            contentColor = White
+                        )
+                    ) {}
+                    MyButton(
+                        onClick = {
+                            menu = 2
+                        },
+                        text = "haqdor",
+                        textSize = 14.sp,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (menu == 2) Green else Gray,
+                            contentColor = White
+                        )
+                    ) {}
+
+                }
             }
         },
         bottomBar = {
@@ -159,45 +222,18 @@ fun Show(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     // verticalArrangement = Arrangement.Top
                 ) {
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            MyText(
-                                text = "hammasi",
-                                color = MaterialTheme.customColors.subTextColor,
-                                modifier = Modifier
-                                    .padding(horizontal = 5.dp)
-                            )
-
-                            MyText(
-                                text = "qarzdorlar",
-                                color = MaterialTheme.customColors.subTextColor,
-                                modifier = Modifier
-                                    .padding(horizontal = 5.dp)
-                            )
-                            MyText(
-                                text = "haqdorlar",
-                                color = MaterialTheme.customColors.subTextColor,
-                                modifier = Modifier
-                                    .padding(horizontal = 5.dp)
-                            )
-
-                        }
-                    }
-                    itemsIndexed(persons) { index, person ->
-                        val chips = personItems[person.id]?.wallets?.filter { it.balance >= 0.01 }
-                            ?: emptyList()
+                    itemsIndexed(list) { index, owner ->
+                        val chips =
+                            walletsByOwners.filter { owner.wallets.map { it.id }.contains(it.id) }
                         ItemPerson(
-                            person = person,
+                            person = owner.person,
+                            chips = chips,
                             onItemClicked = {
-                                viewModel.setPerson(persons[index])
+                                viewModel.setPerson(owner.person)
                                 visibilityIncomeDialog = true
                             },
                             onMenuMoreClicked = { offset ->
-                                currentPerson = person
+                                currentPerson = owner.person
                                 offsetPopup = offset
                                 visibilityPopup =
                                     !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true
@@ -213,13 +249,4 @@ fun Show(
 
 }
 
-
-private fun isValidAmount(amount: String): Pair<Boolean, Double> {
-    var n = -1.0
-    try {
-        n = amount.trim().toDouble()
-    } catch (_: Exception) {
-    }
-    return Pair(n > 0, n)
-}
 

@@ -6,5 +6,7 @@ class WalletUseCases @Inject constructor(
     var add: WalletAdd,
     var delete: WalletDelete,
     var getByOwnerId: WalletGetByOwnerId,
-    var getAll: WalletGetAll
+    var getAll: WalletGetAll,
+    var getBalances: GetBalance,
+    var getWalletsByOwnes: GetWalletsByOwnes
 )

@@ -7,8 +7,8 @@ data class WalletRemote(
     var type: Int = 0,
     val ownerId: String,
     val currencyId: String,
-    var balance: Double,
-    var date: Long
+    var balance: Double = 0.0,
+    var date: Long = 0
 ) {
     fun toLocal() = Wallet(
         id = this.id,

@@ -1,11 +1,14 @@
 package com.example.mynotes.domain.use_cases.transaction_use_case
 
+import android.util.Log
 import com.example.data.db.entities.Wallet
 import com.example.data.repositories.intrefaces.TransactionRepository
 import com.example.data.repositories.intrefaces.WalletRepository
 import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.domain.models.TransactionDomain
 import com.example.mynotes.domain.models.WalletDomain
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import java.util.*
 import javax.inject.Inject
 
@@ -36,12 +39,13 @@ class TransactionConvertation @Inject constructor(
         }.toLocal()
 // to
         val toWallet = repWallet.getByOwnerAndCurrencyId(trans.toId, curTo.id)
+
         val newWalletTo = if (toWallet == null) {
             Wallet(
                 id = UUID.randomUUID().toString(),
                 ownerId = trans.toId,
                 currencyId = curTo.id,
-                balance = trans.amount,
+                balance = amountDollar * curTo.rate,
                 date = trans.date,
             )
         } else if (toWallet.currencyId == currencyConvert.id) {
@@ -56,11 +60,11 @@ class TransactionConvertation @Inject constructor(
                 date = trans.date
             )
         }
+        val resultConvertation = repository.add(trans.toLocal())
+        repWallet.addWallets(listOf(newWalletFrom, newWalletTo))
 
-        repWallet.add(newWalletFrom)
-        repWallet.add(newWalletTo)
 
-        return repository.add(trans.toLocal())
+        return resultConvertation
     }
 
 
