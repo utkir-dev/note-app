@@ -44,6 +44,7 @@ android {
 
 dependencies {
     implementation project(path: ':common')
+    implementation 'com.google.firebase:firebase-storage-ktx:20.2.0'
     compileOnly("com.google.dagger:hilt-android:2.44.2")
     kapt 'com.google.dagger:hilt-android-compiler:2.44.2'
 
@@ -54,7 +55,7 @@ dependencies {
     // Firebase
     implementation 'com.google.firebase:firebase-auth-ktx:22.0.0'
     implementation 'com.google.firebase:firebase-firestore-ktx:24.6.0'
-
+    implementation platform('com.google.firebase:firebase-bom:32.1.0')
 
     // Room components
     implementation "androidx.room:room-ktx:2.5.1"
@@ -62,7 +63,8 @@ dependencies {
     kapt "androidx.room:room-compiler:2.5.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.20"
     androidTestImplementation "androidx.room:room-testing:2.5.1"
-
+    // Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 kapt {

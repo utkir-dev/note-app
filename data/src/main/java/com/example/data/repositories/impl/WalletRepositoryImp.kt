@@ -4,8 +4,8 @@ import com.example.data.constants.Const.USERS
 import com.example.data.constants.Const.WALLETS
 import com.example.data.db.dao.WalletDao
 import com.example.data.db.entities.Wallet
-import com.example.data.db.models.Balance
-import com.example.data.db.models.WalletOwner
+import com.example.data.db.database_relations.Balance
+import com.example.data.db.database_relations.WalletOwner
 import com.example.data.repositories.intrefaces.AuthRepository
 import com.example.data.repositories.intrefaces.RemoteDatabase
 import com.example.data.repositories.intrefaces.WalletRepository
@@ -116,5 +116,9 @@ internal class WalletRepositoryImp @Inject constructor(
 
     override suspend fun getWalletsByOwnes(): Flow<List<WalletOwner>> {
         return local.getWalletsByOwnerGroup()
+    }
+
+    override suspend fun getWalletsByOwnerId(id: String): Flow<List<WalletOwner>> {
+        return local.getWalletsByOwnerId(id)
     }
 }

@@ -1,12 +1,10 @@
 package com.example.mynotes.presentation.ui.screens.main.home
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -23,18 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
-import com.example.common.getTypeText
 import com.example.mynotes.R
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
-import com.example.mynotes.presentation.ui.screens.block.BlockScreen
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.contstants.HISTORY_LIMIT
 import com.example.mynotes.presentation.utils.extensions.huminize
 import com.example.mynotes.presentation.utils.items.ItemHistory
 import com.example.mynotes.presentation.utils.theme.ThemeState
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class HomeScreen() : AppScreen() {
@@ -71,7 +67,6 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
                     text = "Home",
                     onItemClick = {
                         scope.launch { drawerState.close() }
-
                     }
                 )
                 DrawerMenuItem(
@@ -81,21 +76,30 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
                         scope.launch { drawerState.close() }
                     }
                 )
+                DrawerMenuItem(
+                    iconDrawableId = R.drawable.ic_settings,
+                    text = "Sign Out",
+                    onItemClick = {
+                        scope.launch {
+                            (
+                                    (viewModel::onEventDispatcher)(DirectionType.SIGNOUT))
+                        }
+                    }
+                )
             }
         },
         content = {
-            ShowHome(viewModel)
+            ShowHome(viewModel, drawerState, scope)
         }
     )
 }
 
 @Composable
-fun ShowHome(viewModel: HomeViewModelImp) {
+fun ShowHome(viewModel: HomeViewModelImp, drawerState: DrawerState, scope: CoroutineScope) {
     val dispatcher = viewModel::onEventDispatcher
     val balanceList by viewModel.balances.collectAsStateWithLifecycle(emptyList())
     val history by viewModel.history.collectAsStateWithLifecycle(emptyList())
 
-    Log.d("history", "history : $history")
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -109,8 +113,9 @@ fun ShowHome(viewModel: HomeViewModelImp) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
-                    BlockScreen()
+                    // BlockScreen()
                     //dispatcher(DirectionType.SIGNOUT)
+                    scope.launch { drawerState.open() }
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_menu),
@@ -191,37 +196,37 @@ fun ShowHome(viewModel: HomeViewModelImp) {
                 MenuBig("Valyutalar", dispatcher, directionType = DirectionType.CURRENCIES)
             }
         }
-        if (history.isNotEmpty()) item {
-            MyText(
-                text = "Tarix :  ",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp)
-                    .padding(horizontal = 10.dp),
-                color = MaterialTheme.customColors.textColor,
-                textAlign = TextAlign.Start
-            )
-        }
-
-        items(items = history.take(HISTORY_LIMIT), key = { it.hashCode() }) { historyItem ->
-            ItemHistory(
-                item = historyItem,
-                onItemClicked = { })
-        }
-
-        if (history.isNotEmpty()) item {
-            MyText(
-                text = "Hammasini ko'rish  >>",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp)
-                    .padding(horizontal = 10.dp, vertical = 5.dp)
-                    .clickable {
-                        dispatcher(DirectionType.HISTORY)
-                    },
-                color = MaterialTheme.customColors.textColor,
-                textAlign = TextAlign.Start
-            )
+        if (history.isNotEmpty()) {
+            item {
+                MyText(
+                    text = "Tarix :  ",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp)
+                        .padding(horizontal = 10.dp),
+                    color = MaterialTheme.customColors.textColor,
+                    textAlign = TextAlign.Start
+                )
+            }
+            items(items = history, key = { it.hashCode() }) { historyItem ->
+                ItemHistory(
+                    item = historyItem,
+                    onItemClicked = { })
+            }
+            item {
+                MyText(
+                    text = "Hammasini ko'rish  >>",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp)
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                        .clickable {
+                            dispatcher(DirectionType.HISTORY)
+                        },
+                    color = MaterialTheme.customColors.textColor,
+                    textAlign = TextAlign.Start
+                )
+            }
         }
     }
 }

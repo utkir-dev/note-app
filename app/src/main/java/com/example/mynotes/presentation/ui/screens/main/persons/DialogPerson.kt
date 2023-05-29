@@ -158,6 +158,7 @@ fun DialogPerson(person: PersonDomain, onDismiss: (PersonDomain?) -> Unit) {
                             containerColor = Gray,
                             contentColor = White
                         ),
+                        textSize = 16.sp,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -186,6 +187,7 @@ fun DialogPerson(person: PersonDomain, onDismiss: (PersonDomain?) -> Unit) {
                             }
                         },
                         text = "Tasdiq",
+                        textSize = 16.sp,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Green,
                             contentColor = White

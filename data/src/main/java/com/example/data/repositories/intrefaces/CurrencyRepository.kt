@@ -10,4 +10,5 @@ interface CurrencyRepository {
     suspend fun getById(id: String): Currency
     suspend fun getByWalletIds(ids: List<String>): Flow<List<Currency>>
     suspend fun getAll(): Flow<List<Currency>>
+    suspend fun getCount(): Int
 }

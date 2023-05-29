@@ -36,7 +36,9 @@ class GiveCreditViewModelImp @Inject constructor(
     override val currencies: Flow<List<CurrencyDomain>> = flow {
         emitAll(currencyUseCases.getAll.invoke())
     }
-
+    override val balances: Flow<List<BalanceDomain>> = flow {
+        emitAll(walletUseCases.getBalances.invoke())
+    }
     override val pocket: MutableState<PocketDomain> = mutableStateOf(PocketDomain(""))
 
     override val pockets: Flow<List<PocketDomain>> = flow {
@@ -66,7 +68,7 @@ class GiveCreditViewModelImp @Inject constructor(
         viewModelScope.launch { this@GiveCreditViewModelImp.pocket.value = pocket }
     }
 
-    override fun addTransaction(amountTransaction: Double, comment: String) {
+    override fun addTransaction(amountTransaction: Double, comment: String, balance: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val transaction = TransactionDomain(
                 id = UUID.randomUUID().toString(),
@@ -76,7 +78,14 @@ class GiveCreditViewModelImp @Inject constructor(
                 currencyId = currency.value.id,
                 amount = amountTransaction,
                 date = System.currentTimeMillis(),
-                comment = comment
+                comment = comment,
+
+                isFromPocket = true,
+                isToPocket = false,
+                rate = currency.value.rate,
+                rateFrom = currency.value.rate,
+                rateTo = currency.value.rate,
+                balance = balance
             )
             this@GiveCreditViewModelImp.transactionUseCase.invoke(transaction)
         }

@@ -1,6 +1,8 @@
 package com.example.mynotes.presentation.ui.screens
 
 
+import com.example.mynotes.domain.models.PersonDomain
+import com.example.mynotes.domain.models.PocketDomain
 import com.example.mynotes.presentation.ui.screens.auth.signin.SignInScreen
 import com.example.mynotes.presentation.ui.screens.auth.signup.SignUpScreen
 import com.example.mynotes.presentation.ui.screens.main.balance.BalanceScreen
@@ -13,8 +15,10 @@ import com.example.mynotes.presentation.ui.screens.main.home.HomeScreen
 import com.example.mynotes.presentation.ui.screens.main.income.IncomeScreen
 import com.example.mynotes.presentation.ui.screens.main.outcome_currency.OutcomeCurrencyScreen
 import com.example.mynotes.presentation.ui.screens.main.outcome_pocket.OutcomePocketScreen
+import com.example.mynotes.presentation.ui.screens.main.person_info.PersonScreen
 import com.example.mynotes.presentation.ui.screens.main.persons.PersonsScreen
-import com.example.mynotes.presentation.ui.screens.main.pockets.PocketScreen
+import com.example.mynotes.presentation.ui.screens.main.pocket_info.PocketScreen
+import com.example.mynotes.presentation.ui.screens.main.pockets.PocketsScreen
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,10 +34,12 @@ class AppScreens @Inject constructor() {
     fun giveCreditScreen(): GiveCreditScreen = GiveCreditScreen()
     fun getPersonsScreen(): PersonsScreen = PersonsScreen()
     fun convertationScreen(): ConvertationScreen = ConvertationScreen()
-    fun getPocketScreen(): PocketScreen = PocketScreen()
+    fun getPocketsScreen(): PocketsScreen = PocketsScreen()
+    fun getPocketScreen(pocket: PocketDomain): PocketScreen = PocketScreen(pocket)
     fun outcomePocketScreen(): OutcomePocketScreen = OutcomePocketScreen()
     fun outcomeCurrencyScreen(pocketId: String): OutcomeCurrencyScreen =
         OutcomeCurrencyScreen(pocketId)
 
     fun historyScreen(): HistoryScreen = HistoryScreen()
+    fun personScreen(person: PersonDomain): PersonScreen = PersonScreen(person)
 }

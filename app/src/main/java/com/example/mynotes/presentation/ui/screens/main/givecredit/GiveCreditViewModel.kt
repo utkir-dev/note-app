@@ -1,10 +1,7 @@
 package com.example.mynotes.presentation.ui.screens.main.givecredit
 
 import androidx.compose.runtime.MutableState
-import com.example.mynotes.domain.models.CurrencyDomain
-import com.example.mynotes.domain.models.PersonDomain
-import com.example.mynotes.domain.models.PocketDomain
-import com.example.mynotes.domain.models.WalletDomain
+import com.example.mynotes.domain.models.*
 import kotlinx.coroutines.flow.Flow
 
 
@@ -19,7 +16,8 @@ interface GiveCreditViewModel {
     fun setPerson(person: PersonDomain)
     fun setCurrency(currency: CurrencyDomain)
     fun setPocket(pocket: PocketDomain)
-    fun addTransaction(amountTransaction: Double, comment: String)
+    fun addTransaction(amountTransaction: Double, comment: String, balance: Double)
     fun back()
     val wallets: Flow<List<WalletDomain>>
+    val balances: Flow<List<BalanceDomain>>
 }

@@ -4,9 +4,10 @@ import com.example.data.constants.Const.TRANSACTIONS
 import com.example.data.constants.Const.USERS
 import com.example.data.db.dao.TransactionDao
 import com.example.data.db.entities.Transaction
-import com.example.data.db.models.History
+import com.example.data.db.database_relations.History
 import com.example.data.repositories.intrefaces.AuthRepository
 import com.example.data.repositories.intrefaces.RemoteDatabase
+import com.example.data.repositories.intrefaces.RemoteRepository
 import com.example.data.repositories.intrefaces.TransactionRepository
 import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.async
@@ -17,11 +18,13 @@ import javax.inject.Inject
 internal class TransactionRepositoryImp @Inject constructor(
     private val remote: RemoteDatabase,
     private val local: TransactionDao,
+    private val remoteStorage: RemoteRepository,
     private val auth: AuthRepository
 ) : TransactionRepository {
 
     override suspend fun add(transaction: Transaction): Long {
         val result = local.add(transaction)
+        remoteStorage.upload()
         val dbRemote = remote.storageRef.firestore
             .collection(USERS).document(auth.currentUser?.uid ?: "")
             .collection(TRANSACTIONS)
@@ -60,16 +63,18 @@ internal class TransactionRepositoryImp @Inject constructor(
         return local.delete(transaction.id)
     }
 
-    override suspend fun getForHome(count: Int): Flow<List<Transaction>> {
+    override suspend fun getForHome(count: Int): Flow<List<History>> {
         return local.getForHome(count)
     }
 
-    override suspend fun getByOwnerId(id: String): Flow<List<Transaction>> {
-        return local.getByOwnerId(id)
+    override suspend fun getByOwnerId(ownerId: String): Flow<List<History>> {
+        return local.getByOwnerId(ownerId)
     }
 
     override suspend fun getAll() = local.getAll()
     override suspend fun getHistory(): Flow<List<History>> {
         return local.getHistory()
     }
+
+
 }

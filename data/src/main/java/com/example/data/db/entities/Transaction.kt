@@ -2,7 +2,6 @@ package com.example.data.db.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.data.db.remote_models.CurrencyRemote
 import com.example.data.db.remote_models.TransactionRemote
 
 @Entity(tableName = "transactions")
@@ -18,7 +17,14 @@ data class Transaction(
     var currencyTo: String = "",
     var date: Long,
     var comment: String = "",
-    var uploaded: Boolean = false
+    var uploaded: Boolean = false,
+
+    var isFromPocket: Boolean = false,
+    var isToPocket: Boolean = false,
+    var rate: Double = 1.0,
+    var rateFrom: Double = 1.0,
+    var rateTo: Double = 1.0,
+    var balance: Double = 0.0
 ) {
     override fun toString(): String {
         return """
@@ -45,6 +51,13 @@ data class Transaction(
         currencyFrom = this.currencyFrom,
         currencyTo = this.currencyTo,
         date = this.date,
-        comment = this.comment
+        comment = this.comment,
+
+        isFromPocket = this.isFromPocket,
+        isToPocket = this.isToPocket,
+        rate = this.rate,
+        rateFrom = this.rateFrom,
+        rateTo = this.rateTo,
+        balance = this.balance,
     )
 }

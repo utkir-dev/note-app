@@ -32,15 +32,9 @@ class PersonsViewModelImp @Inject constructor(
         emitAll(personUseCases.getAll.invoke())
     }
 
-    val personsWithWallets: Flow<List<PersonWithWalletsDomain>> = flow {
-        emitAll(personUseCases.getPersonsWithWallets.invoke())
-    }
-
-
     override fun setPerson(person: PersonDomain) {
         viewModelScope.launch { this@PersonsViewModelImp.person.value = person }
     }
-
 
     override fun add(person: PersonDomain) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -60,4 +54,9 @@ class PersonsViewModelImp @Inject constructor(
         }
     }
 
+    override fun navigateToPerson(person: PersonDomain) {
+        viewModelScope.launch {
+            direction.navigateToPerson(person)
+        }
+    }
 }

@@ -34,6 +34,7 @@ import com.example.mynotes.presentation.utils.components.image.Green
 import com.example.mynotes.presentation.utils.components.image.White
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.extensions.huminize
 import com.example.mynotes.presentation.utils.items.EmptyRowSizeble
 import com.example.mynotes.presentation.utils.items.ItemEmptyRow
 
@@ -53,6 +54,7 @@ fun Show(
     val persons by viewModel.persons.collectAsStateWithLifecycle(emptyList())
     val pockets by viewModel.pockets.collectAsStateWithLifecycle(emptyList())
     val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+    val balances by viewModel.balances.collectAsStateWithLifecycle(emptyList())
 
     val person by remember { viewModel.person }
     val curency by remember { viewModel.currency }
@@ -322,7 +324,11 @@ fun Show(
                                 onClick = {
                                     val (isValid, amount) = isValidAmount(amountTransaction)
                                     if (isValid) {
-                                        viewModel.addTransaction(amount, comment)
+                                        viewModel.addTransaction(
+                                            amount,
+                                            comment,
+                                            balances.sumOf { it.amount * (1 / it.rate) }
+                                        )
                                         viewModel.back()
                                     }
                                 }, text = "Tasdiq", colors = ButtonDefaults.buttonColors(

@@ -167,7 +167,6 @@ fun ShowCurrencies(
                     offsetPopup = offset
                     visibilityPopup =
                         !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true
-
                 })
         }
 

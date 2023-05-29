@@ -9,7 +9,7 @@ import com.example.common.getTypeNumber
 import com.example.mynotes.domain.models.*
 import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
 import com.example.mynotes.domain.use_cases.pocket_use_case.PocketUseCases
-import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionIncomeOutcome
+import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionUseCases
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +23,7 @@ class IncomeViewModelImp @Inject constructor(
     private val pocketUseCases: PocketUseCases,
     private val currencyUseCases: CurrencyUseCases,
     private val walletUseCases: WalletUseCases,
-    private val transactionAdd: TransactionIncomeOutcome,
+    private val transactions: TransactionUseCases,
     private val direction: IncomeDirection
 ) : ViewModel(), IncomeViewModel {
 
@@ -45,7 +45,6 @@ class IncomeViewModelImp @Inject constructor(
     val walletsByOwners: Flow<List<WalletOwnerDomain>> = flow {
         emitAll(walletUseCases.getWalletsByOwnes.invoke())
     }
-
 
     override fun setPocket(pocket: PocketDomain) {
         viewModelScope.launch { this@IncomeViewModelImp.pocket.value = pocket }
@@ -73,9 +72,8 @@ class IncomeViewModelImp @Inject constructor(
         }
     }
 
-    override fun addTransaction(amountTransaction: Double, comment: String) {
+    override fun addTransaction(amountTransaction: Double, comment: String, balance: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-
             val transaction = TransactionDomain(
                 id = UUID.randomUUID().toString(),
                 type = getTypeNumber(Type.INCOME),
@@ -84,9 +82,20 @@ class IncomeViewModelImp @Inject constructor(
                 currencyId = currency.value.id,
                 amount = amountTransaction,
                 date = System.currentTimeMillis(),
-                comment = comment
+                comment = comment,
+
+                isFromPocket = false,
+                isToPocket = true,
+                rate = currency.value.rate,
+                rateFrom = currency.value.rate,
+                rateTo = currency.value.rate,
+                balance = balance
             )
-            transactionAdd.invoke(transaction)
+            transactions.add.invoke(transaction)
         }
+    }
+
+    override val balances: Flow<List<BalanceDomain>> = flow {
+        emitAll(walletUseCases.getBalances.invoke())
     }
 }

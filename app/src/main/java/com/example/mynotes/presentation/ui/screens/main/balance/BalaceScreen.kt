@@ -60,7 +60,7 @@ fun ShowBalance(viewModel: BalanceViewModelImp) {
                 }
                 MyText(
                     modifier = Modifier.weight(1.0f),
-                    text = "Balance",
+                    text = "BalanceDomain",
                     fontSize = 18.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,

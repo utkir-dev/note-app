@@ -19,8 +19,10 @@ import com.example.mynotes.presentation.ui.screens.main.home.HomeDirection
 import com.example.mynotes.presentation.ui.screens.main.income.IncomeDirection
 import com.example.mynotes.presentation.ui.screens.main.outcome_currency.OutcomeCurrencyDirection
 import com.example.mynotes.presentation.ui.screens.main.outcome_pocket.OutcomePocketDirection
+import com.example.mynotes.presentation.ui.screens.main.person_info.PersonDirection
 import com.example.mynotes.presentation.ui.screens.main.persons.PersonsDirection
-import com.example.mynotes.presentation.ui.screens.main.pockets.PocketDirection
+import com.example.mynotes.presentation.ui.screens.main.pocket_info.PocketDirection
+import com.example.mynotes.presentation.ui.screens.main.pockets.PocketsDirection
 import com.example.mynotes.presentation.ui.screens.splash.SplashDirection
 import dagger.Module
 import dagger.Provides
@@ -123,14 +125,6 @@ object AppModule {
         )
     }
 
-    @Provides
-    fun providePocketDirection(
-        navigator: AppNavigator
-    ): PocketDirection {
-        return PocketDirectionImpl(
-            navigator
-        )
-    }
 
     @Provides
     fun provideGetCreditDirection(
@@ -161,12 +155,44 @@ object AppModule {
 
     @Provides
     fun providePersonsDirection(
-        navigator: AppNavigator
-    ): PersonsDirection {
+        navigator: AppNavigator,
+        appScreens: AppScreens,
+
+        ): PersonsDirection {
         return PersonsDirectionImpl(
+            navigator,
+            appScreens
+        )
+    }
+
+    @Provides
+    fun providePersonDirection(
+        navigator: AppNavigator
+    ): PersonDirection {
+        return PersonDirectionImpl(
             navigator
         )
     }
+
+    @Provides
+    fun providePocketsDirection(
+        navigator: AppNavigator,
+        appScreens: AppScreens
+    ): PocketsDirection {
+        return PocketsDirectionImpl(
+            navigator, appScreens
+        )
+    }
+
+    @Provides
+    fun providePocketDirection(
+        navigator: AppNavigator
+    ): PocketDirection {
+        return PocketDirectionImpl(
+            navigator
+        )
+    }
+
 
     @Provides
     fun provideHistoryDirectionImpl(

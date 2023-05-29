@@ -4,13 +4,17 @@ import com.example.data.db.entities.Wallet
 import com.example.data.repositories.intrefaces.TransactionRepository
 import com.example.data.repositories.intrefaces.WalletRepository
 import com.example.mynotes.domain.models.TransactionDomain
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 import java.util.UUID
 import javax.inject.Inject
 
 class TransactionIncomeOutcome @Inject constructor(
-    private val repository: TransactionRepository, private val repWallet: WalletRepository
+    private val repository: TransactionRepository,
+    private val repWallet: WalletRepository
 ) {
-    suspend operator fun invoke(trans: TransactionDomain): Long {
+    suspend operator fun invoke(trans: TransactionDomain) {
         val fromWallet = repWallet.getByOwnerAndCurrencyId(trans.fromId, trans.currencyId)
         val toWallet = repWallet.getByOwnerAndCurrencyId(trans.toId, trans.currencyId)
 
@@ -24,21 +28,29 @@ class TransactionIncomeOutcome @Inject constructor(
                     transactionFrom(fromWallet, trans)
                 }
             }
-        return repository.add(trans.toLocal())
     }
 
     private suspend fun transactionFrom(
-        wallet: Wallet, trans: TransactionDomain
-    ): Boolean {
+        wallet: Wallet,
+        trans: TransactionDomain
+    ) {
         val newWallet = wallet.copy(
             balance = wallet.balance - trans.amount, date = trans.date
         )
-        return repWallet.add(newWallet) > 0
+        runBlocking {
+            val def = async {
+                repWallet.add(newWallet)
+            }
+            val result: Long = def.await()
+            if (result > 0) {
+                repository.add(trans.toLocal())
+            }
+        }
     }
 
     private suspend fun transactionTo(
         wallet: Wallet, trans: TransactionDomain
-    ): Boolean {
+    ) {
         val newWallet = if (wallet == null) {
             Wallet(
                 id = UUID.randomUUID().toString(),
@@ -53,7 +65,14 @@ class TransactionIncomeOutcome @Inject constructor(
                 balance = wallet.balance + trans.amount, date = trans.date
             )
         }
-        return repWallet.add(newWallet) > 0
+        runBlocking {
+            val def = async {
+                repWallet.add(newWallet)
+            }
+            val result: Long = def.await()
+            if (result > 0) {
+                repository.add(trans.toLocal())
+            }
+        }
     }
-
 }

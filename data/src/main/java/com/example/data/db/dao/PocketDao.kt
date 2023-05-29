@@ -1,8 +1,6 @@
 package com.example.data.db.dao
 
 import androidx.room.*
-import com.example.common.ResponseResult
-import com.example.data.db.entities.Currency
 import com.example.data.db.entities.Pocket
 import kotlinx.coroutines.flow.Flow
 
@@ -10,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 interface PocketDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(pocket: Pocket): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addPockets(pockets: List<Pocket>): List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(pocket: Pocket): Int
@@ -22,4 +23,5 @@ interface PocketDao {
 
     @Query("SELECT * FROM pockets order by date")
     fun getAll(): Flow<List<Pocket>>
+
 }

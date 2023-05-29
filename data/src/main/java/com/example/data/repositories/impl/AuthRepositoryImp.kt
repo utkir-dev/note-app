@@ -8,9 +8,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 internal class AuthRepositoryImp @Inject constructor(
     private val auth: FirebaseAuth
@@ -23,7 +23,9 @@ internal class AuthRepositoryImp @Inject constructor(
         password: String
     ): SignUpResponse {
         return try {
-            auth.createUserWithEmailAndPassword(email, password).await()
+            auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
+                runBlocking { com.example.common.ResponseResult.Success(true) }
+            }.await()
             com.example.common.ResponseResult.Success(true)
         } catch (e: Exception) {
             com.example.common.ResponseResult.Failure(e)

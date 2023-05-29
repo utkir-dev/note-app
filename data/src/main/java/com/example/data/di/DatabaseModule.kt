@@ -1,6 +1,8 @@
 package com.example.data.di
 
 import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import com.example.data.db.dao.*
 import com.example.data.repositories.impl.*
 import com.example.data.repositories.impl.AuthRepositoryImp
@@ -11,9 +13,11 @@ import com.example.data.repositories.impl.WalletRepositoryImp
 import com.example.data.repositories.intrefaces.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -80,10 +84,12 @@ object DatabaseModule {
     fun provideTransactionRepository(
         remote: RemoteDatabase,
         db: MyRoom,
+        remoteStorage: RemoteRepository,
         auth: AuthRepository
     ): TransactionRepository = TransactionRepositoryImp(
         remote = remote,
         local = db.TransactionDao(),
+        remoteStorage = remoteStorage,
         auth = auth
     )
 
@@ -91,6 +97,41 @@ object DatabaseModule {
     @Singleton
     fun provideRemoteDatabase(): RemoteDatabase = RemoteDatabaseImpl(
         remote = Firebase
+    )
+
+    @Provides
+    @Singleton
+    fun provideSharedPreference(@ApplicationContext context: Context): SharedPrefRepository =
+        SharedPrefRepositoryImpl(
+            context.getSharedPreferences("shared_pref", Context.MODE_PRIVATE)
+        )
+
+    @Provides
+    @Singleton
+    fun provideRemoteStorage(): RemoteStorage = RemoteStorageImpl(
+        remote = FirebaseStorage.getInstance().reference
+    )
+
+    @Provides
+    @Singleton
+    fun provideRemoteRepository(
+        storage: RemoteStorage,
+        database: RemoteDatabase,
+        persons: PersonDao,
+        pockets: PocketDao,
+        currencies: CurrencyDao,
+        wallets: WalletDao,
+        transactions: TransactionDao,
+        shared: SharedPrefRepository
+    ): RemoteRepository = RemoteRepositoryImpl(
+        storage,
+        database,
+        persons,
+        pockets,
+        currencies,
+        wallets,
+        transactions,
+        shared
     )
 
     @Provides
@@ -104,6 +145,10 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDaoPocket(db: MyRoom): PocketDao = db.PocketDao()
+
+    @Provides
+    @Singleton
+    fun provideDaoPersont(db: MyRoom): PersonDao = db.PersonDao()
 
     @Provides
     @Singleton

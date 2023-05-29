@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+
 import com.example.data.db.entities.*
 
 @Database(
@@ -18,7 +19,6 @@ abstract class MyRoom : RoomDatabase() {
     abstract fun PersonDao(): PersonDao
     abstract fun WalletDao(): WalletDao
     abstract fun TransactionDao(): TransactionDao
-
     companion object {
         @Volatile
         private var INSTANSE: MyRoom? = null

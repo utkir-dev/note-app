@@ -10,6 +10,9 @@ interface CurrencyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(currency: Currency): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addCurrencies(currencies: List<Currency>): List<Long>
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(currency: Currency): Int
 
@@ -18,6 +21,9 @@ interface CurrencyDao {
 
     @Query("SELECT * FROM currencies WHERE id=:id limit 1")
     fun getById(id: String): Currency
+
+    @Query("SELECT COUNT(*) FROM currencies")
+    fun getCount(): Int
 
     @Query("SELECT * FROM currencies WHERE id IN (:ids)")
     fun getCurrencies(ids: List<String>): Flow<List<Currency>>

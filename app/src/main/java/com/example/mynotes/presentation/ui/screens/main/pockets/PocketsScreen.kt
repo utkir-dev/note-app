@@ -35,20 +35,21 @@ import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.items.ItemInPocket
 import com.example.mynotes.presentation.utils.types.PopupType
 
-class PocketScreen : AppScreen() {
+class PocketsScreen : AppScreen() {
     @Composable
     override fun Content() {
-        val viewModel: PocketViewModelImp = getViewModel()
+        val viewModel: PocketsViewModelImp = getViewModel()
         ShowCurrencies(viewModel)
     }
 }
 
 @Composable
 fun ShowCurrencies(
-    viewModel: PocketViewModelImp
+    viewModel: PocketsViewModelImp
 
 ) {
     val listPocket by viewModel.pockets.collectAsStateWithLifecycle(emptyList())
+    val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
 
     var visibilityPopup by remember {
         mutableStateOf(false)
@@ -154,13 +155,19 @@ fun ShowCurrencies(
         }
         items(items = listPocket, key = {
             it.id
-        }) { currencyDomain ->
+        }) { pocketDomain ->
+
+            val chips =
+                walletsByOwners.filter { pocketDomain.id == it.ownerId }
             ItemInPocket(
-                pocket = currencyDomain,
+                pocket = pocketDomain,
+                chipsVisibility = true,
+                chips = chips,
                 onItemClicked = {
+                    viewModel.navigateToPocket(pocketDomain)
                     visibilityPopup = false
                 }, onMenuMoreClicked = { offset ->
-                    pocket = currencyDomain
+                    pocket = pocketDomain
                     offsetPopup = offset
                     visibilityPopup =
                         !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true

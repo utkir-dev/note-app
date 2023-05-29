@@ -13,6 +13,14 @@ data class TransactionDomain(
     var currencyTo: String = "",
     var date: Long,
     var comment: String = "",
+
+
+    var isFromPocket: Boolean = false,
+    var isToPocket: Boolean = false,
+    var rate: Double = 1.0,
+    var rateFrom: Double = 1.0,
+    var rateTo: Double = 1.0,
+    var balance: Double = 0.0
 ) {
     override fun toString(): String {
         return """
@@ -39,7 +47,13 @@ data class TransactionDomain(
         currencyFrom = this.currencyFrom,
         currencyTo = this.currencyTo,
         date = this.date,
-        comment = this.comment
+        comment = this.comment,
+        isFromPocket = this.isFromPocket,
+        isToPocket = this.isToPocket,
+        rate = this.rate,
+        rateFrom = this.rateFrom,
+        rateTo = this.rateTo,
+        balance = this.balance
     )
 
     fun isValid(): Boolean =

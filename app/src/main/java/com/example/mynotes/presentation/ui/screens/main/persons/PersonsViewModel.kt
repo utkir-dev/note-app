@@ -10,5 +10,7 @@ interface PersonsViewModel {
     fun setPerson(person: PersonDomain)
     fun add(person: PersonDomain)
     fun back()
+    fun navigateToPerson(person: PersonDomain)
+
     val persons: Flow<List<PersonDomain>>
 }

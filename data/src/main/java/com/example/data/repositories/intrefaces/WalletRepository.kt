@@ -1,8 +1,8 @@
 package com.example.data.repositories.intrefaces
 
 import com.example.data.db.entities.Wallet
-import com.example.data.db.models.Balance
-import com.example.data.db.models.WalletOwner
+import com.example.data.db.database_relations.Balance
+import com.example.data.db.database_relations.WalletOwner
 import kotlinx.coroutines.flow.Flow
 
 interface WalletRepository {
@@ -15,4 +15,5 @@ interface WalletRepository {
     suspend fun getAll(): Flow<List<Wallet>>
     suspend fun getBalabce(): Flow<List<Balance>>
     suspend fun getWalletsByOwnes(): Flow<List<WalletOwner>>
+    suspend fun getWalletsByOwnerId(id: String): Flow<List<WalletOwner>>
 }

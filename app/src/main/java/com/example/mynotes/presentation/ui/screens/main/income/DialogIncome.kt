@@ -33,6 +33,7 @@ import com.example.mynotes.presentation.utils.components.image.Green
 import com.example.mynotes.presentation.utils.components.image.White
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.extensions.huminize
 import com.example.mynotes.presentation.utils.items.ItemEmptyRow
 
 @Composable
@@ -40,6 +41,8 @@ fun DialogIncome(
     viewModel: IncomeViewModel, onDismiss: () -> Unit
 ) {
     val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+    val balances by viewModel.balances.collectAsStateWithLifecycle(emptyList())
+
     val curency by remember {
         viewModel.currency
     }
@@ -202,7 +205,11 @@ fun DialogIncome(
                                         if (viewModel.currency.value.id.isEmpty()) {
                                             viewModel.setCurrency(currencies[0])
                                         }
-                                        viewModel.addTransaction(amount, comment)
+                                        viewModel.addTransaction(
+                                            amount,
+                                            comment,
+                                            balances.sumOf { it.amount * (1 / it.rate) }
+                                        )
                                         onDismiss()
                                     }
                                 }, text = "Tasdiq", colors = ButtonDefaults.buttonColors(
@@ -211,11 +218,9 @@ fun DialogIncome(
                                     .fillMaxWidth()
                                     .padding(8.dp)
                                     .weight(1F)
-
                             ) {}
                         }
                     }
-
                 }
 
                 if (visibilityDropDownMenu) LazyColumn(
@@ -246,11 +251,7 @@ fun DialogIncome(
                             color = MaterialTheme.customColors.textColor)
                     }
                 }
-
-
             }
-
-
         }
     }
 }

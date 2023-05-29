@@ -4,7 +4,6 @@ import com.example.data.constants.Const
 import com.example.data.constants.Const.PERSONS
 import com.example.data.db.dao.PersonDao
 import com.example.data.db.entities.Person
-import com.example.data.db.models.PersonWithWallets
 import com.example.data.repositories.intrefaces.AuthRepository
 import com.example.data.repositories.intrefaces.PersonRepository
 import com.example.data.repositories.intrefaces.RemoteDatabase
@@ -84,7 +83,5 @@ internal class PersonRepositoryImp @Inject constructor(
         return local.getAll()
     }
 
-    override suspend fun getPersonWithWallets(): Flow<List<PersonWithWallets>> {
-        return local.getPersonsWithWallets()
-    }
+
 }

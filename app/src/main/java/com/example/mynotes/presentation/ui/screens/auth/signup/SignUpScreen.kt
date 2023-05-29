@@ -2,6 +2,7 @@ package com.example.mynotes.presentation.ui.screens.auth.signup
 
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -19,6 +20,10 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.presentation.ui.directions.common.UiState
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.buttons.buttonColors
+import com.example.mynotes.presentation.utils.components.image.Green
+import com.example.mynotes.presentation.utils.components.image.White
+import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.progress.MyCircularProgressBar
 import com.example.mynotes.presentation.utils.components.text.MyText
 
@@ -58,17 +63,24 @@ fun SignUp(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
-                modifier = Modifier.padding(bottom = 15.dp),
+                modifier = Modifier
+                    .padding(bottom = 15.dp),
                 value = login,
                 onValueChange = { it ->
                     login = it
                 },
-                //  placeholder = { Text(text = "Login") },
-                label = { MyText(text = "Login") },
+                label = {
+                    MyText(
+                        text = "Login",
+                        color = MaterialTheme.customColors.subTextColor
+                    )
+                },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
-                )
+                ),
+                shape = RoundedCornerShape(15.dp),
+                colors = buttonColors()
             )
 
             OutlinedTextField(
@@ -76,22 +88,27 @@ fun SignUp(
                 onValueChange = { it ->
                     password1 = it
                 },
-                label = { MyText(text = "Parol") },
-                trailingIcon = {
+                label = {
+                    MyText(
+                        text = "Parol",
+                        color = MaterialTheme.customColors.subTextColor
+                    )
+                }, trailingIcon = {
                     IconButton(onClick = {
                         passwordVisibility = !passwordVisibility
                     }) {
                         Icon(painter = icon, contentDescription = "Icon Visibility")
                     }
                 },
-
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(onDone = KeyboardActions.Default.onDone),
                 visualTransformation = if (passwordVisibility) VisualTransformation.None
-                else PasswordVisualTransformation()
+                else PasswordVisualTransformation(),
+                shape = RoundedCornerShape(15.dp),
+                colors = buttonColors()
             )
 
             OutlinedTextField(
@@ -99,33 +116,45 @@ fun SignUp(
                 onValueChange = { it ->
                     password2 = it
                 },
-                label = { MyText(text = "Parol") },
-                trailingIcon = {
+                label = {
+                    MyText(
+                        text = "Parol",
+                        color = MaterialTheme.customColors.subTextColor
+                    )
+                }, trailingIcon = {
                     IconButton(onClick = {
                         passwordVisibility = !passwordVisibility
                     }) {
                         Icon(painter = icon, contentDescription = "Icon Visibility")
                     }
                 },
-
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(onDone = KeyboardActions.Default.onDone),
                 visualTransformation = if (passwordVisibility) VisualTransformation.None
-                else PasswordVisualTransformation()
+                else PasswordVisualTransformation(),
+                shape = RoundedCornerShape(15.dp),
+                colors = buttonColors()
             )
+
+
             Spacer(modifier = Modifier.height(25.dp))
-            Button(onClick = {
-                if (password1==password2){
-                    dispatcher(login, password1)
-                }else{
-                 // Toast.makeText()
-                }
 
 
-            }) {
+            Button(
+                onClick = {
+                    if (password1 == password2) {
+                        dispatcher(login, password1)
+                    } else {
+                        // Toast.makeText()
+                    }
+                }, colors = ButtonDefaults.buttonColors(
+                    containerColor = Green,
+                    contentColor = White
+                )
+            ) {
                 MyText(text = "Registraciya", fontSize = 18.sp)
             }
         }
@@ -137,6 +166,7 @@ fun SignUp(
         is UiState.Error -> {
 
         }
+
     }
 
 }

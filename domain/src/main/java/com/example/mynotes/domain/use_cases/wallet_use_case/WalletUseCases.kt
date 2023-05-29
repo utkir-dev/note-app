@@ -8,5 +8,6 @@ class WalletUseCases @Inject constructor(
     var getByOwnerId: WalletGetByOwnerId,
     var getAll: WalletGetAll,
     var getBalances: GetBalance,
-    var getWalletsByOwnes: GetWalletsByOwnes
+    var getWalletsByOwnes: GetWalletsByOwnes,
+    var getWalletsByOwnerId: GetWalletsByOwnerId
 )

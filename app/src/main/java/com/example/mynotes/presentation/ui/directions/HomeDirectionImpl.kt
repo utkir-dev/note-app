@@ -40,7 +40,7 @@ class HomeDirectionImpl @Inject constructor(
     }
 
     override suspend fun navigateToPockets() {
-        navigator.navigateTo(appScreens.getPocketScreen())
+        navigator.navigateTo(appScreens.getPocketsScreen())
     }
 
     override suspend fun navigateToCurrencies() {

@@ -54,6 +54,7 @@ fun Show(
     val pockets by viewModel.pockets.collectAsStateWithLifecycle(emptyList())
     val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
     val wallets by viewModel.wallets.collectAsStateWithLifecycle(emptyList())
+    val balances by viewModel.balances.collectAsStateWithLifecycle(emptyList())
 
     val person by remember { viewModel.person }
     val curency by remember { viewModel.currency }
@@ -369,7 +370,11 @@ fun Show(
                                     )
                                     if (isValid) {
                                         visibilityValidationAmount = false
-                                        viewModel.addTransaction(amount, comment)
+                                        viewModel.addTransaction(
+                                            amount,
+                                            comment,
+                                            balances.sumOf { it.amount * (1 / it.rate) }
+                                        )
                                         viewModel.back()
                                     } else {
                                         visibilityValidationAmount = true

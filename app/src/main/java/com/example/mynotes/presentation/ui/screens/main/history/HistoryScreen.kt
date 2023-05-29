@@ -32,7 +32,6 @@ class HistoryScreen() : AppScreen() {
     }
 }
 
-
 @Composable
 fun Show(viewModel: HistoryViewModelImp) {
     val historyList by viewModel.history.collectAsStateWithLifecycle(emptyList())
@@ -76,7 +75,6 @@ fun Show(viewModel: HistoryViewModelImp) {
                 isCommentVisible = true,
                 onItemClicked = { })
         }
-
     }
 }
 

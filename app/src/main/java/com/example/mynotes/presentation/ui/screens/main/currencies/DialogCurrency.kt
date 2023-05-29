@@ -26,6 +26,7 @@ import com.example.mynotes.presentation.utils.components.buttons.MyButton
 import com.example.mynotes.presentation.utils.components.buttons.buttonColors
 import com.example.mynotes.presentation.utils.components.image.*
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.extensions.huminize
 import java.util.*
 
 @Composable
@@ -39,7 +40,7 @@ fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Uni
         mutableStateOf(false)
     }
     var rateValue by rememberSaveable {
-        mutableStateOf(currency.rate.toString())
+        mutableStateOf(if (currency.rate > 0) currency.rate.toString() else "")
     }
     var rateValidation by rememberSaveable {
         mutableStateOf(false)
@@ -147,6 +148,7 @@ fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Uni
                     MyButton(
                         onClick = { onDismiss(null) },
                         text = "Bekor",
+                        textSize = 16.sp,
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Gray,
@@ -178,6 +180,7 @@ fun DialogCurrency(currency: CurrencyDomain, onDismiss: (CurrencyDomain?) -> Uni
                             }
                         },
                         text = "Tasdiq",
+                        textSize = 16.sp,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Green,
                             contentColor = White

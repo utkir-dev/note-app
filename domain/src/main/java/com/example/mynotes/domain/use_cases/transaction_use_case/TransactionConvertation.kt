@@ -9,6 +9,7 @@ import com.example.mynotes.domain.models.TransactionDomain
 import com.example.mynotes.domain.models.WalletDomain
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import javax.inject.Inject
 
@@ -23,7 +24,7 @@ class TransactionConvertation @Inject constructor(
         curFrom: CurrencyDomain,
         curTo: CurrencyDomain,
         amountDollar: Double
-    ): Long {
+    ) {
 //from
         val newWalletFrom = if (fromWallet.currencyId == currencyConvert.id) {
             fromWallet.copy(
@@ -60,12 +61,14 @@ class TransactionConvertation @Inject constructor(
                 date = trans.date
             )
         }
-        val resultConvertation = repository.add(trans.toLocal())
-        repWallet.addWallets(listOf(newWalletFrom, newWalletTo))
-
-
-        return resultConvertation
+        runBlocking {
+            val def1 = async {
+                repWallet.addWallets(listOf(newWalletFrom, newWalletTo))
+            }
+            val result: List<Long> = def1.await()
+            if (result.isNotEmpty()) {
+                repository.add(trans.toLocal())
+            }
+        }
     }
-
-
 }

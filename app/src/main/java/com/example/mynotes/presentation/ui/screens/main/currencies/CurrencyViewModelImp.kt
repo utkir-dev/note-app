@@ -23,7 +23,20 @@ class CurrencyViewModelImp @Inject constructor(
     private val useCases: CurrencyUseCases,
     private val direction: CurrencyDirection
 ) : ViewModel(), CurrencyViewModel {
-
+    init {
+        viewModelScope.launch {
+            if (useCases.getCount.invoke() == 0) {
+                useCases.add.invoke(
+                    CurrencyDomain(
+                        id = UUID.randomUUID().toString(),
+                        name = "dollar",
+                        rate = 1.0,
+                        date = System.currentTimeMillis()
+                    )
+                )
+            }
+        }
+    }
 
     override var currencies: Flow<List<CurrencyDomain>> = flow {
         emitAll(useCases.getAll.invoke())

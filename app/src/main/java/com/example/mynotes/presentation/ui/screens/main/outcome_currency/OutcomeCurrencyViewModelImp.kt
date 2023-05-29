@@ -57,7 +57,11 @@ class OutcomeCurrencyViewModelImp @Inject constructor(
         }
     }
 
-    override fun addTransaction(amountTransaction: Double, comment: String) {
+    override val balances: Flow<List<BalanceDomain>> = flow {
+        emitAll(walletUseCases.getBalances.invoke())
+    }
+
+    override fun addTransaction(amountTransaction: Double, comment: String, balance: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val transaction = TransactionDomain(
                 id = UUID.randomUUID().toString(),
@@ -67,7 +71,14 @@ class OutcomeCurrencyViewModelImp @Inject constructor(
                 currencyId = currency.value.id,
                 amount = amountTransaction,
                 date = System.currentTimeMillis(),
-                comment = comment
+                comment = comment,
+
+                isFromPocket = true,
+                isToPocket = false,
+                rate = currency.value.rate,
+                rateFrom = currency.value.rate,
+                rateTo = currency.value.rate,
+                balance = balance
             )
             transactionUseCase.invoke(transaction)
         }

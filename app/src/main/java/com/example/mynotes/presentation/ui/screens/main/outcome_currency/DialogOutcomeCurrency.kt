@@ -39,6 +39,7 @@ fun DialogOutcomeCurrency(
     viewModel: OutcomeCurrencyViewModel, onDismiss: () -> Unit
 ) {
     val pocket by remember { viewModel.pocket }
+    val balances by viewModel.balances.collectAsStateWithLifecycle(emptyList())
 
     val wallet by remember { viewModel.wallet }
     var attentionText by remember { mutableStateOf("") }
@@ -168,10 +169,14 @@ fun DialogOutcomeCurrency(
                                         wallet.balance
                                     )
                                     if (isValid) {
-                                        viewModel.addTransaction(amount, comment)
+                                        viewModel.addTransaction(
+                                            amount,
+                                            comment,
+                                            balances.sumOf { it.amount * (1 / it.rate) }
+                                        )
                                         visibilityValidation = false
                                         attentionText =
-                                            "${pocket.name} dan ${amount} ${curency.name} chiqim qilindi"
+                                            "${pocket.name} dan ${amount.huminize()} ${curency.name} chiqim qilindi"
                                         visibilityDialogAttention = true
                                         onDismiss()
                                     } else {
@@ -183,16 +188,11 @@ fun DialogOutcomeCurrency(
                                     .fillMaxWidth()
                                     .padding(8.dp)
                                     .weight(1F)
-
                             ) {}
                         }
                     }
-
                 }
-
             }
-
-
         }
     }
 }

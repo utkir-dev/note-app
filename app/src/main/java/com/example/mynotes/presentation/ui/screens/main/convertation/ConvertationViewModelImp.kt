@@ -1,6 +1,5 @@
 package com.example.mynotes.presentation.ui.screens.main.convertation
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,6 +11,7 @@ import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
 import com.example.mynotes.domain.use_cases.pocket_use_case.PocketUseCases
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionUseCases
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
+import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -44,6 +44,9 @@ class ConvertationViewModelImp @Inject constructor(
     override val wallets: Flow<List<WalletDomain>> = flow {
         emitAll(walletUseCases.getAll.invoke())
     }
+    override val balances: Flow<List<BalanceDomain>> = flow {
+        emitAll(walletUseCases.getBalances.invoke())
+    }
 
     override fun setCurrencyFrom(currency: CurrencyDomain) {
         viewModelScope.launch { this@ConvertationViewModelImp.currencyFrom.value = currency }
@@ -71,7 +74,8 @@ class ConvertationViewModelImp @Inject constructor(
         amountTransaction: Double,
         walletFrom: WalletDomain,
         amountDollar: Double,
-        comment: String = ""
+        comment: String = "",
+        balance: Double
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val transaction = TransactionDomain(
@@ -84,7 +88,14 @@ class ConvertationViewModelImp @Inject constructor(
                 currencyFrom = currencyFrom.value.id,
                 currencyTo = currencyTo.value.id,
                 date = System.currentTimeMillis(),
-                comment = comment
+                comment = comment,
+
+                isFromPocket = true,
+                isToPocket = true,
+                rate = currency.value.rate,
+                rateFrom = currencyFrom.value.rate,
+                rateTo = currencyTo.value.rate,
+                balance = balance
             )
             this@ConvertationViewModelImp.transactionUseCase.getConvertation.invoke(
                 trans = transaction,
@@ -99,7 +110,10 @@ class ConvertationViewModelImp @Inject constructor(
 
     val isValid: MutableState<Boolean> = mutableStateOf(false)
 
-    fun validateTransaction(amount: String, walletFrom: WalletDomain?) {
+    fun validateTransaction(
+        amount: String, walletFrom: WalletDomain?, comment: String,
+        balance: Double
+    ) {
         viewModelScope.launch {
             var n = -1.0
             try {
@@ -107,8 +121,10 @@ class ConvertationViewModelImp @Inject constructor(
                 walletFrom?.let { wallet ->
                     val amountDollar = (1 / currency.value.rate) * n
                     val balanceDollar = wallet.balance / currencyFrom.value.rate
+                    if (balanceDollar >= amountDollar) {
+                        addTransaction(n, wallet, amountDollar, comment, balance)
+                    }
                     isValid.value = balanceDollar >= amountDollar
-                    addTransaction(n, wallet, amountDollar)
                 }
             } catch (_: Exception) {
                 isValid.value = false

@@ -13,6 +13,13 @@ data class TransactionRemote(
     var currencyTo: String = "",
     var date: Long,
     var comment: String = "",
+
+    var isFromPocket: Boolean = false,
+    var isToPocket: Boolean = false,
+    var rate: Double = 1.0,
+    var rateFrom: Double = 1.0,
+    var rateTo: Double = 1.0,
+    var balance: Double = 0.0
 ) {
     fun toLocal() = Transaction(
         id = this.id,
@@ -24,6 +31,13 @@ data class TransactionRemote(
         currencyFrom = this.currencyFrom,
         currencyTo = this.currencyTo,
         date = this.date,
-        comment = this.comment
+        comment = this.comment,
+        uploaded = true,
+        isFromPocket = this.isFromPocket,
+        isToPocket = this.isToPocket,
+        rate = this.rate,
+        rateFrom = this.rateFrom,
+        rateTo = this.rateTo,
+        balance = this.balance
     )
 }

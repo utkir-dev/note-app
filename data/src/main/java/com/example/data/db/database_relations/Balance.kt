@@ -1,4 +1,4 @@
-package com.example.data.db.models
+package com.example.data.db.database_relations
 
 import androidx.room.Entity
 

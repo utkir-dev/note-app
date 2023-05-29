@@ -54,6 +54,7 @@ fun Show(
     val pockets by viewModel.pockets.collectAsStateWithLifecycle(emptyList())
     val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
     val wallets by viewModel.wallets.collectAsStateWithLifecycle(emptyList())
+    val balances by viewModel.balances.collectAsStateWithLifecycle(emptyList())
 
     val currencyFrom by remember { viewModel.currencyFrom }
     val currencyTo by remember { viewModel.currencyTo }
@@ -469,7 +470,12 @@ fun Show(
                                 onClick = {
                                     val fromWallet: WalletDomain? =
                                         wallets.firstOrNull { it.ownerId == pocketFrom.id && it.currencyId == currencyFrom.id }
-                                    viewModel.validateTransaction(amountTransaction, fromWallet)
+                                    viewModel.validateTransaction(
+                                        amountTransaction,
+                                        fromWallet,
+                                        "",
+                                        balances.sumOf { it.amount * (1 / it.rate) }
+                                    )
                                     if (isValid) {
                                         visibilityValidationAmount = false
                                         viewModel.back()

@@ -2,8 +2,8 @@ package com.example.data.db.dao
 
 import androidx.room.*
 import com.example.data.db.entities.Wallet
-import com.example.data.db.models.Balance
-import com.example.data.db.models.WalletOwner
+import com.example.data.db.database_relations.Balance
+import com.example.data.db.database_relations.WalletOwner
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -54,5 +54,14 @@ interface WalletDao {
     )
     fun getWalletsByOwnerGroup(): Flow<List<WalletOwner>>
 
+    @Query(
+        "SELECT wallets.id as id, wallets.ownerId as ownerId, currencies.name as currencyName,\n" +
+                "wallets.balance as currencyBalance, \n" +
+                "currencies.rate as rate \n" +
+                "FROM wallets,currencies \n" +
+                "WHERE wallets.currencyId=currencies.id and wallets.ownerId=:id\n" +
+                "GROUP BY wallets.id"
+    )
+    fun getWalletsByOwnerId(id: String): Flow<List<WalletOwner>>
 }
 

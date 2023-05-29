@@ -3,9 +3,7 @@ package com.example.mynotes.presentation.ui.screens.main.persons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,13 +14,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.domain.models.PersonDomain
-import com.example.mynotes.domain.models.WalletDomain
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.buttons.ButtonAdd
 import com.example.mynotes.presentation.utils.components.buttons.MyButton
@@ -33,6 +31,7 @@ import com.example.mynotes.presentation.utils.components.image.Green
 import com.example.mynotes.presentation.utils.components.image.White
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.extensions.round
 import com.example.mynotes.presentation.utils.items.ItemPerson
 import com.example.mynotes.presentation.utils.types.PopupType
 
@@ -48,29 +47,29 @@ class PersonsScreen : AppScreen() {
 fun Show(
     viewModel: PersonsViewModelImp
 ) {
-    // val radioOptions = listOf("hamma", "qarzdor", "haqdor")
-    //  val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
     var menu by remember {
         mutableStateOf(0)
     }
-
-    val personsWithWallets by viewModel.personsWithWallets.collectAsStateWithLifecycle(emptyList())
+    val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
+    val persons by viewModel.persons.collectAsStateWithLifecycle(emptyList())
 
     val list = if (menu == 1)
-        personsWithWallets.filter { it.wallets.filter { it.balance >= 0 }.isNotEmpty() }
-    else if (menu == 2) personsWithWallets.filter {
-        it.wallets.filter { it.balance <= 0 }.isNotEmpty()
+        persons.filter {
+            walletsByOwners.filter { it.currencyBalance.round() > 0 }.map { it.ownerId }
+                .contains(it.id)
+        }
+    else if (menu == 2) persons.filter {
+        walletsByOwners.filter { it.currencyBalance.round() < 0 }.map { it.ownerId }
+            .contains(it.id)
     }
-    else personsWithWallets
-
-    val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
+    else persons
 
     var visibilityAddDialog by remember {
         mutableStateOf(false)
     }
-    var visibilityIncomeDialog by remember {
-        mutableStateOf(false)
-    }
+//    var visibilityIncomeDialog by remember {
+//        mutableStateOf(false)
+//    }
 
     var visibilityConfirm by remember {
         mutableStateOf(false)
@@ -133,8 +132,7 @@ fun Show(
                         .background(MaterialTheme.customColors.backgroundBrush)
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = {
                         viewModel.back()
@@ -146,12 +144,13 @@ fun Show(
                         )
                     }
                     MyText(
-                        modifier = Modifier.weight(1.0f),
                         text = "Shaxslar",
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.customColors.textColor,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
                     )
                 }
 
@@ -224,16 +223,16 @@ fun Show(
                 ) {
                     itemsIndexed(list) { index, owner ->
                         val chips =
-                            walletsByOwners.filter { owner.wallets.map { it.id }.contains(it.id) }
+                            walletsByOwners.filter { owner.id == it.ownerId && it.currencyBalance.round() != 0.0 }
                         ItemPerson(
-                            person = owner.person,
+                            person = owner,
                             chips = chips,
                             onItemClicked = {
-                                viewModel.setPerson(owner.person)
-                                visibilityIncomeDialog = true
+                                viewModel.navigateToPerson(owner)
+                                //setPerson(owner)
                             },
                             onMenuMoreClicked = { offset ->
-                                currentPerson = owner.person
+                                currentPerson = owner
                                 offsetPopup = offset
                                 visibilityPopup =
                                     !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true

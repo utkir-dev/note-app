@@ -1,10 +1,7 @@
 package com.example.mynotes.presentation.ui.directions.common
 
 import com.example.mynotes.presentation.ui.dispatcher.AppNavigator
-import com.example.mynotes.presentation.ui.screens.AppScreens
-import com.example.mynotes.presentation.ui.screens.main.currencies.CurrencyDirection
-import com.example.mynotes.presentation.ui.screens.main.home.HomeDirection
-import com.example.mynotes.presentation.ui.screens.main.pockets.PocketDirection
+import com.example.mynotes.presentation.ui.screens.main.pocket_info.PocketDirection
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
@@ -15,4 +12,5 @@ class PocketDirectionImpl @Inject constructor(
     override suspend fun back() {
         navigator.back()
     }
+
 }

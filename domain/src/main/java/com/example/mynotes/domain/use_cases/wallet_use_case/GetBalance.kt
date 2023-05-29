@@ -1,6 +1,6 @@
 package com.example.mynotes.domain.use_cases.wallet_use_case
 
-import com.example.data.db.models.Balance
+import com.example.data.db.database_relations.Balance
 import com.example.data.repositories.intrefaces.WalletRepository
 import com.example.mynotes.domain.models.BalanceDomain
 import kotlinx.coroutines.flow.Flow

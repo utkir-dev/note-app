@@ -90,4 +90,5 @@ internal class CurrencyRepositoryImp @Inject constructor(
     }
 
     override suspend fun getAll() = local.getAll()
+    override suspend fun getCount() = local.getCount()
 }

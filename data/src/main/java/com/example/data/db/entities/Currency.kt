@@ -8,7 +8,6 @@ import com.example.data.db.remote_models.CurrencyRemote
 @Entity(tableName = "currencies")
 data class Currency(
     @PrimaryKey
-
     val id: String,
     var name: String,
     var rate: Double,

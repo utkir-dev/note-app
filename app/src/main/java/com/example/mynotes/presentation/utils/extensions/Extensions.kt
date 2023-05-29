@@ -36,3 +36,13 @@ fun Long.huminize(): String {
     }
     return formatted
 }
+
+fun Double.round() = Math.round(this * 100.0) / 100.0
+//fun String.huminize(): String {
+//    var text = this
+//    try {
+//        text = text.toDouble().huminize()
+//    } catch (_: Exception) {
+//    }
+//    return text
+//}

@@ -8,5 +8,4 @@ class PersonUseCases @Inject constructor(
     var update: PersonUpdate,
     var getOne: PersonGet,
     var getAll: PersonGetAll,
-    var getPersonsWithWallets: GetPersonsWithWallets
 )

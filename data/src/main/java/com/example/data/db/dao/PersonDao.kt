@@ -2,13 +2,16 @@ package com.example.data.db.dao
 
 import androidx.room.*
 import com.example.data.db.entities.Person
-import com.example.data.db.models.PersonWithWallets
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Singleton
 
 @Dao
 interface PersonDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(person: Person): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addPersons(persons: List<Person>): List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(person: Person): Int
@@ -22,7 +25,4 @@ interface PersonDao {
     @Query("SELECT * FROM persons order by date")
     fun getAll(): Flow<List<Person>>
 
-    @Transaction
-    @Query("SELECT * FROM persons")
-    fun getPersonsWithWallets(): Flow<List<PersonWithWallets>>
 }

@@ -111,6 +111,7 @@ fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
                             containerColor = Gray,
                             contentColor = White
                         ),
+                        textSize = 16.sp,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -134,6 +135,7 @@ fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
                             }
                         },
                         text = "Tasdiq",
+                        textSize = 16.sp,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Green,
                             contentColor = White
