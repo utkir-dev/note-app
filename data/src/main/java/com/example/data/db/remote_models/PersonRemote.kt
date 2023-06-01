@@ -3,11 +3,11 @@ package com.example.data.db.remote_models
 import com.example.data.db.entities.Person
 
 data class PersonRemote(
-    val id: String,
-    val name: String,
-    val phone: String,
-    var address: String,
-    var date: Long
+    var id: String = "",
+    var name: String = "",
+    var phone: String = "",
+    var address: String = "",
+    var date: Long = 0
 ) {
     fun toLocal() = Person(
         id = this.id,

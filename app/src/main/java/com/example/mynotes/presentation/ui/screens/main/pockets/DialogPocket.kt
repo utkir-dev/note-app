@@ -157,12 +157,3 @@ fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
 
 private fun validateName(textValue: String) = textValue.trim().isEmpty()
 
-private fun validateRate(rateValue: String): Boolean {
-    var number = -1.0
-    try {
-        number = rateValue.trim().toDouble()
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    return number <= 0
-}

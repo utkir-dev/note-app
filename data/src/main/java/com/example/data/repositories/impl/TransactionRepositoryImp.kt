@@ -18,13 +18,13 @@ import javax.inject.Inject
 internal class TransactionRepositoryImp @Inject constructor(
     private val remote: RemoteDatabase,
     private val local: TransactionDao,
-    private val remoteStorage: RemoteRepository,
+   // private val remoteStorage: RemoteRepository,
     private val auth: AuthRepository
 ) : TransactionRepository {
 
     override suspend fun add(transaction: Transaction): Long {
         val result = local.add(transaction)
-        remoteStorage.upload()
+        // remoteStorage.upload()
         val dbRemote = remote.storageRef.firestore
             .collection(USERS).document(auth.currentUser?.uid ?: "")
             .collection(TRANSACTIONS)

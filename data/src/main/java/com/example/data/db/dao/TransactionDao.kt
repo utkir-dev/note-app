@@ -16,8 +16,23 @@ interface TransactionDao {
     @Query("DELETE FROM transactions WHERE id=:id")
     suspend fun delete(id: String): Int
 
+    @Query("DELETE FROM transactions")
+    fun clear()
+
     @Query("SELECT * FROM transactions order by date desc")
     fun getAll(): Flow<List<Transaction>>
+
+    @Query("SELECT COUNT(*) FROM transactions")
+    fun getCount(): Int
+
+    @Query("SELECT MAX(date) FROM transactions")
+    fun getLastUpdatedTime(): Long
+
+    @Query("SELECT * FROM transactions WHERE date>:date order by date desc")
+    fun getFromDate(date: Long): Flow<List<Transaction>>
+
+    @Query("SELECT * FROM transactions WHERE uploaded=:uploaded")
+    fun getNotUploaded(uploaded: Boolean): Flow<List<Transaction>>
 
     @Query(
         "SELECT transactions.type AS title, " +

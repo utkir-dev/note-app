@@ -14,4 +14,16 @@ class SharedPrefRepositoryImpl @Inject constructor(
     override suspend fun getLong(key: String): Long {
         return sharedPref.getLong(key, 0)
     }
+
+    override suspend fun saveBoolean(key: String, value: Boolean) {
+        sharedPref.edit().putBoolean(key, value).apply()
+    }
+
+    override suspend fun getBoolean(key: String): Boolean {
+        return sharedPref.getBoolean(key, false)
+    }
+
+    override suspend fun clearCash() =
+        sharedPref.edit().clear().commit()
+
 }

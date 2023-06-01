@@ -89,7 +89,7 @@ object DatabaseModule {
     ): TransactionRepository = TransactionRepositoryImp(
         remote = remote,
         local = db.TransactionDao(),
-        remoteStorage = remoteStorage,
+     //   remoteStorage = remoteStorage,
         auth = auth
     )
 
@@ -122,7 +122,9 @@ object DatabaseModule {
         currencies: CurrencyDao,
         wallets: WalletDao,
         transactions: TransactionDao,
-        shared: SharedPrefRepository
+        shared: SharedPrefRepository,
+        auth: AuthRepository,
+        @ApplicationContext context: Context
     ): RemoteRepository = RemoteRepositoryImpl(
         storage,
         database,
@@ -131,7 +133,9 @@ object DatabaseModule {
         currencies,
         wallets,
         transactions,
-        shared
+        shared,
+        auth,
+        context
     )
 
     @Provides

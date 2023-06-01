@@ -161,6 +161,9 @@ fun ShowCurrencies(
             ItemCurrency(
                 currency = currencyDomain,
                 onItemClicked = {
+                    if (!currencyDomain.uploaded) {
+                        viewModel.add(currencyDomain)
+                    }
                     visibilityPopup = false
                 }, onMenuMoreClicked = { offset ->
                     currency = currencyDomain

@@ -3,10 +3,10 @@ package com.example.data.db.remote_models
 import com.example.data.db.entities.Wallet
 
 data class WalletRemote(
-    val id: String,
+    var id: String = "",
     var type: Int = 0,
-    val ownerId: String,
-    val currencyId: String,
+    var ownerId: String = "",
+    var currencyId: String = "",
     var balance: Double = 0.0,
     var date: Long = 0
 ) {

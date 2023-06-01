@@ -8,7 +8,7 @@ import com.example.common.Type
 import com.example.common.getTypeNumber
 import com.example.mynotes.domain.models.*
 import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
-import com.example.mynotes.domain.use_cases.person_use_case.PersonUseCases
+import com.example.mynotes.domain.use_cases.getcredit_use_case.person_use_case.PersonUseCases
 import com.example.mynotes.domain.use_cases.pocket_use_case.PocketUseCases
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionDebetCredit
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases

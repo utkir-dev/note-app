@@ -11,6 +11,7 @@ import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 internal class CurrencyRepositoryImp @Inject constructor(
@@ -26,39 +27,31 @@ internal class CurrencyRepositoryImp @Inject constructor(
         val dbRemote = remote.storageRef.firestore
             .collection(USERS).document(auth.currentUser?.uid ?: "")
             .collection(CURRENCIES)
-        var remoteTask = false
-        coroutineScope {
-            val job1 = async {
-                dbRemote.document(currency.id).set(currency.toRemote()).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        remoteTask = true
 
-                    }
+        dbRemote.document(currency.id).set(currency.toRemote()).addOnCompleteListener {
+            if (it.isSuccessful) {
+                runBlocking {
+                    local.add(currency.copy(uploaded = true))
                 }
             }
-            job1.await()
         }
+
         return result
     }
 
     override suspend fun update(currency: Currency): Int {
+        val result = local.update(currency)
         val dbRemote = remote.storageRef.firestore
             .collection(USERS).document(auth.currentUser?.uid ?: "")
             .collection(CURRENCIES)
-        var remoteTask = false
-        coroutineScope {
-            val task1 = async {
-                dbRemote.document(currency.id).set(currency.toRemote()).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        remoteTask = true
-                    }
+        dbRemote.document(currency.id).set(currency.toRemote()).addOnCompleteListener {
+            if (it.isSuccessful) {
+                runBlocking {
+                    local.update(currency.copy(uploaded = true))
                 }
             }
-
-            task1.await()
         }
-
-        return local.update(currency)
+        return result
     }
 
     override suspend fun delete(currency: Currency): Int {

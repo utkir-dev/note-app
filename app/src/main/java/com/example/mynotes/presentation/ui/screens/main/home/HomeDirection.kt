@@ -11,5 +11,5 @@ interface HomeDirection {
     suspend fun navigateToPockets()
     suspend fun navigateToCurrencies()
     suspend fun navigateToHistory()
-    suspend fun navigateToSignIn()
+    suspend fun replaceToSignIn()
 }

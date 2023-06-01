@@ -9,4 +9,5 @@ internal class RemoteDatabaseImpl @Inject constructor(
 ) : RemoteDatabase {
     override val storageRef: Firebase
         get() = remote
+
 }

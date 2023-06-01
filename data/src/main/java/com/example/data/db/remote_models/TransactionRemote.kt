@@ -3,15 +3,15 @@ package com.example.data.db.remote_models
 import com.example.data.db.entities.Transaction
 
 data class TransactionRemote(
-    val id: String,
+    var id: String = "",
     var type: Int = 0,
-    var fromId: String,
-    var toId: String,
-    var currencyId: String,
-    var amount: Double,
+    var fromId: String = "",
+    var toId: String = "",
+    var currencyId: String = "",
+    var amount: Double = 0.0,
     var currencyFrom: String = "",
     var currencyTo: String = "",
-    var date: Long,
+    var date: Long = 0,
     var comment: String = "",
 
     var isFromPocket: Boolean = false,

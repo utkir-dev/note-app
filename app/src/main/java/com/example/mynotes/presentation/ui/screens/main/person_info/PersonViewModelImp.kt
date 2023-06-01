@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mynotes.domain.models.*
 import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
-import com.example.mynotes.domain.use_cases.person_use_case.PersonUseCases
+import com.example.mynotes.domain.use_cases.getcredit_use_case.person_use_case.PersonUseCases
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionUseCases
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
 import com.example.mynotes.presentation.utils.contstants.HISTORY_LIMIT

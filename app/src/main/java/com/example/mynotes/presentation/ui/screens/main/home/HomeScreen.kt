@@ -1,5 +1,6 @@
 package com.example.mynotes.presentation.ui.screens.main.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,6 +45,7 @@ class HomeScreen() : AppScreen() {
 
 @Composable
 fun ShowDrawer(viewModel: HomeViewModelImp) {
+    Log.d("enter", " HomeScreen")
 
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var width by remember {

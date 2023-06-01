@@ -166,7 +166,5 @@ fun SignUp(
         is UiState.Error -> {
 
         }
-
     }
-
 }

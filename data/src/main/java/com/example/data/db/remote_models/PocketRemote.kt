@@ -4,9 +4,9 @@ import com.example.data.db.entities.Person
 import com.example.data.db.entities.Pocket
 
 data class PocketRemote(
-    val id: String,
-    var name: String,
-    var date: Long
+    val id: String = "",
+    var name: String = "",
+    var date: Long = 0
 ) {
     fun toLocal() = Pocket(
         id = this.id,

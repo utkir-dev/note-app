@@ -21,18 +21,19 @@ internal class PocketRepositoryImp @Inject constructor(
 
     override suspend fun add(pocket: Pocket): Long {
         val result = local.add(pocket)
-        val dbRemote = remote.storageRef.firestore.collection(Const.USERS)
-            .document(auth.currentUser?.uid ?: "").collection(POCKETS)
+
         var remoteTask = false
 
         coroutineScope {
             val job1 = async {
-                dbRemote.document(pocket.id).set(pocket.toRemote()).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        remoteTask = true
+                remote.storageRef.firestore.collection(Const.USERS)
+                    .document(auth.currentUser?.uid ?: "").collection(POCKETS).document(pocket.id)
+                    .set(pocket.toRemote()).addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            remoteTask = true
 
+                        }
                     }
-                }
             }
             job1.await()
         }

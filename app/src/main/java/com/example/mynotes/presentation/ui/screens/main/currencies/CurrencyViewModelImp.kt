@@ -49,11 +49,12 @@ class CurrencyViewModelImp @Inject constructor(
     }
 
     override fun update(currency: CurrencyDomain) {
-        //  useCases.update.invoke()
+        viewModelScope.launch(Dispatchers.IO) {
+            useCases.update.invoke(currency)
+        }
     }
 
     override fun delete(currency: CurrencyDomain) {
-        Log.d("!!!", "${currency.name} delete in CurrencyViewModelImp")
         viewModelScope.launch(Dispatchers.IO) { useCases.delete.invoke(currency) }
     }
 
@@ -61,5 +62,9 @@ class CurrencyViewModelImp @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             direction.back()
         }
+    }
+
+    private fun checkValidation() {
+        useCases
     }
 }

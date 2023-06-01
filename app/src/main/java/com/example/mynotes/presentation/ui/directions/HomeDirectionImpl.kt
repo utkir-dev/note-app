@@ -51,7 +51,7 @@ class HomeDirectionImpl @Inject constructor(
         navigator.navigateTo(appScreens.historyScreen())
     }
 
-    override suspend fun navigateToSignIn() {
+    override suspend fun replaceToSignIn() {
         navigator.replaceAll(appScreens.signInScreen())
     }
 }

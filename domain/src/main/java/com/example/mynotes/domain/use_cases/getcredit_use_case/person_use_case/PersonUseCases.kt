@@ -1,4 +1,4 @@
-package com.example.mynotes.domain.use_cases.person_use_case
+package com.example.mynotes.domain.use_cases.getcredit_use_case.person_use_case
 
 import javax.inject.Inject
 

@@ -12,6 +12,7 @@ val Pink40 = Color(0xFF7D5260)
 // custom stable colors
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
+val RedDark = Color(0xFFC40000)
 val Red = Color(0xFFF60808)
 val Green = Color(0xFF0BCB83)
 val GreenPlus = Color(0xFF48CB0B)

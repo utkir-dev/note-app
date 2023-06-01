@@ -20,6 +20,9 @@ interface WalletDao {
     @Query("DELETE FROM wallets WHERE id=:id")
     suspend fun delete(id: String): Int
 
+    @Query("DELETE FROM wallets")
+    fun clear()
+
     @Query("SELECT * FROM wallets WHERE ownerId=:ownerId and currencyId=:currencyId")
     suspend fun getByCurrencyOwnerId(ownerId: String, currencyId: String): Wallet
 
@@ -31,6 +34,15 @@ interface WalletDao {
 
     @Query("SELECT * FROM wallets order by date asc")
     fun getAll(): Flow<List<Wallet>>
+
+    @Query("SELECT MAX(date) FROM wallets")
+    fun getLastUpdatedTime(): Long
+
+    @Query("SELECT * FROM wallets WHERE date>:date order by date asc")
+    fun getFromDate(date: Long): Flow<List<Wallet>>
+
+    @Query("SELECT * FROM wallets WHERE uploaded=:uploaded")
+    fun getNotUploaded(uploaded: Boolean): Flow<List<Wallet>>
 
     @Query(
         "SELECT currencies.name as name,\n" +

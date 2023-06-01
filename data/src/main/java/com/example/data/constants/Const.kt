@@ -8,4 +8,6 @@ object Const {
     const val TRANSACTIONS = "transactions"
     const val DEVICES = "devices"
     const val PERSONS = "persons"
+
+
 }
