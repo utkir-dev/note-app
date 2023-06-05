@@ -41,6 +41,7 @@ fun ShowIncomes(
 ) {
     val pockets by viewModel.pockets.collectAsStateWithLifecycle(emptyList())
     val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
+    val pocket by viewModel.pocket.collectAsStateWithLifecycle()
 
     var visibilityAddDialog by remember {
         mutableStateOf(false)
@@ -51,17 +52,7 @@ fun ShowIncomes(
     var visibilityConfirm by remember {
         mutableStateOf(false)
     }
-    var pocket by remember { viewModel.pocket }
 
-    if (visibilityAddDialog) {
-        DialogPocket(pocket) { cur ->
-            cur?.let { pocket = it }
-            if (pocket.isValid()) {
-                viewModel.add(pocket)
-            }
-            visibilityAddDialog = false
-        }
-    }
 
     if (visibilityIncomeDialog) {
         DialogIncome(viewModel) {
@@ -69,9 +60,10 @@ fun ShowIncomes(
         }
     }
     if (visibilityConfirm) {
-        DialogConfirm(clazz = pocket) { boo, clazz ->
-            val pock = clazz as PocketDomain
-            if (boo && pock.isValid()) {
+        DialogConfirm(clazz = pocket, onDismiss = {
+            visibilityConfirm = false
+        }) { boo ->
+            if (boo) {
                 //  viewModel.delete(pock)
             }
             visibilityConfirm = false
@@ -89,7 +81,6 @@ fun ShowIncomes(
                     .height(toolBarHeight)
                     .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     viewModel.back()
@@ -101,10 +92,11 @@ fun ShowIncomes(
                     )
                 }
                 MyText(
-                    modifier = Modifier.weight(1.0f),
+                    modifier = Modifier
+                        .weight(1.0f)
+                        .padding(start = 8.dp),
                     text = "Kirim",
                     fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
                     color = MaterialTheme.customColors.textColor,
                     fontWeight = FontWeight.Bold
                 )
@@ -141,16 +133,7 @@ fun ShowIncomes(
                             visibilityIncomeDialog = true
                         })
                 }
-
-
-                item {
-                    ButtonAdd(text = "Yangi hamyon qo'shish", onClicked = {
-                        pocket = PocketDomain("")
-                        visibilityAddDialog = true
-                    })
-                }
             }
         }
     )
-
 }

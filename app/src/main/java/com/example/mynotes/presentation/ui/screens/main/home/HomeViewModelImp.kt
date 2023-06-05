@@ -3,16 +3,23 @@ package com.example.mynotes.presentation.ui.screens.main.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mynotes.domain.models.BalanceDomain
+import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.domain.models.HistoryDomain
 import com.example.mynotes.domain.use_cases.auth_use_case.SignOutUseCase
+import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
 import com.example.mynotes.domain.use_cases.data_use_case.DataUseCases
-import com.example.mynotes.domain.use_cases.data_use_case.ObserveDevice
+import com.example.mynotes.domain.use_cases.device_use_case.DeviceUseCases
+import com.example.mynotes.domain.use_cases.shared_pref_use_case.SharedPrefUseCases
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionUseCases
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.utils.contstants.HISTORY_LIMIT
+import com.example.mynotes.presentation.utils.contstants.KEY_NIGHT_MODE
+import com.example.mynotes.presentation.utils.contstants.obj
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -23,14 +30,28 @@ class HomeViewModelImp @Inject constructor(
     private val direction: HomeDirection,
     private val signOutUseCase: SignOutUseCase,
     private val walletUseCases: WalletUseCases,
+    private val currencyUseCases: CurrencyUseCases,
     private val historyUseCase: TransactionUseCases,
-    private val observeUseCase: ObserveDevice,
-    private val dataUseCases: DataUseCases
+    private val deviceUseCases: DeviceUseCases,
+    private val dataUseCases: DataUseCases,
+    private val shared: SharedPrefUseCases
 ) : ViewModel(), HomeViewModel {
-    init {
-        viewModelScope.launch {
-            dataUseCases.download.invoke()
-            observeUseCase.invoke().collect {
+    var isLoading = MutableStateFlow(false)
+
+    fun checkData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataUseCases.download.invoke().collect { ch ->
+                if (ch) {
+                    obj.firstShown = true
+                    isLoading.let { it.value = ch }
+                }
+            }
+        }
+    }
+
+    fun observeDevice() {
+        viewModelScope.launch(Dispatchers.IO) {
+            deviceUseCases.observeDevice.invoke().collect {
                 if (it) {
                     exit()
                 }
@@ -38,8 +59,12 @@ class HomeViewModelImp @Inject constructor(
         }
     }
 
+
     override val balances: Flow<List<BalanceDomain>> = flow {
         emitAll(walletUseCases.getBalances.invoke())
+    }
+    override val currencies: Flow<List<CurrencyDomain>> = flow {
+        emitAll(currencyUseCases.getAll.invoke())
     }
 
     val history: Flow<List<HistoryDomain>> = flow {
@@ -70,7 +95,6 @@ class HomeViewModelImp @Inject constructor(
                 DirectionType.POCKETS -> {
                     direction.navigateToPockets()
                 }
-
                 DirectionType.PERSONS -> {
                     direction.navigateToPersons()
                 }
@@ -83,12 +107,22 @@ class HomeViewModelImp @Inject constructor(
                 DirectionType.HISTORY -> {
                     direction.navigateToHistory()
                 }
+                DirectionType.CHANGE_NIGHT_MODE -> {
+                    shared.saveBoolen.invoke(
+                        KEY_NIGHT_MODE,
+                        !shared.getBoolean.invoke(KEY_NIGHT_MODE)
+                    )
+                }
 
                 DirectionType.BACK -> {
                 }
                 else -> {}
             }
         }
+    }
+
+    override fun checkNotUploads() {
+        dataUseCases.checkAllData
     }
 
     private suspend fun exit() {

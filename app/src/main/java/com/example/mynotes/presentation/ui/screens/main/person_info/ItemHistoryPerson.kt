@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,14 +30,14 @@ import com.example.mynotes.presentation.utils.extensions.huminize
 @Composable
 fun ItemHistoryPerson(
     item: HistoryDomain,
-    isCommentVisible: Boolean = false,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     horizontalPading: Dp = 1.dp,
     verticalPading: Dp = 2.dp,
     background: Color = MaterialTheme.customColors.backgroundItem,
     onItemClicked: () -> Unit,
-    //  content: @Composable RowScope.() -> Unit
 ) {
+    var visibilityComment by remember {
+        mutableStateOf(false)
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,6 +50,7 @@ fun ItemHistoryPerson(
                 shape = RoundedCornerShape(6.dp)
             )
             .clickable {
+                visibilityComment = !visibilityComment
                 onItemClicked()
             }
             .padding(5.dp)
@@ -130,14 +131,6 @@ fun ItemHistoryPerson(
                 )
             }
         }
-
-//        if (isCommentVisible && !item.comment.isNullOrEmpty()) {
-//            MyText(
-//                text = "izoh: ${item.comment}",
-//                fontSize = 12.sp,
-//                color = MaterialTheme.customColors.subTextColor,
-//            )
-//        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -163,6 +156,21 @@ fun ItemHistoryPerson(
                 fontSize = 12.sp,
                 color = MaterialTheme.customColors.subTextColor,
             )
+        }
+
+        if (visibilityComment) {
+            MyText(
+                text = "oldingi balans: " + item.balance + " $",
+                fontSize = 12.sp,
+                color = MaterialTheme.customColors.subTextColor,
+            )
+            if (item.comment?.isNotEmpty() ?: false) {
+                MyText(
+                    text = "izoh: " + item.comment,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.customColors.subTextColor,
+                )
+            }
         }
     }
 }

@@ -7,7 +7,8 @@ data class PersonDomain(
     override var name: String = "",
     var phone: String = "",
     var address: String = "",
-    var date: Long = 0
+    var date: Long = 0,
+    var uploaded: Boolean = false
 ) : ModelDomain {
     fun toLocal() = Person(
         id = this.id,
@@ -15,6 +16,7 @@ data class PersonDomain(
         phone = this.phone,
         address = this.address,
         date = this.date,
+        uploaded = this.uploaded
     )
 
     fun isValid(): Boolean =

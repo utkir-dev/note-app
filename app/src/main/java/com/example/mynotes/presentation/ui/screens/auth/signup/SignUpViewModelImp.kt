@@ -6,8 +6,10 @@ import com.example.common.ResponseResult
 import com.example.mynotes.domain.use_cases.auth_use_case.SignUpUseCase
 import com.example.mynotes.presentation.ui.directions.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,6 +19,16 @@ class SignUpViewModelImp @Inject constructor(
 ) : ViewModel(), SignUpViewModel {
 
     override val uiState = MutableStateFlow<UiState>(UiState.Default)
+    val success = MutableStateFlow(false)
+    override fun changeUiState(state: UiState) {
+        uiState.value = state
+    }
+
+    override fun back() {
+        viewModelScope.launch {
+            direction.back()
+        }
+    }
 
     override fun signUp(login: String, password: String) {
         uiState.value = UiState.Progress
@@ -29,7 +41,8 @@ class SignUpViewModelImp @Inject constructor(
                     uiState.value = UiState.Error("Xatolik")
                 }
                 is ResponseResult.Success -> {
-                    direction.back()
+                    success.value = true
+
                 }
             }
         }

@@ -21,9 +21,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.domain.models.PersonDomain
+import com.example.mynotes.domain.models.PocketDomain
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.DialogPocket
 import com.example.mynotes.presentation.utils.components.buttons.ButtonAdd
 import com.example.mynotes.presentation.utils.components.buttons.MyButton
+import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
 import com.example.mynotes.presentation.utils.components.dialogs.DialogConfirm
 import com.example.mynotes.presentation.utils.components.dialogs.PopupDialog
 import com.example.mynotes.presentation.utils.components.image.Gray
@@ -52,7 +55,18 @@ fun Show(
     }
     val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
     val persons by viewModel.persons.collectAsStateWithLifecycle(emptyList())
-
+    val wallets by viewModel.wallets.collectAsStateWithLifecycle(emptyList())
+    var visibilityAlert by remember {
+        mutableStateOf(false)
+    }
+    var alertMessage by remember {
+        mutableStateOf("")
+    }
+    if (visibilityAlert) {
+        DialogAttention(message = alertMessage) {
+            visibilityAlert = false
+        }
+    }
     val list = if (menu == 1)
         persons.filter {
             walletsByOwners.filter { it.currencyBalance.round() > 0 }.map { it.ownerId }
@@ -67,14 +81,10 @@ fun Show(
     var visibilityAddDialog by remember {
         mutableStateOf(false)
     }
-//    var visibilityIncomeDialog by remember {
-//        mutableStateOf(false)
-//    }
 
     var visibilityConfirm by remember {
         mutableStateOf(false)
     }
-    var currentPerson by remember { viewModel.person }
 
     var visibilityPopup by remember {
         mutableStateOf(false)
@@ -83,7 +93,7 @@ fun Show(
         mutableStateOf(Offset(0f, 0f))
     }
     if (visibilityPopup) {
-        PopupDialog(currentPerson.name, offsetPopup) { type ->
+        PopupDialog(viewModel.getPerson().name, offsetPopup) { type ->
             when (type) {
                 PopupType.EDIT -> {
                     visibilityAddDialog = true
@@ -99,20 +109,24 @@ fun Show(
         }
     }
     if (visibilityAddDialog) {
-        DialogPerson(currentPerson) { cur ->
-            cur?.let { currentPerson = it }
-            if (currentPerson.isValid()) {
-                viewModel.add(currentPerson)
-            }
+        visibilityPopup = false
+        DialogPerson(viewModel, persons) {
             visibilityAddDialog = false
         }
     }
 
     if (visibilityConfirm) {
-        DialogConfirm(clazz = currentPerson) { boo, clazz ->
-            val person = clazz as PersonDomain
-            if (boo && person.isValid()) {
-                //viewModel.delete(person)
+        visibilityPopup = false
+        DialogConfirm(clazz = viewModel.getPerson(), onDismiss = {
+            visibilityConfirm = false
+        }) { boo ->
+            if (boo) {
+                if (wallets.filter { it.ownerId == viewModel.getPerson().id }.size > 0) {
+                    alertMessage = "Bu shaxs bilan muomala qilingan. O'chirish mumkin emas !"
+                    visibilityAlert = true
+                } else {
+                    viewModel.delete()
+                }
             }
             visibilityConfirm = false
         }
@@ -144,9 +158,11 @@ fun Show(
                         )
                     }
                     MyText(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 8.dp),
                         text = "Shaxslar",
                         fontSize = 20.sp,
-                        textAlign = TextAlign.Center,
                         color = MaterialTheme.customColors.textColor,
                         fontWeight = FontWeight.Bold,
                         overflow = TextOverflow.Ellipsis,
@@ -201,7 +217,7 @@ fun Show(
         bottomBar = {
             ButtonAdd(
                 text = "Yangi odam qo'shish", onClicked = {
-                    currentPerson = PersonDomain("")
+                    viewModel.person.value = PersonDomain("")
                     visibilityAddDialog = true
                 })
         },
@@ -232,20 +248,22 @@ fun Show(
                                 //setPerson(owner)
                             },
                             onMenuMoreClicked = { offset ->
-                                currentPerson = owner
+                                viewModel.person.value = owner
                                 offsetPopup = offset
                                 visibilityPopup =
                                     !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true
-
+                            },
+                            onIconClicked = {
+                                alertMessage =
+                                    "Bu shaxs serverga saqlanmagan. Internetni yo'qib qaytadan bosing"
+                                visibilityAlert = true
                             }
                         )
                     }
                 }
             }
-
         }
     )
-
 }
 
 

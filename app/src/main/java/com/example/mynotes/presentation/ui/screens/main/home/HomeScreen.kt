@@ -1,6 +1,5 @@
 package com.example.mynotes.presentation.ui.screens.main.home
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,9 +24,11 @@ import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
+import com.example.mynotes.presentation.utils.components.dialogs.DialogBoxLoading
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
-import com.example.mynotes.presentation.utils.contstants.HISTORY_LIMIT
+import com.example.mynotes.presentation.utils.contstants.obj.firstShown
 import com.example.mynotes.presentation.utils.extensions.huminize
 import com.example.mynotes.presentation.utils.items.ItemHistory
 import com.example.mynotes.presentation.utils.theme.ThemeState
@@ -39,13 +40,14 @@ class HomeScreen() : AppScreen() {
     @Composable
     override fun Content() {
         val viewModel: HomeViewModelImp = getViewModel()
+        viewModel.checkData()
+        viewModel.observeDevice()
         ShowDrawer(viewModel)
     }
 }
 
 @Composable
 fun ShowDrawer(viewModel: HomeViewModelImp) {
-    Log.d("enter", " HomeScreen")
 
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var width by remember {
@@ -66,24 +68,25 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
                 DrawerHeader()
                 DrawerMenuItem(
                     iconDrawableId = R.drawable.ic_home,
-                    text = "Home",
+                    text = "Asosiy oyna",
                     onItemClick = {
                         scope.launch { drawerState.close() }
                     }
                 )
                 DrawerMenuItem(
                     iconDrawableId = R.drawable.ic_settings,
-                    text = "Settings",
+                    text = "Sozlashlasr",
                     onItemClick = {
                         scope.launch { drawerState.close() }
                     }
                 )
                 DrawerMenuItem(
                     iconDrawableId = R.drawable.ic_settings,
-                    text = "Sign Out",
+                    text = "Chiqish",
                     onItemClick = {
                         scope.launch {
                             (
+
                                     (viewModel::onEventDispatcher)(DirectionType.SIGNOUT))
                         }
                     }
@@ -101,7 +104,19 @@ fun ShowHome(viewModel: HomeViewModelImp, drawerState: DrawerState, scope: Corou
     val dispatcher = viewModel::onEventDispatcher
     val balanceList by viewModel.balances.collectAsStateWithLifecycle(emptyList())
     val history by viewModel.history.collectAsStateWithLifecycle(emptyList())
+    val dialogProgress = viewModel.isLoading.collectAsStateWithLifecycle(false)
+    var visibilityAlert by remember {
+        mutableStateOf(false)
+    }
 
+    if (visibilityAlert) {
+        DialogAttention("Bu ma'lumot serverga saqlanmagan. Internetni yo'qib qaytadan bosing !") {
+            visibilityAlert = false
+        }
+    }
+    if (!dialogProgress.value && !firstShown) {
+        DialogBoxLoading()
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -134,6 +149,7 @@ fun ShowHome(viewModel: HomeViewModelImp, drawerState: DrawerState, scope: Corou
                 )
                 Spacer(modifier = Modifier.padding(horizontal = 10.dp))
                 IconButton(onClick = {
+                    dispatcher(DirectionType.CHANGE_NIGHT_MODE)
                     ThemeState.darkModeState.value = !ThemeState.darkModeState.value
                 }) {
                     Icon(
@@ -211,9 +227,10 @@ fun ShowHome(viewModel: HomeViewModelImp, drawerState: DrawerState, scope: Corou
                 )
             }
             items(items = history, key = { it.hashCode() }) { historyItem ->
-                ItemHistory(
-                    item = historyItem,
-                    onItemClicked = { })
+                ItemHistory(item = historyItem) {
+                    visibilityAlert = true
+                    viewModel.checkNotUploads()
+                }
             }
             item {
                 MyText(

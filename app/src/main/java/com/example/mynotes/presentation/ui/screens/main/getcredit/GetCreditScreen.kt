@@ -56,15 +56,13 @@ fun Show(
     val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
     val balances by viewModel.balances.collectAsStateWithLifecycle(emptyList())
 
-    val person by remember { viewModel.person }
-    val curency by remember { viewModel.currency }
-    val pocket by remember { viewModel.pocket }
+    val person by viewModel.person.collectAsStateWithLifecycle()
+    val curency by viewModel.currency.collectAsStateWithLifecycle()
+    val pocket by viewModel.pocket.collectAsStateWithLifecycle()
 
     var offset by remember { mutableStateOf(Offset(0f, 0f)) }
 
     var visibilityConfirm by remember { mutableStateOf(false) }
-
-    var visibilityDialogAttention by remember { mutableStateOf(false) }
 
     var visibilityList by remember { mutableStateOf(false) }
     var list by remember {
@@ -82,12 +80,21 @@ fun Show(
     var comment by rememberSaveable {
         mutableStateOf("")
     }
+    var message by rememberSaveable {
+        mutableStateOf("")
+    }
 
     if (visibilityConfirm) {
-        DialogConfirm(clazz = person) { boo, clazz ->
-            val pock = clazz as PocketDomain
-            if (boo && pock.isValid()) {
-                //  viewModel.delete(pock)
+        DialogConfirm(clazz = person, message = message, onDismiss = {
+            visibilityConfirm = false
+        }) { boo ->
+            if (boo) {
+                viewModel.addTransaction(
+                    amountTransaction.trim().toDouble(),
+                    comment,
+                    balances.sumOf { it.amount * (1 / it.rate) }
+                )
+                viewModel.back()
             }
             visibilityConfirm = false
         }
@@ -324,12 +331,9 @@ fun Show(
                                 onClick = {
                                     val (isValid, amount) = isValidAmount(amountTransaction)
                                     if (isValid) {
-                                        viewModel.addTransaction(
-                                            amount,
-                                            comment,
-                                            balances.sumOf { it.amount * (1 / it.rate) }
-                                        )
-                                        viewModel.back()
+                                        message =
+                                            "${person.name}dan $amount ${curency.name} qarz olishga ishonchingiz komilmi?"
+                                        visibilityConfirm = true
                                     }
                                 }, text = "Tasdiq", colors = ButtonDefaults.buttonColors(
                                     containerColor = Green, contentColor = White

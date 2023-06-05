@@ -28,13 +28,15 @@ internal class CurrencyRepositoryImp @Inject constructor(
             .collection(USERS).document(auth.currentUser?.uid ?: "")
             .collection(CURRENCIES)
 
-        dbRemote.document(currency.id).set(currency.toRemote()).addOnCompleteListener {
-            if (it.isSuccessful) {
-                runBlocking {
-                    local.add(currency.copy(uploaded = true))
+        dbRemote.document(currency.id)
+            .set(currency.toRemote().copy(date = System.currentTimeMillis()))
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    runBlocking {
+                        local.add(currency.copy(date = System.currentTimeMillis(), uploaded = true))
+                    }
                 }
             }
-        }
 
         return result
     }
@@ -44,13 +46,20 @@ internal class CurrencyRepositoryImp @Inject constructor(
         val dbRemote = remote.storageRef.firestore
             .collection(USERS).document(auth.currentUser?.uid ?: "")
             .collection(CURRENCIES)
-        dbRemote.document(currency.id).set(currency.toRemote()).addOnCompleteListener {
-            if (it.isSuccessful) {
-                runBlocking {
-                    local.update(currency.copy(uploaded = true))
+        dbRemote.document(currency.id)
+            .set(currency.toRemote().copy(date = System.currentTimeMillis()))
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    runBlocking {
+                        local.update(
+                            currency.copy(
+                                date = System.currentTimeMillis(),
+                                uploaded = true
+                            )
+                        )
+                    }
                 }
             }
-        }
         return result
     }
 

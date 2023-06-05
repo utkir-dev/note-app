@@ -28,15 +28,15 @@ class ConvertationViewModelImp @Inject constructor(
     private val direction: ConvertationDirection,
 ) : ViewModel(), ConvertationViewModel {
 
-    override val currencyFrom: MutableState<CurrencyDomain> = mutableStateOf(CurrencyDomain(""))
-    override val currencyTo: MutableState<CurrencyDomain> = mutableStateOf(CurrencyDomain(""))
-    override val currency: MutableState<CurrencyDomain> = mutableStateOf(CurrencyDomain(""))
+    override val currencyFrom = MutableStateFlow(CurrencyDomain(""))
+    override val currencyTo = MutableStateFlow(CurrencyDomain(""))
+    override val currency = MutableStateFlow(CurrencyDomain(""))
     override val currencies: Flow<List<CurrencyDomain>> = flow {
         emitAll(currencyUseCases.getAll.invoke())
     }
 
-    override val pocketFrom: MutableState<PocketDomain> = mutableStateOf(PocketDomain(""))
-    override val pocketTo: MutableState<PocketDomain> = mutableStateOf(PocketDomain(""))
+    override val pocketFrom = MutableStateFlow(PocketDomain(""))
+    override val pocketTo = MutableStateFlow(PocketDomain(""))
     override val pockets: Flow<List<PocketDomain>> = flow {
         emitAll(pocketUseCases.getAll.invoke())
     }
@@ -70,7 +70,7 @@ class ConvertationViewModelImp @Inject constructor(
 
     }
 
-    private fun addTransaction(
+    fun addTransaction(
         amountTransaction: Double,
         walletFrom: WalletDomain,
         amountDollar: Double,
@@ -97,27 +97,32 @@ class ConvertationViewModelImp @Inject constructor(
                 rateTo = currencyTo.value.rate,
                 balance = balance
             )
-            this@ConvertationViewModelImp.transactionUseCase.getConvertation.invoke(
-                trans = transaction,
-                currencyConvert = currency.value,
-                fromWallet = walletFrom,
-                curFrom = currencyFrom.value,
-                curTo = currencyTo.value,
-                amountDollar = amountDollar,
-            )
+            if (pocketFrom.value.id == pocketTo.value.id && currencyFrom.value.id == currencyTo.value.id) {
+                // xato
+
+            } else {
+                this@ConvertationViewModelImp.transactionUseCase.getConvertation.invoke(
+                    trans = transaction,
+                    currencyConvert = currency.value,
+                    fromWallet = walletFrom,
+                    curFrom = currencyFrom.value,
+                    curTo = currencyTo.value,
+                    amountDollar = amountDollar,
+                )
+            }
         }
     }
 
-    val isValid: MutableState<Boolean> = mutableStateOf(false)
+    val isValid = MutableStateFlow(false)
 
     fun validateTransaction(
         amount: String, walletFrom: WalletDomain?, comment: String,
         balance: Double
     ) {
         viewModelScope.launch {
-            var n = -1.0
+            isValid.value = false
             try {
-                n = amount.trim().toDouble()
+                val n = amount.trim().toDouble()
                 walletFrom?.let { wallet ->
                     val amountDollar = (1 / currency.value.rate) * n
                     val balanceDollar = wallet.balance / currencyFrom.value.rate

@@ -27,8 +27,8 @@ class IncomeViewModelImp @Inject constructor(
     private val direction: IncomeDirection
 ) : ViewModel(), IncomeViewModel {
 
-    override val pocket: MutableState<PocketDomain> = mutableStateOf(PocketDomain(""))
-    override val currency: MutableState<CurrencyDomain> = mutableStateOf(CurrencyDomain(""))
+    override val pocket = MutableStateFlow(PocketDomain(""))
+    override val currency = MutableStateFlow(CurrencyDomain(""))
 
     override val currencies: Flow<List<CurrencyDomain>> = flow {
         emitAll(currencyUseCases.getAll.invoke())

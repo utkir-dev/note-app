@@ -1,5 +1,6 @@
 package com.example.mynotes.presentation.ui.screens.main.getcredit
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -31,6 +33,27 @@ fun PopupGetCredit(
     offset: Offset,
     onSelected: () -> Unit
 ) {
+    val durationUp: Int = 200
+    val durationDown: Int = 100
+    val scaleUp: Float = 1.02f
+    val scaleDown: Float = 0.9f
+    val scale = remember {
+        androidx.compose.animation.core.Animatable(1f)
+    }
+    LaunchedEffect(key1 = scale) {
+        scale.animateTo(
+            scaleDown,
+            animationSpec = tween(durationDown),
+        )
+        scale.animateTo(
+            scaleUp,
+            animationSpec = tween(durationUp),
+        )
+        scale.animateTo(
+            1f,
+            animationSpec = tween(durationDown),
+        )
+    }
     val popupWidth = 200.dp
     val pxValue = LocalDensity.current.run { popupWidth.toPx() }
     val pxHeight = LocalDensity.current.run { 50.dp.toPx() }
@@ -40,6 +63,7 @@ fun PopupGetCredit(
     ) {
         LazyColumn(
             modifier = Modifier
+                .scale(scale.value)
                 .padding(6.dp)
                 .clip(shape = RoundedCornerShape(10.dp))
                 .background(

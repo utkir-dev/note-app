@@ -14,5 +14,6 @@ sealed class DirectionType {
     object POCKETS : DirectionType()
     object CURRENCIES : DirectionType()
     object HISTORY : DirectionType()
+    object CHANGE_NIGHT_MODE : DirectionType()
     object SIGNOUT : DirectionType()
 }

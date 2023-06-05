@@ -37,7 +37,7 @@ interface CurrencyDao {
     @Query("SELECT MAX(date) FROM currencies")
     fun getLastUpdatedTime(): Long
 
-    @Query("SELECT * FROM currencies order by date asc")
+    @Query("SELECT * FROM currencies order by name")
     fun getAll(): Flow<List<Currency>>
 
     @Query("SELECT * FROM currencies WHERE date>:date order by date asc")

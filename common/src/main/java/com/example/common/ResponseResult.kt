@@ -10,4 +10,5 @@ sealed class ResponseResult<out T> {
     data class Failure(
         val e: Exception?
     ) : ResponseResult<Nothing>()
+
 }

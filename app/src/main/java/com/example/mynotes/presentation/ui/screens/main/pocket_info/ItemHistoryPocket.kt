@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,9 +24,12 @@ import com.example.common.Type
 import com.example.common.getTypeEnum
 import com.example.common.getTypeNumber
 import com.example.common.getTypeText
+import com.example.mynotes.R
 import com.example.mynotes.domain.models.HistoryDomain
+import com.example.mynotes.presentation.utils.components.buttons.IconAnimationButton
 import com.example.mynotes.presentation.utils.components.image.Green
 import com.example.mynotes.presentation.utils.components.image.Red
+import com.example.mynotes.presentation.utils.components.image.RedDark
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.extensions.huminize
@@ -33,14 +38,15 @@ import com.example.mynotes.presentation.utils.extensions.huminize
 fun ItemHistoryPocket(
     item: HistoryDomain,
     pocketName: String = "",
-    isCommentVisible: Boolean = false,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     horizontalPading: Dp = 1.dp,
     verticalPading: Dp = 2.dp,
     background: Color = MaterialTheme.customColors.backgroundItem,
+    onIconClicked: () -> Unit,
     onItemClicked: () -> Unit,
-    //  content: @Composable RowScope.() -> Unit
 ) {
+    var visibilityComment by remember {
+        mutableStateOf(false)
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,6 +59,7 @@ fun ItemHistoryPocket(
                 shape = RoundedCornerShape(6.dp)
             )
             .clickable {
+                visibilityComment = !visibilityComment
                 onItemClicked()
             }
             .padding(5.dp)
@@ -84,8 +91,8 @@ fun ItemHistoryPocket(
                 moneyName = item.moneyNameTo
             }
         }
-        val idPerson = com.example.mynotes.R.drawable.ic_person
-        val idPocket = com.example.mynotes.R.drawable.ic_wallet
+        val idPerson = R.drawable.ic_person
+        val idPocket = R.drawable.ic_wallet
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -95,8 +102,19 @@ fun ItemHistoryPocket(
                 text = getTypeText(item.title),
                 fontSize = 16.sp,
                 color = MaterialTheme.customColors.textColor,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+            if (!item.uploaded) {
+                IconAnimationButton(
+                    imageId = R.drawable.ic_alert,
+                    tint = RedDark
+                ) {
+                    onIconClicked()
+                }
+            }
+
             MyText(
                 text = "$incr${amount?.huminize()} ${moneyName}",
                 color = color,
@@ -199,6 +217,21 @@ fun ItemHistoryPocket(
                 fontSize = 12.sp,
                 color = MaterialTheme.customColors.subTextColor,
             )
+        }
+        if (visibilityComment) {
+            MyText(
+                text = "oldingi balans: " + item.balance + " $",
+                fontSize = 12.sp,
+                color = MaterialTheme.customColors.subTextColor,
+            )
+            if (item.comment?.isNotEmpty() ?: false) {
+                MyText(
+                    text = "izoh: " + item.comment,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.customColors.subTextColor,
+                )
+            }
+
         }
     }
 }

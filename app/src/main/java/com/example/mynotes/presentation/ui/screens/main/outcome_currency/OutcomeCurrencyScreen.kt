@@ -20,7 +20,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
-import com.example.mynotes.presentation.ui.screens.main.income.DialogPocket
 import com.example.mynotes.presentation.ui.screens.main.outcome_pocket.DialogOutcomeCurrency
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
@@ -69,7 +68,6 @@ fun Show(
                     .height(toolBarHeight)
                     .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     viewModel.back()
@@ -80,11 +78,17 @@ fun Show(
                         tint = MaterialTheme.customColors.textColor
                     )
                 }
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_wallet),
+                    contentDescription = "back arrow",
+                    tint = MaterialTheme.customColors.textColor
+                )
                 MyText(
-                    modifier = Modifier.weight(1.0f),
+                    modifier = Modifier
+                        .weight(1.0f)
+                        .padding(start = 8.dp),
                     text = "${pocket.name} hamyon",
                     fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
                     color = MaterialTheme.customColors.textColor,
                     fontWeight = FontWeight.Bold
                 )

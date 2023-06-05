@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -38,6 +39,27 @@ fun PopupDialog(text: String, offset: Offset, onSelected: (PopupType) -> Unit) {
     val pxValue = LocalDensity.current.run { popupWidth.toPx() }
     var visible by remember { mutableStateOf(true) }
     val density = LocalDensity.current
+    val durationUp: Int = 200
+    val durationDown: Int = 100
+    val scaleUp: Float = 1.02f
+    val scaleDown: Float = 0.9f
+    val scale = remember {
+        androidx.compose.animation.core.Animatable(1f)
+    }
+    LaunchedEffect(key1 = scale) {
+        scale.animateTo(
+            scaleDown,
+            animationSpec = tween(durationDown),
+        )
+        scale.animateTo(
+            scaleUp,
+            animationSpec = tween(durationUp),
+        )
+        scale.animateTo(
+            1f,
+            animationSpec = tween(durationDown),
+        )
+    }
 
     Popup(
         offset = IntOffset((offset.x - pxValue).toInt(), offset.y.toInt()),
@@ -48,6 +70,9 @@ fun PopupDialog(text: String, offset: Offset, onSelected: (PopupType) -> Unit) {
         Box(
             Modifier
                 .width(popupWidth)
+                .scale(
+                    scale = scale.value
+                )
                 //.size(width = popupWidth, height =  popupHeight)
                 .padding(5.dp)
                 .background(

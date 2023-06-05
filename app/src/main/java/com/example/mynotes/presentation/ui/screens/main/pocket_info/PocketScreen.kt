@@ -22,6 +22,7 @@ import com.example.mynotes.R
 import com.example.mynotes.domain.models.PersonDomain
 import com.example.mynotes.domain.models.PocketDomain
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.extensions.huminize
@@ -44,10 +45,19 @@ fun Show(
     viewModel.setPocket(pocket)
     val wallets by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
     val history by viewModel.history.collectAsStateWithLifecycle(emptyList())
+    var visibilityAlert by remember {
+        mutableStateOf(false)
+    }
 
+    if (visibilityAlert) {
+        DialogAttention("Bu ma'lumot serverga saqlanmagan. Internetni yo'qib qaytadan bosing !") {
+            visibilityAlert = false
+        }
+    }
     val toolBarHeight = 56.dp
-    Scaffold(modifier = Modifier
-        .fillMaxSize(),
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
         topBar = {
             Column(
                 modifier = Modifier
@@ -78,7 +88,6 @@ fun Show(
                     MyText(
                         text = pocket.name + " hamyon",
                         fontSize = 20.sp,
-                        textAlign = TextAlign.Center,
                         color = MaterialTheme.customColors.textColor,
                         fontWeight = FontWeight.Bold,
                         overflow = TextOverflow.Ellipsis,
@@ -143,7 +152,11 @@ fun Show(
                             ItemHistoryPocket(
                                 item = historyItem,
                                 pocketName = pocket.name,
-                                onItemClicked = { })
+                                onItemClicked = { },
+                                onIconClicked = {
+                                    visibilityAlert = true
+                                }
+                            )
                         }
                     }
                 }

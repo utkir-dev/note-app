@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface GetCreditViewModel {
-    val person: MutableState<PersonDomain>
+    val person: Flow<PersonDomain>
     val persons: Flow<List<PersonDomain>>
-    val currency: MutableState<CurrencyDomain>
+    val currency: Flow<CurrencyDomain>
     val currencies: Flow<List<CurrencyDomain>>
-    val pocket: MutableState<PocketDomain>
+    val pocket: Flow<PocketDomain>
     val pockets: Flow<List<PocketDomain>>
 
     fun setPerson(person: PersonDomain)

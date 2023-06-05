@@ -1,14 +1,16 @@
 package com.example.mynotes.presentation.utils.items
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,9 +25,12 @@ import com.example.common.Type
 import com.example.common.getTypeEnum
 import com.example.common.getTypeNumber
 import com.example.common.getTypeText
+import com.example.mynotes.R
 import com.example.mynotes.domain.models.HistoryDomain
+import com.example.mynotes.presentation.utils.components.buttons.IconAnimationButton
 import com.example.mynotes.presentation.utils.components.image.Green
 import com.example.mynotes.presentation.utils.components.image.Red
+import com.example.mynotes.presentation.utils.components.image.RedDark
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.extensions.huminize
@@ -33,14 +38,14 @@ import com.example.mynotes.presentation.utils.extensions.huminize
 @Composable
 fun ItemHistory(
     item: HistoryDomain,
-    isCommentVisible: Boolean = false,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     horizontalPading: Dp = 10.dp,
     verticalPading: Dp = 2.dp,
     background: Color = MaterialTheme.customColors.backgroundItem,
-    onItemClicked: () -> Unit,
-    //  content: @Composable RowScope.() -> Unit
+    onIconClicked: () -> Unit
 ) {
+    var visibilityComment by remember {
+        mutableStateOf(false)
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,7 +58,7 @@ fun ItemHistory(
                 shape = RoundedCornerShape(6.dp)
             )
             .clickable {
-                onItemClicked()
+                visibilityComment = !visibilityComment
             }
             .padding(5.dp)
     ) {
@@ -67,8 +72,8 @@ fun ItemHistory(
             incr = "-"
             color = Red
         }
-        val idPerson = com.example.mynotes.R.drawable.ic_person
-        val idPocket = com.example.mynotes.R.drawable.ic_wallet
+        val idPerson = R.drawable.ic_person
+        val idPocket = R.drawable.ic_wallet
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -79,8 +84,19 @@ fun ItemHistory(
                 text = getTypeText(item.title),
                 fontSize = 16.sp,
                 color = MaterialTheme.customColors.textColor,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+
+            if (!item.uploaded) {
+                IconAnimationButton(
+                    imageId = R.drawable.ic_alert,
+                    tint = RedDark
+                ) {
+                    onIconClicked()
+                }
+            }
             MyText(
                 text = "$incr${item.amount.huminize()} ${item.currency}",
                 color = color,
@@ -115,6 +131,7 @@ fun ItemHistory(
                         maxLines = 1
                     )
                 }
+
             }
         }
         if (!item.toName.isNullOrEmpty()) {
@@ -142,19 +159,14 @@ fun ItemHistory(
                         text = "+${item.moneyTo?.huminize()} ${item.moneyNameTo}",
                         color = Green,
                         fontSize = 12.sp,
-                        maxLines = 1
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
         }
 
-//        if (isCommentVisible && !item.comment.isNullOrEmpty()) {
-//            MyText(
-//                text = "izoh: ${item.comment}",
-//                fontSize = 12.sp,
-//                color = MaterialTheme.customColors.subTextColor,
-//            )
-//        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -174,6 +186,8 @@ fun ItemHistory(
                 text = kurs,
                 fontSize = 12.sp,
                 color = MaterialTheme.customColors.subTextColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             MyText(
                 text = item.date.huminize(),
@@ -181,5 +195,20 @@ fun ItemHistory(
                 color = MaterialTheme.customColors.subTextColor,
             )
         }
+        if (visibilityComment) {
+            var izoh = ""
+            item.comment?.let {
+                if (it.isNotEmpty()) {
+                    izoh = "\nizoh: $it"
+                }
+            }
+            MyText(
+                text = "oldingi balans: ${item.balance} $$izoh",
+                color = MaterialTheme.customColors.subTextColor,
+                fontSize = 12.sp
+            )
+        }
+
     }
 }
+

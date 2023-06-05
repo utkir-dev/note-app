@@ -87,7 +87,9 @@ dependencies {
     implementation "cafe.adriel.voyager:voyager-navigator:1.0.0-rc03"
     implementation "cafe.adriel.voyager:voyager-hilt:1.0.0-rc03"
 
+
     //implementation "androidx.compose.material:material-icons-extended:1.4.2"
+
 
 }
 kapt {

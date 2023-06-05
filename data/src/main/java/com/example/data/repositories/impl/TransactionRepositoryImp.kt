@@ -1,5 +1,6 @@
 package com.example.data.repositories.impl
 
+import com.example.data.constants.Const
 import com.example.data.constants.Const.TRANSACTIONS
 import com.example.data.constants.Const.USERS
 import com.example.data.db.dao.TransactionDao
@@ -13,34 +14,36 @@ import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 internal class TransactionRepositoryImp @Inject constructor(
     private val remote: RemoteDatabase,
     private val local: TransactionDao,
-   // private val remoteStorage: RemoteRepository,
+    // private val remoteStorage: RemoteRepository,
     private val auth: AuthRepository
 ) : TransactionRepository {
 
     override suspend fun add(transaction: Transaction): Long {
         val result = local.add(transaction)
-        // remoteStorage.upload()
         val dbRemote = remote.storageRef.firestore
             .collection(USERS).document(auth.currentUser?.uid ?: "")
             .collection(TRANSACTIONS)
-        var remoteTask = false
-        coroutineScope {
-            val job1 = async {
-                dbRemote.document(transaction.id).set(transaction.toRemote())
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            remoteTask = true
 
-                        }
+        dbRemote.document(transaction.id)
+            .set(transaction.toRemote().copy(date = System.currentTimeMillis()))
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    runBlocking {
+                        local.add(
+                            transaction.copy(
+                                date = System.currentTimeMillis(),
+                                uploaded = true
+                            )
+                        )
                     }
+                }
             }
-            job1.await()
-        }
         return result
 
     }

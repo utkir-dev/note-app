@@ -1,11 +1,8 @@
 package com.example.mynotes.presentation.ui.screens.main.persons
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mynotes.domain.models.*
-import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
 import com.example.mynotes.domain.use_cases.getcredit_use_case.person_use_case.PersonUseCases
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,9 +18,6 @@ class PersonsViewModelImp @Inject constructor(
     private val walletUseCases: WalletUseCases,
     private val direction: PersonsDirection,
 ) : ViewModel(), PersonsViewModel {
-
-    override val person: MutableState<PersonDomain> = mutableStateOf(PersonDomain(""))
-
 
     val walletsByOwners: Flow<List<WalletOwnerDomain>> = flow {
         emitAll(walletUseCases.getWalletsByOwnes.invoke())
@@ -48,6 +42,12 @@ class PersonsViewModelImp @Inject constructor(
         }
     }
 
+    override fun delete() {
+        viewModelScope.launch(Dispatchers.IO) {
+            personUseCases.delete.invoke(getPerson())
+        }
+    }
+
     override fun back() {
         viewModelScope.launch(Dispatchers.Default) {
             direction.back()
@@ -57,6 +57,36 @@ class PersonsViewModelImp @Inject constructor(
     override fun navigateToPerson(person: PersonDomain) {
         viewModelScope.launch {
             direction.navigateToPerson(person)
+        }
+    }
+
+    override var wallets: Flow<List<WalletDomain>> = flow {
+        emitAll(walletUseCases.getAll.invoke())
+    }
+
+    override val person = MutableStateFlow(PersonDomain(""))
+    fun getPerson() = person.value
+    fun savePerson(name: String, phone: String, address: String) {
+        if (person.value.name != name
+            || person.value.phone != phone
+            || person.value.address != address
+        ) {
+            val personNew = if (person.value.isValid()) {
+                person.value.copy(
+                    name = name,
+                    phone = phone,
+                    address = address,
+                    date = System.currentTimeMillis(),
+                    uploaded = false
+                )
+            } else PersonDomain(
+                id = UUID.randomUUID().toString(),
+                name = name,
+                phone = phone,
+                address = address,
+                date = System.currentTimeMillis()
+            )
+            add(personNew)
         }
     }
 }

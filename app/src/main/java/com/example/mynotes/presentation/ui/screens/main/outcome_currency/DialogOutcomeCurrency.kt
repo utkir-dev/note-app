@@ -1,5 +1,7 @@
 package com.example.mynotes.presentation.ui.screens.main.outcome_pocket
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -54,7 +57,27 @@ fun DialogOutcomeCurrency(
     var comment by rememberSaveable {
         mutableStateOf("")
     }
-
+    val durationUp: Int = 250
+    val durationDown: Int = 100
+    val scaleUp: Float = 1.02f
+    val scaleDown: Float = 0.8f
+    val scale = remember {
+        Animatable(1f)
+    }
+    LaunchedEffect(key1 = scale) {
+        scale.animateTo(
+            scaleDown,
+            animationSpec = tween(durationDown),
+        )
+        scale.animateTo(
+            scaleUp,
+            animationSpec = tween(durationUp),
+        )
+        scale.animateTo(
+            1f,
+            animationSpec = tween(durationUp),
+        )
+    }
     var visibilityDialogAttention by remember { mutableStateOf(false) }
 
     var visibilityValidation by remember { mutableStateOf(false) }
@@ -71,7 +94,8 @@ fun DialogOutcomeCurrency(
         )
     ) {
         Card(
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.scale(scale.value)
         ) {
             Box(
                 contentAlignment = Alignment.CenterEnd,

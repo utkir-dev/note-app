@@ -7,6 +7,6 @@ class UploadAllData @Inject constructor(
     private val repository: RemoteRepository
 ) {
     suspend operator fun invoke() {
-        repository.uploadDataAsFile()
+        repository.uploadDataAsFile(false)
     }
 }

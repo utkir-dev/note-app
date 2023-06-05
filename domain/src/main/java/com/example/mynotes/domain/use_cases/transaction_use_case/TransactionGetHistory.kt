@@ -31,6 +31,8 @@ fun History.toDomain() = HistoryDomain(
     rate = this.rate,
     rateFrom = this.rateFrom,
     rateTo = this.rateTo,
-    balance = this.balance
+    balance = this.balance,
+    transactionId = this.transactionId,
+    uploaded = this.uploaded
 )
 

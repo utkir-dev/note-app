@@ -26,8 +26,10 @@ import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.domain.models.PocketDomain
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.DialogCurrency
 import com.example.mynotes.presentation.utils.components.DialogPocket
 import com.example.mynotes.presentation.utils.components.buttons.ButtonAdd
+import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
 import com.example.mynotes.presentation.utils.components.dialogs.DialogConfirm
 import com.example.mynotes.presentation.utils.components.dialogs.PopupDialog
 import com.example.mynotes.presentation.utils.components.image.customColors
@@ -50,6 +52,7 @@ fun ShowCurrencies(
 ) {
     val listPocket by viewModel.pockets.collectAsStateWithLifecycle(emptyList())
     val walletsByOwners by viewModel.walletsByOwners.collectAsStateWithLifecycle(emptyList())
+    val wallets by viewModel.wallets.collectAsStateWithLifecycle(emptyList())
 
     var visibilityPopup by remember {
         mutableStateOf(false)
@@ -63,12 +66,19 @@ fun ShowCurrencies(
     var visibilityConfirm by remember {
         mutableStateOf(false)
     }
-    var pocket by remember {
-        mutableStateOf(PocketDomain(""))
+    var visibilityAlert by remember {
+        mutableStateOf(false)
     }
-
+    var alertMessage by remember {
+        mutableStateOf("")
+    }
+    if (visibilityAlert) {
+        DialogAttention(alertMessage) {
+            visibilityAlert = false
+        }
+    }
     if (visibilityPopup) {
-        PopupDialog(pocket.name, offsetPopup) { type ->
+        PopupDialog(viewModel.getPocket().name, offsetPopup) { type ->
             when (type) {
                 PopupType.EDIT -> {
                     visibilityDialog = true
@@ -85,24 +95,22 @@ fun ShowCurrencies(
     }
     if (visibilityDialog) {
         visibilityPopup = false
-        DialogPocket(pocket) { cur ->
-            cur?.let {
-                pocket = it as PocketDomain
-                if (pocket.isValid()) {
-                    // notes.add(currency)
-                    viewModel.add(pocket)
-                }
-            }
+        DialogPocket(viewModel, listPocket) {
             visibilityDialog = false
         }
     }
     if (visibilityConfirm) {
         visibilityPopup = false
-        DialogConfirm(clazz = pocket) { boo, clazz ->
-            val pock = clazz as PocketDomain
-            if (boo && pock.isValid()) {
-                // notes.remove(currency)
-                viewModel.delete(pock)
+        DialogConfirm(clazz = viewModel.getPocket(), onDismiss = {
+            visibilityConfirm = false
+        }) { boo ->
+            if (boo) {
+                if (wallets.filter { it.ownerId == viewModel.getPocket().id }.size > 0) {
+                    alertMessage = "Bu hamyon orqali qilingan ishlar bor. O'chirish mumkin emas !"
+                    visibilityAlert = true
+                } else {
+                    viewModel.delete()
+                }
             }
             visibilityConfirm = false
         }
@@ -133,7 +141,6 @@ fun ShowCurrencies(
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     viewModel.back()
@@ -145,8 +152,9 @@ fun ShowCurrencies(
                     )
                 }
                 MyText(
-                    modifier = Modifier.weight(1.0f),
-                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .weight(1.0f)
+                        .padding(start = 8.dp),
                     fontSize = 18.sp,
                     text = "Hamyonlar",
                     color = MaterialTheme.customColors.textColor
@@ -167,17 +175,28 @@ fun ShowCurrencies(
                     viewModel.navigateToPocket(pocketDomain)
                     visibilityPopup = false
                 }, onMenuMoreClicked = { offset ->
-                    pocket = pocketDomain
+                    viewModel.pocket.value = pocketDomain
                     offsetPopup = offset
                     visibilityPopup =
                         !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true
 
-                })
+                },
+                onIconClicked = {
+                    alertMessage =
+                        "Bu ma'lumot serverga saqlanmagan. Internetni yo'qib qaytadan bosing"
+                    if (!pocketDomain.uploaded) {
+                        viewModel.add(pocketDomain)
+                    }
+                    visibilityPopup = false
+                    visibilityAlert = true
+                }
+
+            )
         }
 
         item(key = "add new pocket") {
             ButtonAdd(text = "Yangi hamyon qo'shish", onClicked = {
-                pocket = PocketDomain("")
+                viewModel.pocket.value = PocketDomain("")
                 visibilityDialog = true
             })
         }

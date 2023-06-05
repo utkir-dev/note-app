@@ -5,6 +5,8 @@ import javax.inject.Inject
 class DeviceUseCases @Inject constructor(
     var getRemoteDevice: GetDevice,
     var getLocalDeviceId: GetLocalDeviceId,
-    var saveDevice: SaveDevice
+    var saveDevice: SaveDevice,
+    var observeDevice: ObserveDevice,
+    var stopObservingDevice: StopObservingDevice
 
 )

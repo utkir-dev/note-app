@@ -47,7 +47,6 @@ fun ShowBalance(viewModel: BalanceViewModelImp) {
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     viewModel.back()
@@ -59,10 +58,11 @@ fun ShowBalance(viewModel: BalanceViewModelImp) {
                     )
                 }
                 MyText(
-                    modifier = Modifier.weight(1.0f),
-                    text = "BalanceDomain",
+                    modifier = Modifier
+                        .weight(1.0f)
+                        .padding(start = 10.dp),
+                    text = "Balans",
                     fontSize = 18.sp,
-                    textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.customColors.textColor
                 )

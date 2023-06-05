@@ -51,7 +51,7 @@ fun Show(
     viewModel.setPerson(person)
 
 
-    val toolBarHeight = 56.dp
+    val toolBarHeight = 80.dp
     Scaffold(modifier = Modifier
         .fillMaxSize(),
         topBar = {
@@ -84,11 +84,8 @@ fun Show(
                     MyText(
                         text = person.name,
                         fontSize = 20.sp,
-                        textAlign = TextAlign.Center,
                         color = MaterialTheme.customColors.textColor,
-                        fontWeight = FontWeight.Bold,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }

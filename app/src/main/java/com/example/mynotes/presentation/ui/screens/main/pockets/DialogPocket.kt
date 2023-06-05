@@ -1,18 +1,23 @@
 package com.example.mynotes.presentation.utils.components
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -21,28 +26,55 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.domain.models.PocketDomain
+import com.example.mynotes.presentation.ui.screens.main.pockets.PocketsViewModelImp
 import com.example.mynotes.presentation.utils.components.buttons.MyButton
 import com.example.mynotes.presentation.utils.components.buttons.buttonColors
-import com.example.mynotes.presentation.utils.components.image.*
+import com.example.mynotes.presentation.utils.components.image.Gray
+import com.example.mynotes.presentation.utils.components.image.Green
+import com.example.mynotes.presentation.utils.components.image.White
+import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
-import java.util.*
 
 @Composable
-fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
+fun DialogPocket(
+    vm: PocketsViewModelImp,
+    listPocket: List<PocketDomain>,
+    onDismiss: () -> Unit
+) {
 
     //val context = LocalContext.current
-    var textValue by rememberSaveable {
-        mutableStateOf(pocket.name)
-    }
-    var textValidation by rememberSaveable {
-        mutableStateOf(false)
+    var pocketName by rememberSaveable {
+        mutableStateOf(vm.getPocket().name)
     }
 
+    var errorName by remember {
+        mutableStateOf("")
+    }
+    val durationUp: Int = 250
+    val durationDown: Int = 100
+    val scaleUp: Float = 1.02f
+    val scaleDown: Float = 0.8f
+    val scale = remember {
+        Animatable(1f)
+    }
+    LaunchedEffect(key1 = scale) {
+        scale.animateTo(
+            scaleDown,
+            animationSpec = tween(durationDown),
+        )
+        scale.animateTo(
+            scaleUp,
+            animationSpec = tween(durationUp),
+        )
+        scale.animateTo(
+            1f,
+            animationSpec = tween(durationUp),
+        )
+    }
     Dialog(
         onDismissRequest = {
-            onDismiss(null)
+            onDismiss()
         }, properties = DialogProperties(
             dismissOnBackPress = false,
             dismissOnClickOutside = false
@@ -51,24 +83,19 @@ fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
         Card(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier
+                .scale(scale.value)
                 .padding(8.dp)
 
         ) {
             Column(
                 Modifier
                     .background(MaterialTheme.customColors.backgroundDialog)
-                    .padding(16.dp)
-                    .animateContentSize(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    ),
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 MyText(
-                    text = if (pocket.name.isEmpty()) "Yangi hamyon qo'shish" else
-                        "${pocket.name} hamyon nomini o'zgartirish",
+                    text = if (vm.getPocket().name.isEmpty()) "Yangi hamyon qo'shish" else
+                        "${vm.getPocket().name} hamyon nomini o'zgartirish",
                     modifier = Modifier.padding(8.dp),
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
@@ -79,9 +106,9 @@ fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(5.dp),
-                    value = textValue,
+                    value = pocketName,
                     onValueChange = { it ->
-                        textValue = it
+                        pocketName = it
                     },
                     label = {
                         MyText(
@@ -97,14 +124,14 @@ fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
                     colors = buttonColors()
                 )
                 MyText(
-                    text = if (textValidation) "Hamyon nomini kiriting" else "",
+                    text = errorName,
                     fontSize = 14.sp,
                     color = MaterialTheme.customColors.errorText
                 )
 
                 Row(modifier = Modifier.fillMaxWidth()) {
                     MyButton(
-                        onClick = { onDismiss(null) },
+                        onClick = { onDismiss() },
                         text = "Bekor",
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -120,18 +147,25 @@ fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
 
                     MyButton(
                         onClick = {
-                            textValidation = validateName(textValue)
-                            if (!textValidation) {
-                                val pocketNew = if (pocket.isValid()) {
-                                    pocket.copy(
-                                        name = textValue
-                                    )
-                                } else PocketDomain(
-                                    id = UUID.randomUUID().toString(),
-                                    name = textValue,
-                                    date = System.currentTimeMillis()
-                                )
-                                onDismiss(pocketNew)
+                            var validPocket = true
+                            val name = pocketName.trim()
+                            val size =
+                                listPocket.filter {
+                                    it.name.lowercase() == name.lowercase()
+                                }.size
+
+                            if (name.isEmpty()) {
+                                validPocket = false
+                                errorName = "Hamyon nomini kiriting"
+                            } else if (size > 0 && !vm.pocket.value.isValid()) {
+                                validPocket = false
+                                errorName = "Bu hamyon allaqachon bor"
+                            } else {
+                                errorName = ""
+                            }
+                            if (validPocket) {
+                                vm.savePocket(name)
+                                onDismiss()
                             }
                         },
                         text = "Tasdiq",
@@ -155,5 +189,4 @@ fun DialogPocket(pocket: PocketDomain, onDismiss: (PocketDomain?) -> Unit) {
     }
 }
 
-private fun validateName(textValue: String) = textValue.trim().isEmpty()
 

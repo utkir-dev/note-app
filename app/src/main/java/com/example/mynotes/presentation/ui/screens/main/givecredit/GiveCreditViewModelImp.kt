@@ -29,9 +29,9 @@ class GiveCreditViewModelImp @Inject constructor(
     private val direction: GiveCreditDirection,
 ) : ViewModel(), GiveCreditViewModel {
 
-    override val person: MutableState<PersonDomain> = mutableStateOf(PersonDomain(""))
+    override val person = MutableStateFlow(PersonDomain(""))
 
-    override val currency: MutableState<CurrencyDomain> = mutableStateOf(CurrencyDomain(""))
+    override val currency = MutableStateFlow(CurrencyDomain(""))
 
     override val currencies: Flow<List<CurrencyDomain>> = flow {
         emitAll(currencyUseCases.getAll.invoke())
@@ -39,7 +39,7 @@ class GiveCreditViewModelImp @Inject constructor(
     override val balances: Flow<List<BalanceDomain>> = flow {
         emitAll(walletUseCases.getBalances.invoke())
     }
-    override val pocket: MutableState<PocketDomain> = mutableStateOf(PocketDomain(""))
+    override val pocket = MutableStateFlow(PocketDomain(""))
 
     override val pockets: Flow<List<PocketDomain>> = flow {
         emitAll(pocketUseCases.getAll.invoke())

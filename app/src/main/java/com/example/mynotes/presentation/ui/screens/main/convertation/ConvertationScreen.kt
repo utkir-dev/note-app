@@ -38,6 +38,9 @@ import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.extensions.huminize
 import com.example.mynotes.presentation.utils.items.EmptyRowSizeble
 import com.example.mynotes.presentation.utils.items.ItemEmptyRow
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 class ConvertationScreen : AppScreen() {
     @Composable
@@ -56,22 +59,17 @@ fun Show(
     val wallets by viewModel.wallets.collectAsStateWithLifecycle(emptyList())
     val balances by viewModel.balances.collectAsStateWithLifecycle(emptyList())
 
-    val currencyFrom by remember { viewModel.currencyFrom }
-    val currencyTo by remember { viewModel.currencyTo }
-    val currencyConvert by remember { viewModel.currency }
-
-    val pocketFrom by remember { viewModel.pocketFrom }
-    val pocketTo by remember { viewModel.pocketTo }
+    val currencyFrom by viewModel.currencyFrom.collectAsStateWithLifecycle()
+    val currencyTo by viewModel.currencyTo.collectAsStateWithLifecycle()
+    val currencyConvert by viewModel.currency.collectAsStateWithLifecycle()
+    val pocketFrom by viewModel.pocketFrom.collectAsStateWithLifecycle()
+    val pocketTo by viewModel.pocketTo.collectAsStateWithLifecycle()
 
     var offset by remember { mutableStateOf(Offset(0f, 0f)) }
     var type by remember { mutableStateOf(ConvertType.FROM_POCKET) }
 
-    val isValid by remember { viewModel.isValid }
     var visibilityConfirm by remember { mutableStateOf(false) }
     var visibilityValidationAmount by remember { mutableStateOf(false) }
-
-    var visibilityDialogAttention by remember { mutableStateOf(false) }
-
     var visibilityList by remember { mutableStateOf(false) }
     var list by remember {
         mutableStateOf(listOf<ModelDomain>())
@@ -87,11 +85,12 @@ fun Show(
     }
 
     if (visibilityConfirm) {
-        DialogConfirm(clazz = pocketTo) { boo, clazz ->
-            val pock = clazz as PocketDomain
-            if (boo && pock.isValid()) {
-                //  viewModel.delete(pock)
-            }
+        DialogConfirm(clazz = pocketTo, onDismiss = {
+            visibilityConfirm = false
+        }) { boo ->
+//            if (boo && pock.isValid()) {
+//                 viewModel.delete(pock)
+//            }
             visibilityConfirm = false
         }
     }
@@ -189,8 +188,8 @@ fun Show(
                                     }.firstOrNull()
 
                                 MyText(
-                                    text = if (wallet == null) "0 ${viewModel.currencyFrom.value.name}" else
-                                        "${wallet.balance.huminize()} ${viewModel.currencyFrom.value.name}",
+                                    text = if (wallet == null) "0 ${currencyFrom.name}" else
+                                        "${wallet.balance.huminize()} ${currencyFrom.name}",
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 5.dp),
@@ -210,7 +209,9 @@ fun Show(
                     // Currency from
                     item {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -313,8 +314,8 @@ fun Show(
                                     }.firstOrNull()
 
                                 MyText(
-                                    text = if (wallet == null) "0 ${viewModel.currencyTo.value.name}" else
-                                        "${wallet.balance.huminize()} ${viewModel.currencyTo.value.name}",
+                                    text = if (wallet == null) "0 ${currencyTo.name}" else
+                                        "${wallet.balance.huminize()} ${currencyTo.name}",
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 5.dp),
@@ -333,7 +334,9 @@ fun Show(
                     // Currency to
                     item {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -457,6 +460,7 @@ fun Show(
                             MyButton(
                                 onClick = { viewModel.back() },
                                 text = "Bekor",
+                                textSize = 16.sp,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Gray, contentColor = White
                                 ),
@@ -470,21 +474,35 @@ fun Show(
                                 onClick = {
                                     val fromWallet: WalletDomain? =
                                         wallets.firstOrNull { it.ownerId == pocketFrom.id && it.currencyId == currencyFrom.id }
-                                    viewModel.validateTransaction(
-                                        amountTransaction,
-                                        fromWallet,
-                                        "",
-                                        balances.sumOf { it.amount * (1 / it.rate) }
-                                    )
-                                    if (isValid) {
-                                        visibilityValidationAmount = false
-                                        viewModel.back()
-                                    } else {
+                                    try {
+                                        val n = amountTransaction.trim().toDouble()
+                                        fromWallet?.let { wallet ->
+                                            val amountDollar = (1 / currencyConvert.rate) * n
+                                            val balanceDollar = wallet.balance / currencyFrom.rate
+                                            if (balanceDollar >= amountDollar) {
+                                                visibilityValidationAmount = false
+                                                viewModel.addTransaction(
+                                                    n,
+                                                    wallet,
+                                                    amountDollar,
+                                                    "",
+                                                    balances.sumOf { it.amount * (1 / it.rate) })
+                                                viewModel.back()
+                                            } else {
+                                                visibilityValidationAmount = true
+                                            }
+                                        }
+                                    } catch (_: Exception) {
                                         visibilityValidationAmount = true
+
                                     }
-                                }, text = "Tasdiq", colors = ButtonDefaults.buttonColors(
+                                },
+                                text = "Tasdiq",
+                                textSize = 16.sp,
+                                colors = ButtonDefaults.buttonColors(
                                     containerColor = Green, contentColor = White
-                                ), modifier = Modifier
+                                ),
+                                modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(8.dp)
                                     .weight(1F)

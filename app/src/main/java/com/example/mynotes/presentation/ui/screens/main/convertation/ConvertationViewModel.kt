@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface ConvertationViewModel {
-    val pocketFrom: MutableState<PocketDomain>
-    val pocketTo: MutableState<PocketDomain>
+    val pocketFrom: Flow<PocketDomain>
+    val pocketTo: Flow<PocketDomain>
 
-    val currencyFrom: MutableState<CurrencyDomain>
-    val currencyTo: MutableState<CurrencyDomain>
-    val currency: MutableState<CurrencyDomain>
+    val currencyFrom: Flow<CurrencyDomain>
+    val currencyTo: Flow<CurrencyDomain>
+    val currency: Flow<CurrencyDomain>
 
     val pockets: Flow<List<PocketDomain>>
     val wallets: Flow<List<WalletDomain>>

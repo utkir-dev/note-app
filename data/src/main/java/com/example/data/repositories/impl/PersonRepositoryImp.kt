@@ -11,6 +11,7 @@ import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 internal class PersonRepositoryImp @Inject constructor(
@@ -21,21 +22,18 @@ internal class PersonRepositoryImp @Inject constructor(
 
     override suspend fun add(person: Person): Long {
         val result = local.add(person)
-        val dbRemote = remote.storageRef.firestore.collection(Const.USERS)
-            .document(auth.currentUser?.uid ?: "").collection(PERSONS)
-        var remoteTask = false
+        val dbRemote = remote.storageRef.firestore
+            .collection(Const.USERS).document(auth.currentUser?.uid ?: "")
+            .collection(Const.PERSONS)
 
-        coroutineScope {
-            val job1 = async {
-                dbRemote.document(person.id).set(person.toRemote()).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        remoteTask = true
-
+        dbRemote.document(person.id).set(person.toRemote().copy(date = System.currentTimeMillis()))
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    runBlocking {
+                        local.add(person.copy(date = System.currentTimeMillis(), uploaded = true))
                     }
                 }
             }
-            job1.await()
-        }
         return result
     }
 

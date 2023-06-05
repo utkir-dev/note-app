@@ -34,21 +34,16 @@ class CheckDatabase @AssistedInject constructor(
     params
 ) {
     override suspend fun doWork(): Result {
-        Log.d("worker", "doWork")
-
         coroutineScope {
             if (auth.currentUser != null) {
-                Log.d("worker", "runBlocking")
                 FirebaseFirestore.getInstance().collection(Const.USERS)
                     .document(auth.currentUser?.uid ?: "")
                     .collection(Const.DEVICES).document(Const.DEVICES).get()
                     .addOnSuccessListener {
                         val remoteDevice = it.toObject(UserDevice::class.java)
-                        Log.d("worker", "remoteDevice : $remoteDevice")
                         runBlocking {
                             val localDeviceId: String =
                                 deviceUseCases.getLocalDeviceId.invoke()
-                            Log.d("worker", "localDeviceId : $localDeviceId")
                             remoteDevice?.let {
                                 if (it.id != localDeviceId) {
                                     auth.signOut()
@@ -57,13 +52,9 @@ class CheckDatabase @AssistedInject constructor(
                             }
                         }
                     }.await()
-
                 delay(10_000)
-                Log.d("worker", "runBlocking end")
-                async { remoteStorage.checkNotLoadedDatas() }
-                Log.d("worker", "checkNotLoadedDatas end")
-                async { remoteStorage.uploadDataAsFile() }
-                Log.d("worker", "uploadDataAsFile end")
+                async { remoteStorage.checkNotLoadedDatas() }.await()
+                async { remoteStorage.uploadDataAsFile(false) }.await()
             }
         }
         return Result.success()

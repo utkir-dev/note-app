@@ -1,5 +1,6 @@
 package com.example.common
 
+
 //fun isInternetAvailable(context: Context): Boolean {
 //    var result = false
 //    val connectivityManager =
@@ -29,3 +30,5 @@ package com.example.common
 //
 //    return result
 //}
+
+

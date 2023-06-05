@@ -1,5 +1,6 @@
 package com.example.data.repositories.impl
 
+import com.example.data.constants.Const
 import com.example.data.constants.Const.USERS
 import com.example.data.constants.Const.WALLETS
 import com.example.data.db.dao.WalletDao
@@ -13,6 +14,7 @@ import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 internal class WalletRepositoryImp @Inject constructor(
@@ -23,19 +25,18 @@ internal class WalletRepositoryImp @Inject constructor(
     ) : WalletRepository {
     override suspend fun add(wallet: Wallet): Long {
         val result = local.add(wallet)
-        val dbRemote = remote.storageRef.firestore.collection(USERS)
-            .document(auth.currentUser?.uid ?: "").collection(WALLETS)
-        var remoteTask = false
-        coroutineScope {
-            val job1 = async {
-                dbRemote.document(wallet.id).set(wallet.toRemote()).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        remoteTask = true
+        val dbRemote = remote.storageRef.firestore
+            .collection(USERS).document(auth.currentUser?.uid ?: "")
+            .collection(WALLETS)
+
+        dbRemote.document(wallet.id).set(wallet.toRemote().copy(date = System.currentTimeMillis()))
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    runBlocking {
+                        local.add(wallet.copy(date = System.currentTimeMillis(), uploaded = true))
                     }
                 }
             }
-            job1.await()
-        }
         return result
     }
 
@@ -43,15 +44,23 @@ internal class WalletRepositoryImp @Inject constructor(
         val result = local.addWallets(wallets)
         val dbRemote = remote.storageRef.firestore.collection(USERS)
             .document(auth.currentUser?.uid ?: "").collection(WALLETS)
-        var remoteTask = false
         coroutineScope {
             wallets.forEach { wallet ->
                 val job1 = async {
-                    dbRemote.document(wallet.id).set(wallet.toRemote()).addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            remoteTask = true
+                    dbRemote.document(wallet.id)
+                        .set(wallet.toRemote().copy(date = System.currentTimeMillis()))
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                runBlocking {
+                                    local.add(
+                                        wallet.copy(
+                                            date = System.currentTimeMillis(),
+                                            uploaded = true
+                                        )
+                                    )
+                                }
+                            }
                         }
-                    }
                 }
                 job1.await()
             }

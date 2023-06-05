@@ -4,6 +4,7 @@ import com.example.data.db.entities.Transaction
 import com.example.data.repositories.intrefaces.TransactionRepository
 import com.example.mynotes.domain.models.TransactionDomain
 import com.example.mynotes.domain.use_cases.currency_use_case.toDomain
+import com.example.mynotes.domain.use_cases.pocket_use_case.toDomain
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 

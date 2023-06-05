@@ -1,4 +1,4 @@
-package com.example.mynotes.domain.use_cases.data_use_case
+package com.example.mynotes.domain.use_cases.device_use_case
 
 import com.example.data.repositories.intrefaces.RemoteRepository
 import javax.inject.Inject

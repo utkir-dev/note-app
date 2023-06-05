@@ -11,6 +11,7 @@ import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 internal class PocketRepositoryImp @Inject constructor(
@@ -21,22 +22,18 @@ internal class PocketRepositoryImp @Inject constructor(
 
     override suspend fun add(pocket: Pocket): Long {
         val result = local.add(pocket)
+        val dbRemote = remote.storageRef.firestore
+            .collection(Const.USERS).document(auth.currentUser?.uid ?: "")
+            .collection(POCKETS)
 
-        var remoteTask = false
-
-        coroutineScope {
-            val job1 = async {
-                remote.storageRef.firestore.collection(Const.USERS)
-                    .document(auth.currentUser?.uid ?: "").collection(POCKETS).document(pocket.id)
-                    .set(pocket.toRemote()).addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            remoteTask = true
-
-                        }
+        dbRemote.document(pocket.id).set(pocket.toRemote().copy(date = System.currentTimeMillis()))
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    runBlocking {
+                        local.add(pocket.copy(date = System.currentTimeMillis(), uploaded = true))
                     }
+                }
             }
-            job1.await()
-        }
         return result
     }
 

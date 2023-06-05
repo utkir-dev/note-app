@@ -9,14 +9,17 @@ import androidx.work.*
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.mynotes.domain.background_task.CheckDatabase
+import com.example.mynotes.domain.use_cases.shared_pref_use_case.SharedPrefUseCases
 import com.example.mynotes.presentation.ui.dispatcher.NavigationHandler
 import com.example.mynotes.presentation.ui.screens.splash.SplashScreen
 import com.example.mynotes.presentation.utils.components.image.MyNotesTheme
+import com.example.mynotes.presentation.utils.contstants.KEY_NIGHT_MODE
 import com.example.mynotes.presentation.utils.contstants.KEY_WORK_MANAGER_ID
 import com.example.mynotes.presentation.utils.theme.ThemeState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -24,17 +27,29 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var navigationHandler: NavigationHandler
+
+    @Inject
+    lateinit var shared: SharedPrefUseCases
     private val workManager by lazy {
         WorkManager.getInstance(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
+
+
         createPeriodicWorkRequest()
-        ThemeState.darkModeState.value = when (AppCompatDelegate.getDefaultNightMode()) {
-            AppCompatDelegate.MODE_NIGHT_YES -> true
-            else -> false
+        runBlocking {
+            ThemeState.darkModeState.value = shared.getBoolean.invoke(KEY_NIGHT_MODE)
+
         }
+//        ThemeState.darkModeState.value = when (AppCompatDelegate.getDefaultNightMode()) {
+//            AppCompatDelegate.MODE_NIGHT_YES -> true
+//            else -> false
+//        }
         setContent {
             MyNotesTheme(darkTheme = ThemeState.darkModeState.value) {
                 Navigator(SplashScreen()) { navigator ->
@@ -60,7 +75,7 @@ class MainActivity : ComponentActivity() {
             .build()
 
         val checker = PeriodicWorkRequestBuilder<CheckDatabase>(
-            15, TimeUnit.MINUTES
+            60, TimeUnit.MINUTES
         ).setInputData(data)
             .setConstraints(constraints)
             .build()

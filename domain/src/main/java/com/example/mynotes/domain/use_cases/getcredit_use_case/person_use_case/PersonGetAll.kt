@@ -3,6 +3,7 @@ package com.example.mynotes.domain.use_cases.getcredit_use_case.person_use_case
 import com.example.data.db.entities.Person
 import com.example.data.repositories.intrefaces.PersonRepository
 import com.example.mynotes.domain.models.PersonDomain
+import com.example.mynotes.domain.use_cases.pocket_use_case.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -20,5 +21,6 @@ fun Person.toDomain() = PersonDomain(
     name = this.name,
     phone = this.phone,
     address = this.address,
-    date = this.date
+    date = this.date,
+    uploaded = this.uploaded
 )

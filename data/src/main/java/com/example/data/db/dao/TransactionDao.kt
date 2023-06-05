@@ -19,8 +19,12 @@ interface TransactionDao {
     @Query("DELETE FROM transactions")
     fun clear()
 
+    @Query("SELECT * FROM transactions WHERE id=:id LIMIT 1")
+    fun getById(id: String): Transaction
+
     @Query("SELECT * FROM transactions order by date desc")
     fun getAll(): Flow<List<Transaction>>
+
 
     @Query("SELECT COUNT(*) FROM transactions")
     fun getCount(): Int
@@ -51,7 +55,8 @@ interface TransactionDao {
                 "transactions.comment AS comment, transactions.date AS date, \n " +
                 "transactions.isFromPocket AS isFromPocket, transactions.isToPocket AS isToPocket, \n" +
                 "transactions.rate AS rate, transactions.rateFrom AS rateFrom, \n" +
-                "transactions.rateTo AS rateTo, transactions.balance AS balance \n" +
+                "transactions.rateTo AS rateTo, transactions.balance AS balance, \n" +
+                "transactions.id AS transactionId, transactions.uploaded AS uploaded \n" +
                 "FROM currencies, transactions where transactions.currencyId=currencies.id AND (transactions.fromId=:ownerId " +
                 "OR transactions.toId=:ownerId) ORDER BY date DESC"
     )
@@ -74,7 +79,8 @@ interface TransactionDao {
                 "transactions.comment AS comment, transactions.date AS date, \n " +
                 "transactions.isFromPocket AS isFromPocket, transactions.isToPocket AS isToPocket, \n" +
                 "transactions.rate AS rate, transactions.rateFrom AS rateFrom, \n" +
-                "transactions.rateTo AS rateTo, transactions.balance AS balance \n" +
+                "transactions.rateTo AS rateTo, transactions.balance AS balance, \n" +
+                "transactions.id AS transactionId, transactions.uploaded AS uploaded \n" +
                 "FROM currencies, transactions where transactions.currencyId=currencies.id ORDER BY date DESC limit :count"
     )
     fun getForHome(count: Int): Flow<List<History>>
@@ -97,7 +103,8 @@ interface TransactionDao {
                 "transactions.comment AS comment, transactions.date AS date, \n " +
                 "transactions.isFromPocket AS isFromPocket, transactions.isToPocket AS isToPocket, \n" +
                 "transactions.rate AS rate, transactions.rateFrom AS rateFrom, \n" +
-                "transactions.rateTo AS rateTo, transactions.balance AS balance \n" +
+                "transactions.rateTo AS rateTo, transactions.balance AS balance, \n" +
+                "transactions.id AS transactionId, transactions.uploaded AS uploaded \n" +
                 "FROM currencies, transactions where transactions.currencyId=currencies.id ORDER BY date DESC"
     )
     fun getHistory(): Flow<List<History>>

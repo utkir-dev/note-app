@@ -21,6 +21,9 @@ class SignInViewModelImp @Inject constructor(
     private val deviceUseCases: DeviceUseCases,
 ) : ViewModel(), SignInViewModel {
     override var uiState = MutableStateFlow<UiState>(UiState.Default)
+    fun changeUiState(state: UiState) {
+        uiState.value = state
+    }
 
     override fun signIn(login: String, password: String) {
         uiState.value = UiState.Progress

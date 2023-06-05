@@ -19,4 +19,5 @@ fun Pocket.toDomain() = PocketDomain(
     id = this.id,
     name = this.name,
     date = this.date,
+    uploaded = this.uploaded
 )

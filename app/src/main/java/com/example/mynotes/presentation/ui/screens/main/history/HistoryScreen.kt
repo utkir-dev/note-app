@@ -7,8 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -20,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.items.ItemHistory
@@ -35,6 +35,16 @@ class HistoryScreen() : AppScreen() {
 @Composable
 fun Show(viewModel: HistoryViewModelImp) {
     val historyList by viewModel.history.collectAsStateWithLifecycle(emptyList())
+
+    var visibilityAlert by remember {
+        mutableStateOf(false)
+    }
+
+    if (visibilityAlert) {
+        DialogAttention("Bu ma'lumot serverga saqlanmagan. Internetni yo'qib qaytadan bosing !") {
+            visibilityAlert = false
+        }
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -47,7 +57,6 @@ fun Show(viewModel: HistoryViewModelImp) {
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     viewModel.back()
@@ -59,10 +68,11 @@ fun Show(viewModel: HistoryViewModelImp) {
                     )
                 }
                 MyText(
-                    modifier = Modifier.weight(1.0f),
+                    modifier = Modifier
+                        .weight(1.0f)
+                        .padding(start = 8.dp),
                     text = "Tarix",
                     fontSize = 18.sp,
-                    textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.customColors.textColor
                 )
@@ -72,8 +82,10 @@ fun Show(viewModel: HistoryViewModelImp) {
         items(items = historyList, key = { it.hashCode() }) { historyItem ->
             ItemHistory(
                 item = historyItem,
-                isCommentVisible = true,
-                onItemClicked = { })
+            ) {
+                visibilityAlert = true
+                viewModel.checkNotUploadeds()
+            }
         }
     }
 }

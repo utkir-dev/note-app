@@ -21,5 +21,7 @@ data class History(
     var rate: Double = 1.0,
     var rateFrom: Double = 1.0,
     var rateTo: Double = 1.0,
-    var balance: Double = 0.0
+    var balance: Double = 0.0,
+    var transactionId: String? = null,
+    var uploaded: Boolean = false
 )

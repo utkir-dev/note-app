@@ -9,17 +9,13 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,12 +27,15 @@ import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.DialogCurrency
 import com.example.mynotes.presentation.utils.components.buttons.ButtonAdd
+import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
 import com.example.mynotes.presentation.utils.components.dialogs.DialogConfirm
 import com.example.mynotes.presentation.utils.components.dialogs.PopupDialog
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.items.ItemCurrency
 import com.example.mynotes.presentation.utils.types.PopupType
+import com.library.utils.isInternetAvailable
+import kotlinx.coroutines.runBlocking
 
 class CurrencyScreen : AppScreen() {
     @Composable
@@ -52,8 +51,12 @@ fun ShowCurrencies(
 
 ) {
     val listCurrency by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+    val wallets by viewModel.wallets.collectAsStateWithLifecycle(emptyList())
 
     var visibilityPopup by remember {
+        mutableStateOf(false)
+    }
+    var visibilityAlert by remember {
         mutableStateOf(false)
     }
     var offsetPopup by remember {
@@ -65,12 +68,25 @@ fun ShowCurrencies(
     var visibilityConfirm by remember {
         mutableStateOf(false)
     }
-    var currency by remember {
-        mutableStateOf(CurrencyDomain(""))
+
+
+    if (visibilityDialog) {
+        visibilityPopup = false
+        DialogCurrency(viewModel, listCurrency) {
+            visibilityDialog = false
+        }
+    }
+    var alertMessage by remember {
+        mutableStateOf("")
     }
 
+    if (visibilityAlert) {
+        DialogAttention(alertMessage) {
+            visibilityAlert = false
+        }
+    }
     if (visibilityPopup) {
-        PopupDialog(currency.name, offsetPopup) { type ->
+        PopupDialog(viewModel.getCurrency().name, offsetPopup) { type ->
             when (type) {
                 PopupType.EDIT -> {
                     visibilityDialog = true
@@ -85,31 +101,24 @@ fun ShowCurrencies(
             visibilityPopup = false
         }
     }
-    if (visibilityDialog) {
-        visibilityPopup = false
-        DialogCurrency(currency) { cur ->
-            cur?.let {
-                currency = it
-                if (currency.isValid()) {
-                    // notes.add(currency)
-                    viewModel.add(currency)
-                }
-            }
-            visibilityDialog = false
-        }
-    }
+
     if (visibilityConfirm) {
         visibilityPopup = false
-        DialogConfirm(clazz = currency) { boo, clazz ->
-            val cur = clazz as CurrencyDomain
-            if (boo && cur.isValid()) {
-                // notes.remove(currency)
-                viewModel.delete(cur)
+        DialogConfirm(clazz = viewModel.getCurrency(), onDismiss = {
+            visibilityConfirm = false
+        }) { boo ->
+            if (boo) {
+                if (wallets.filter { it.currencyId == viewModel.getCurrency().id }.size > 0) {
+                    alertMessage = "Bu valyuta orqali qilingan ishlar bor. O'chirish mumkin emas !"
+                    visibilityAlert = true
+                } else {
+                    viewModel.delete()
+                }
+
             }
             visibilityConfirm = false
         }
     }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -135,7 +144,6 @@ fun ShowCurrencies(
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     viewModel.back()
@@ -147,10 +155,11 @@ fun ShowCurrencies(
                     )
                 }
                 MyText(
-                    modifier = Modifier.weight(1.0f),
+                    modifier = Modifier
+                        .weight(1.0f)
+                        .padding(start = 8.dp),
                     text = "Valyutalar",
                     fontSize = 18.sp,
-                    textAlign = TextAlign.Center,
                     color = MaterialTheme.customColors.textColor
                 )
             }
@@ -160,22 +169,27 @@ fun ShowCurrencies(
         }) { currencyDomain ->
             ItemCurrency(
                 currency = currencyDomain,
-                onItemClicked = {
+                onMenuMoreClicked = { offset ->
+                    viewModel.currency.value = currencyDomain
+                    offsetPopup = offset
+                    visibilityPopup =
+                        !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true
+                },
+                onIconClicked = {
+                    alertMessage =
+                        "Bu ma'lumot serverga saqlanmagan. Internetni yo'qib qaytadan bosing"
+                    visibilityAlert = true
                     if (!currencyDomain.uploaded) {
                         viewModel.add(currencyDomain)
                     }
                     visibilityPopup = false
-                }, onMenuMoreClicked = { offset ->
-                    currency = currencyDomain
-                    offsetPopup = offset
-                    visibilityPopup =
-                        !visibilityPopup// if (currencyDomain == listCurrency[index]) !visibilityPopup else true
-                })
+                }
+            )
         }
 
         item(key = "add new currency") {
             ButtonAdd(text = "Yangi valyuta qo'shish", onClicked = {
-                currency = CurrencyDomain("")
+                viewModel.currency.value = CurrencyDomain("")
                 visibilityDialog = true
             })
         }

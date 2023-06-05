@@ -49,7 +49,6 @@ fun ShowIncomes(
                     .height(toolBarHeight)
                     .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     viewModel.back()
@@ -61,10 +60,11 @@ fun ShowIncomes(
                     )
                 }
                 MyText(
-                    modifier = Modifier.weight(1.0f),
+                    modifier = Modifier
+                        .weight(1.0f)
+                        .padding(start = 8.dp),
                     text = "Chiqim",
                     fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
                     color = MaterialTheme.customColors.textColor,
                     fontWeight = FontWeight.Bold
                 )

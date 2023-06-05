@@ -17,7 +17,7 @@ class SplashViewModelIml @Inject constructor(
     ) : ViewModel() {
     init {
         viewModelScope.launch {
-            delay(1000)
+            delay(2000)
             if (getCurrentUser.invoke() != null) {
                 direction.navigateToHome()
             } else {

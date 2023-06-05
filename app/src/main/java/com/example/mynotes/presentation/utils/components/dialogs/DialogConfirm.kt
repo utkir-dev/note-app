@@ -1,55 +1,66 @@
 package com.example.mynotes.presentation.utils.components.dialogs
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardElevation
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.mynotes.domain.models.ModelDomain
 import com.example.mynotes.presentation.utils.components.buttons.MyButton
-import com.example.mynotes.presentation.utils.components.image.Gray
 import com.example.mynotes.presentation.utils.components.image.Green
-import com.example.mynotes.presentation.utils.components.image.Red
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
-import com.example.mynotes.presentation.utils.types.PopupType
+
 
 @Composable
 fun DialogConfirm(
     clazz: ModelDomain,
     message: String = "",
-    onDismiss: (Boolean, clazz: ModelDomain) -> Unit
+    onDismiss: () -> Unit,
+    buttonAction: (Boolean) -> Unit
 ) {
+    val durationUp: Int = 250
+    val durationDown: Int = 100
+    val scaleUp: Float = 1.02f
+    val scaleDown: Float = 0.8f
+    val scale = remember {
+        Animatable(1f)
+    }
+    LaunchedEffect(key1 = scale) {
+        scale.animateTo(
+            scaleDown,
+            animationSpec = tween(durationDown),
+        )
+        scale.animateTo(
+            scaleUp,
+            animationSpec = tween(durationUp),
+        )
+        scale.animateTo(
+            1f,
+            animationSpec = tween(durationUp),
+        )
+    }
+
     Dialog(onDismissRequest = {
-        onDismiss(false, clazz)
+        onDismiss()
     }) {
         Card(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier
-                .padding(8.dp)
-                .animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
+                .scale(
+                    scale = scale.value
                 )
+                .padding(8.dp)
+
         ) {
             Column(
                 Modifier
@@ -74,7 +85,7 @@ fun DialogConfirm(
                             .background(MaterialTheme.customColors.borderColor)
                     )
                     MyText(
-                        text = "${clazz.name}ni o'chirishga ishonchingiz komilmi?",
+                        text = if (message.isNotEmpty()) message else "${clazz.name}ni o'chirishga ishonchingiz komilmi?",
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp),
@@ -89,14 +100,19 @@ fun DialogConfirm(
                     ) {
                         MyButton(
                             text = "YO'Q",
-                            onClick = { onDismiss(false, clazz) }) {
+                            textSize = 16.sp,
+                            onClick = {
+                                onDismiss()
+
+                            }) {
 
                         }
                         MyButton(
                             text = "HA",
                             background = Green,
+                            textSize = 16.sp,
                             onClick = {
-                                onDismiss(true, clazz)
+                                buttonAction(true)
                             })
                         {
                         }
