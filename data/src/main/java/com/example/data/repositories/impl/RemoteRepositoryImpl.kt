@@ -12,6 +12,7 @@ import com.example.data.db.dao.*
 import com.example.data.db.entities.Currency
 import com.example.data.db.remote_models.*
 import com.example.data.repositories.intrefaces.*
+import com.example.mynotes.presentation.utils.extensions.huminize
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.gson.Gson
@@ -29,6 +30,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
 
 class RemoteRepositoryImpl @Inject constructor(
     private val remoteStorage: RemoteStorage,
@@ -57,72 +61,80 @@ class RemoteRepositoryImpl @Inject constructor(
 
     @SuppressLint("SimpleDateFormat")
     override suspend fun uploadDataAsFile(doNow: Boolean?) {
+        if (auth.currentUser != null) {
+            //  downloadByNodes(getLastUpdatedDatabaseTime() - BACK_TIME)
+            val lastUploadedDate = shared.getLong(KEY_UPLOADED_DATE)
+            if ((lastUploadedDate < System.currentTimeMillis() - DAY_MILLS) || doNow ?: true) coroutineScope {
+                launch(Dispatchers.IO) {
+                    val time = yearBeginTime()
+                    val r1 = persons.getFromDate(time)
+                    val r2 = pockets.getFromDate(time)
+                    val r3 = currencies.getFromDate(time)
+                    val r4 = wallets.getFromDate(time)
+                    val r5 = transactions.getFromDate(time)
 
-        //  downloadByNodes(getLastUpdatedDatabaseTime() - BACK_TIME)
-        val lastUploadedDate = shared.getLong(KEY_UPLOADED_DATE)
-        if ((lastUploadedDate < System.currentTimeMillis() - DAY_MILLS) || doNow ?: true) coroutineScope {
-            launch(Dispatchers.IO) {
-                val time = yearBeginTime()
-                val r1 = persons.getFromDate(time)
-                val r2 = pockets.getFromDate(time)
-                val r3 = currencies.getFromDate(time)
-                val r4 = wallets.getFromDate(time)
-                val r5 = transactions.getFromDate(time)
+                    combine(
+                        r1,
+                        r2,
+                        r3,
+                        r4,
+                        r5
+                    ) { persons, pockets, currencies, wallets, transactions ->
 
-                combine(r1, r2, r3, r4, r5) { persons, pockets, currencies, wallets, transactions ->
+                        val allData = AllData(date = System.currentTimeMillis() - BACK_TIME,
+                            currency = currencies.map { it.toRemote() },
+                            pocket = pockets.map { it.toRemote() },
+                            person = persons.map { it.toRemote() },
+                            wallet = wallets.map { it.toRemote() },
+                            transaction = transactions.map { it.toRemote() })
+                        val dataString = Gson().toJson(allData).toString()
+                        val dataCompressed = compress(dataString) ?: ByteArray(1)
 
-                    val allData = AllData(date = System.currentTimeMillis() - BACK_TIME,
-                        currency = currencies.map { it.toRemote() },
-                        pocket = pockets.map { it.toRemote() },
-                        person = persons.map { it.toRemote() },
-                        wallet = wallets.map { it.toRemote() },
-                        transaction = transactions.map { it.toRemote() })
-                    val dataString = Gson().toJson(allData).toString()
-                    val dataCompressed = compress(dataString) ?: ByteArray(1)
+                        val fileName = dateFormat.format(Date())
 
-                    val fileName = dateFormat.format(Date())
+                        val storage = remoteStorage.storage.child("${auth.currentUser?.uid}/$PATH")
 
-                    val storage = remoteStorage.storage.child("${auth.currentUser?.uid}/$PATH")
+                        val size = storage.child("$fileName.json").metadata.addOnSuccessListener {
+                            it.sizeBytes
+                        }.await().sizeBytes
 
-                    val size = storage.child("$fileName.json").metadata.addOnSuccessListener {
-                        it.sizeBytes
-                    }.await().sizeBytes
+                        if (dataCompressed.size >= size) {
 
-                    if (dataCompressed.size >= size) {
+                            // upload original file
 
-                        // upload original file
-
-                        storage.child("$fileName.json").putBytes(dataCompressed)
-                            .addOnCompleteListener {
-                                if (it.isSuccessful) {
-                                    runBlocking {
-                                        shared.saveLong(
-                                            KEY_UPLOADED_DATE,
-                                            System.currentTimeMillis() - BACK_TIME
-                                        )
+                            storage.child("$fileName.json").putBytes(dataCompressed)
+                                .addOnCompleteListener {
+                                    if (it.isSuccessful) {
+                                        runBlocking {
+                                            shared.saveLong(
+                                                KEY_UPLOADED_DATE,
+                                                System.currentTimeMillis() - BACK_TIME
+                                            )
+                                        }
                                     }
-                                }
-                            }.await()
+                                }.await()
 
-                        // upload copyFile
+                            // upload copyFile
 
-                        storage.child("$COPY${fileName}.json").putBytes(dataCompressed)
-                            .addOnCompleteListener {
-                                if (it.isSuccessful) {
-                                    runBlocking {
-                                        it.result.totalByteCount
-                                        shared.saveLong(
-                                            KEY_UPLOADED_DATE,
-                                            System.currentTimeMillis() - BACK_TIME
-                                        )
+                            storage.child("$COPY${fileName}.json").putBytes(dataCompressed)
+                                .addOnCompleteListener {
+                                    if (it.isSuccessful) {
+                                        runBlocking {
+                                            it.result.totalByteCount
+                                            shared.saveLong(
+                                                KEY_UPLOADED_DATE,
+                                                System.currentTimeMillis() - BACK_TIME
+                                            )
+                                        }
                                     }
-                                }
-                            }.await()
-                    }
-                }.collect()
+                                }.await()
+                        }
+                    }.collect()
+                }
             }
         }
     }
+
 
     private suspend fun isDownloadAvialable(): Boolean {
         return pockets.getCount() == 0 || currencies.getCount() == 0 || transactions.getCount() == 0 || !shared.getBoolean(
@@ -131,107 +143,109 @@ class RemoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun downloadAllData(): Flow<Boolean> = callbackFlow {
-        val storage = remoteStorage.storage.child("${auth.currentUser?.uid}/$PATH")
-        if (isDownloadAvialable()) {
-            Log.d("HomeViewModelImp", "isDownloadAvialable: TRUE")
+        if (auth.currentUser != null) {
+            val storage = remoteStorage.storage.child("${auth.currentUser?.uid}/$PATH")
+            if (isDownloadAvialable()) {
+                Log.d("HomeViewModelImp", "isDownloadAvialable: TRUE")
 
-            coroutineScope {
-                launch(Dispatchers.IO) {
-                    storage.listAll().addOnSuccessListener { listResult ->
-                        if (listResult.items.isEmpty()) {
+                coroutineScope {
+                    launch(Dispatchers.IO) {
+                        storage.listAll().addOnSuccessListener { listResult ->
+                            if (listResult.items.isEmpty()) {
+                                runBlocking {
+                                    downloadByNodes(0) {
+                                        channel.trySend(it)
+                                    }
+                                }
+
+                            } else {
+                                listResult.items.filter { !it.name.startsWith(COPY) }
+                                    .forEach { fileRemote ->
+                                        var size = 0L
+                                        var copyFileSize = 0L
+                                        runBlocking {
+                                            size = fileRemote.metadata.addOnSuccessListener {
+                                                it.sizeBytes
+                                            }.await().sizeBytes
+                                            copyFileSize =
+                                                storage.child("$COPY${fileRemote.name}").metadata.addOnSuccessListener {
+                                                    it.sizeBytes
+                                                }.await().sizeBytes
+                                        }
+                                        val file = if (copyFileSize > size) {
+                                            storage.child("$COPY${fileRemote.name}")
+                                        } else {
+                                            fileRemote
+                                        }
+                                        runBlocking {
+                                            file.getBytes(10_000_000)
+                                                .addOnSuccessListener { byteArray ->
+                                                    val gson = Gson()
+                                                    val jsonString =
+                                                        JsonParser.parseString(decompress(byteArray))
+                                                    val type = object : TypeToken<AllData>() {}.type
+                                                    var date = 0L
+                                                    try {
+                                                        val allData: AllData =
+                                                            gson.fromJson(jsonString, type)
+                                                        date = allData.date
+                                                        runBlocking {
+                                                            val r5 = async {
+                                                                transactions.addTransactions(allData.transaction.map { it.toLocal() })
+                                                            }
+
+                                                            val r1 =
+                                                                async { persons.addPersons(allData.person.map { it.toLocal() }) }
+                                                            val r2 =
+                                                                async { pockets.addPockets(allData.pocket.map { it.toLocal() }) }
+                                                            val r3 = async {
+                                                                currencies.addCurrencies(allData.currency.map { it.toLocal() })
+                                                            }
+                                                            val r4 =
+                                                                async { wallets.addWallets(allData.wallet.map { it.toLocal() }) }
+
+                                                            r1.await()
+                                                            r2.await()
+                                                            r3.await()
+                                                            r4.await()
+                                                            r5.await()
+                                                        }
+                                                    } catch (_: Exception) {
+                                                        date = 0L
+                                                    }
+                                                    runBlocking {
+                                                        downloadByNodes(date) {
+                                                            trySend(it)
+                                                        }
+                                                    }
+                                                }.await()
+
+                                        }
+                                        trySend(true)
+                                    }
+                            }
+
+                        }.addOnFailureListener {
+                            runBlocking {
+                                downloadByNodes(0) {
+                                    channel.trySend(it)
+                                }
+                                awaitClose { channel.close() }
+                            }
+                        }.addOnCanceledListener {
                             runBlocking {
                                 downloadByNodes(0) {
                                     channel.trySend(it)
                                 }
                             }
-
-                        } else {
-                            listResult.items.filter { !it.name.startsWith(COPY) }
-                                .forEach { fileRemote ->
-                                    var size = 0L
-                                    var copyFileSize = 0L
-                                    runBlocking {
-                                        size = fileRemote.metadata.addOnSuccessListener {
-                                            it.sizeBytes
-                                        }.await().sizeBytes
-                                        copyFileSize =
-                                            storage.child("$COPY${fileRemote.name}").metadata.addOnSuccessListener {
-                                                it.sizeBytes
-                                            }.await().sizeBytes
-                                    }
-                                    val file = if (copyFileSize > size) {
-                                        storage.child("$COPY${fileRemote.name}")
-                                    } else {
-                                        fileRemote
-                                    }
-                                    runBlocking {
-                                        file.getBytes(10_000_000)
-                                            .addOnSuccessListener { byteArray ->
-                                                val gson = Gson()
-                                                val jsonString =
-                                                    JsonParser.parseString(decompress(byteArray))
-                                                val type = object : TypeToken<AllData>() {}.type
-                                                var date = 0L
-                                                try {
-                                                    val allData: AllData =
-                                                        gson.fromJson(jsonString, type)
-                                                    date = allData.date
-                                                    runBlocking {
-                                                        val r5 = async {
-                                                            transactions.addTransactions(allData.transaction.map { it.toLocal() })
-                                                        }
-
-                                                        val r1 =
-                                                            async { persons.addPersons(allData.person.map { it.toLocal() }) }
-                                                        val r2 =
-                                                            async { pockets.addPockets(allData.pocket.map { it.toLocal() }) }
-                                                        val r3 = async {
-                                                            currencies.addCurrencies(allData.currency.map { it.toLocal() })
-                                                        }
-                                                        val r4 =
-                                                            async { wallets.addWallets(allData.wallet.map { it.toLocal() }) }
-
-                                                        r1.await()
-                                                        r2.await()
-                                                        r3.await()
-                                                        r4.await()
-                                                        r5.await()
-                                                    }
-                                                } catch (_: Exception) {
-                                                    date = 0L
-                                                }
-                                                runBlocking {
-                                                    downloadByNodes(date) {
-                                                        trySend(it)
-                                                    }
-                                                }
-                                            }.await()
-
-                                    }
-                                    trySend(true)
-                                }
                         }
+                        Log.d("HomeViewModelImp", "HomeViewModelImp finish")
 
-                    }.addOnFailureListener {
-                        runBlocking {
-                            downloadByNodes(0) {
-                                channel.trySend(it)
-                            }
-                            awaitClose { channel.close() }
-                        }
-                    }.addOnCanceledListener {
-                        runBlocking {
-                            downloadByNodes(0) {
-                                channel.trySend(it)
-                            }
-                        }
                     }
                 }
+            } else {
+                trySend(true)
             }
-        } else {
-
-            Log.d("HomeViewModelImp", "isDownloadAvialable: FALSE")
-            trySend(true)
         }
         awaitClose {
             channel.close()
@@ -241,92 +255,93 @@ class RemoteRepositoryImpl @Inject constructor(
     private suspend fun downloadByNodes(date: Long, function: (Boolean) -> Unit) {
         coroutineScope {
             launch(Dispatchers.IO) {
-                runBlocking {
-                    val remote = remoteDatabase.storageRef.firestore.collection(
-                        USERS
-                    ).document(auth.currentUser?.uid ?: "")
+                if (auth.currentUser != null)
+                    runBlocking {
+                        val remote = remoteDatabase.storageRef.firestore.collection(
+                            USERS
+                        ).document(auth.currentUser?.uid ?: "")
 
-                    remote.collection(Const.TRANSACTIONS).whereGreaterThanOrEqualTo(
-                        DATE, date
-                    ).orderBy(DATE).limitToLast(10_000).get().addOnSuccessListener { snapshot ->
-                        if (!snapshot.isEmpty) try {
-                            val list = snapshot.map {
-                                it.toObject(
-                                    TransactionRemote::class.java
-                                )
+                        remote.collection(Const.TRANSACTIONS).whereGreaterThanOrEqualTo(
+                            DATE, date
+                        ).orderBy(DATE).limitToLast(10_000).get().addOnSuccessListener { snapshot ->
+                            if (!snapshot.isEmpty) try {
+                                val list = snapshot.map {
+                                    it.toObject(
+                                        TransactionRemote::class.java
+                                    )
+                                }
+                                runBlocking {
+                                    transactions.addTransactions(list.map { it.toLocal() })
+                                }
+                            } catch (_: Exception) {
                             }
-                            runBlocking {
-                                transactions.addTransactions(list.map { it.toLocal() })
-                            }
-                        } catch (_: Exception) {
-                        }
-                    }.await()
+                        }.await()
 
-                    remote.collection(Const.CURRENCIES).whereGreaterThanOrEqualTo(
-                        DATE, date
-                    ).get().addOnSuccessListener { snapshot ->
-                        if (!snapshot.isEmpty) try {
-                            val list = snapshot.map {
-                                it.toObject(
-                                    CurrencyRemote::class.java
-                                )
+                        remote.collection(Const.CURRENCIES).whereGreaterThanOrEqualTo(
+                            DATE, date
+                        ).get().addOnSuccessListener { snapshot ->
+                            if (!snapshot.isEmpty) try {
+                                val list = snapshot.map {
+                                    it.toObject(
+                                        CurrencyRemote::class.java
+                                    )
+                                }
+                                runBlocking {
+                                    currencies.addCurrencies(list.map { it.toLocal() })
+                                }
+                            } catch (_: Exception) {
                             }
-                            runBlocking {
-                                currencies.addCurrencies(list.map { it.toLocal() })
-                            }
-                        } catch (_: Exception) {
-                        }
-                    }.await()
+                        }.await()
 
-                    remote.collection(Const.POCKETS).whereGreaterThanOrEqualTo(
-                        DATE, date
-                    ).get().addOnSuccessListener { snapshot ->
-                        if (!snapshot.isEmpty) try {
-                            val list = snapshot.map {
-                                it.toObject(
-                                    PocketRemote::class.java
-                                )
+                        remote.collection(Const.POCKETS).whereGreaterThanOrEqualTo(
+                            DATE, date
+                        ).get().addOnSuccessListener { snapshot ->
+                            if (!snapshot.isEmpty) try {
+                                val list = snapshot.map {
+                                    it.toObject(
+                                        PocketRemote::class.java
+                                    )
+                                }
+                                runBlocking {
+                                    pockets.addPockets(list.map { it.toLocal() })
+                                }
+                            } catch (_: Exception) {
                             }
-                            runBlocking {
-                                pockets.addPockets(list.map { it.toLocal() })
-                            }
-                        } catch (_: Exception) {
-                        }
-                    }.await()
+                        }.await()
 
-                    remote.collection(Const.PERSONS).whereGreaterThanOrEqualTo(
-                        DATE, date
-                    ).get().addOnSuccessListener { snapshot ->
-                        if (!snapshot.isEmpty) try {
-                            val list = snapshot.map {
-                                it.toObject(
-                                    PersonRemote::class.java
-                                )
+                        remote.collection(Const.PERSONS).whereGreaterThanOrEqualTo(
+                            DATE, date
+                        ).get().addOnSuccessListener { snapshot ->
+                            if (!snapshot.isEmpty) try {
+                                val list = snapshot.map {
+                                    it.toObject(
+                                        PersonRemote::class.java
+                                    )
+                                }
+                                runBlocking {
+                                    persons.addPersons(list.map {
+                                        it.toLocal()
+                                    })
+                                }
+                            } catch (_: Exception) {
                             }
-                            runBlocking {
-                                persons.addPersons(list.map {
-                                    it.toLocal()
-                                })
-                            }
-                        } catch (_: Exception) {
-                        }
-                    }.await()
+                        }.await()
 
-                    remote.collection(Const.WALLETS).whereGreaterThanOrEqualTo(
-                        DATE, date
-                    ).get().addOnSuccessListener { snapshot ->
-                        if (!snapshot.isEmpty) try {
-                            val list = snapshot.map {
-                                it.toObject(
-                                    WalletRemote::class.java
-                                )
+                        remote.collection(Const.WALLETS).whereGreaterThanOrEqualTo(
+                            DATE, date
+                        ).get().addOnSuccessListener { snapshot ->
+                            if (!snapshot.isEmpty) try {
+                                val list = snapshot.map {
+                                    it.toObject(
+                                        WalletRemote::class.java
+                                    )
+                                }
+                                runBlocking {
+                                    wallets.addWallets(list.map { it.toLocal() })
+                                }
+                            } catch (_: Exception) {
                             }
-                            runBlocking {
-                                wallets.addWallets(list.map { it.toLocal() })
-                            }
-                        } catch (_: Exception) {
-                        }
-                    }.await()
+                        }.await()
 
 //
 //                    if (currencies.getCount() == 0) {
@@ -340,95 +355,99 @@ class RemoteRepositoryImpl @Inject constructor(
 //                        )
 //                    }
 
-                    shared.saveBoolean(KEY_DOWNLOADED_DATE, true)
-                }
+                        shared.saveBoolean(KEY_DOWNLOADED_DATE, true)
+                    }
                 function(true)
             }
         }
     }
 
     override suspend fun checkNotLoadedDatas() {
-        val remote = remoteDatabase.storageRef.firestore.collection(USERS)
-            .document(auth.currentUser?.uid ?: "")
-        coroutineScope {
-            launch(Dispatchers.IO) {
-                val r1 = persons.getNotUploaded(false)
-                val r2 = pockets.getNotUploaded(false)
-                val r3 = currencies.getNotUploaded(false)
-                val r4 = wallets.getNotUploaded(false)
-                val r5 = transactions.getNotUploaded(false)
-                combine(r1, r2, r3, r4, r5) { person, pocket, currency, wallet, transaction ->
-                    val task1 = async {
-                        person.forEach { p ->
-                            remote.collection(Const.PERSONS).document(p.id).set(p.toRemote())
-                                .addOnSuccessListener {
-                                    runBlocking { persons.add(p.copy(uploaded = true)) }
-                                }
+        if (auth.currentUser != null) {
+            val remote = remoteDatabase.storageRef.firestore.collection(USERS)
+                .document(auth.currentUser?.uid ?: "")
+            coroutineScope {
+                launch(Dispatchers.IO) {
+                    val r1 = persons.getNotUploaded(false)
+                    val r2 = pockets.getNotUploaded(false)
+                    val r3 = currencies.getNotUploaded(false)
+                    val r4 = wallets.getNotUploaded(false)
+                    val r5 = transactions.getNotUploaded(false)
+                    combine(r1, r2, r3, r4, r5) { person, pocket, currency, wallet, transaction ->
+                        val task1 = async {
+                            person.forEach { p ->
+                                remote.collection(Const.PERSONS).document(p.id).set(p.toRemote())
+                                    .addOnSuccessListener {
+                                        runBlocking { persons.add(p.copy(uploaded = true)) }
+                                    }
+                            }
                         }
-                    }
-                    val task2 = async {
-                        pocket.forEach { p ->
-                            remote.collection(Const.POCKETS).document(p.id).set(p.toRemote())
-                                .addOnSuccessListener {
-                                    runBlocking { pockets.add(p.copy(uploaded = true)) }
-                                }
+                        val task2 = async {
+                            pocket.forEach { p ->
+                                remote.collection(Const.POCKETS).document(p.id).set(p.toRemote())
+                                    .addOnSuccessListener {
+                                        runBlocking { pockets.add(p.copy(uploaded = true)) }
+                                    }
+                            }
                         }
-                    }
-                    val task3 = async {
-                        currency.forEach { p ->
-                            remote.collection(Const.CURRENCIES).document(p.id).set(p.toRemote())
-                                .addOnSuccessListener {
-                                    runBlocking { currencies.add(p.copy(uploaded = true)) }
-                                }
+                        val task3 = async {
+                            currency.forEach { p ->
+                                remote.collection(Const.CURRENCIES).document(p.id).set(p.toRemote())
+                                    .addOnSuccessListener {
+                                        runBlocking { currencies.add(p.copy(uploaded = true)) }
+                                    }
+                            }
                         }
-                    }
-                    val task4 = async {
-                        wallet.forEach { p ->
-                            remote.collection(Const.WALLETS).document(p.id).set(p.toRemote())
-                                .addOnSuccessListener {
-                                    runBlocking { wallets.add(p.copy(uploaded = true)) }
-                                }
+                        val task4 = async {
+                            wallet.forEach { p ->
+                                remote.collection(Const.WALLETS).document(p.id).set(p.toRemote())
+                                    .addOnSuccessListener {
+                                        runBlocking { wallets.add(p.copy(uploaded = true)) }
+                                    }
+                            }
                         }
-                    }
-                    val task5 = async {
-                        transaction.forEach { p ->
-                            remote.collection(Const.TRANSACTIONS).document(p.id).set(p.toRemote())
-                                .addOnSuccessListener {
-                                    runBlocking { transactions.add(p.copy(uploaded = true)) }
-                                }
+                        val task5 = async {
+                            transaction.forEach { p ->
+                                remote.collection(Const.TRANSACTIONS).document(p.id)
+                                    .set(p.toRemote())
+                                    .addOnSuccessListener {
+                                        runBlocking { transactions.add(p.copy(uploaded = true)) }
+                                    }
+                            }
                         }
-                    }
-                    task1.await()
-                    task2.await()
-                    task3.await()
-                    task4.await()
-                    task5.await()
+                        task1.await()
+                        task2.await()
+                        task3.await()
+                        task4.await()
+                        task5.await()
 
-                }.collect()
+                    }.collect()
+                }
             }
         }
     }
 
     @SuppressLint("HardwareIds")
     override suspend fun observeDevice(): Flow<Boolean> = callbackFlow {
-        val remote = remoteDatabase.storageRef.firestore.collection(USERS)
-            .document(auth.currentUser?.uid ?: "")
+        if (auth.currentUser != null) {
+            val remote = remoteDatabase.storageRef.firestore.collection(USERS)
+                .document(auth.currentUser?.uid ?: "")
 
-        subscription =
-            remote.collection(DEVICES).document(DEVICES).addSnapshotListener { value, error ->
-                val device = value?.toObject(UserDevice::class.java)
-                val id: String = Settings.Secure.getString(
-                    context.contentResolver, Settings.Secure.ANDROID_ID
-                )
-                device?.let {
-                    if (it.id != id) {
-                        trySend(true)
-                    } else {
-                        trySend(false)
+            subscription =
+                remote.collection(DEVICES).document(DEVICES).addSnapshotListener { value, error ->
+                    val device = value?.toObject(UserDevice::class.java)
+                    val id: String = Settings.Secure.getString(
+                        context.contentResolver, Settings.Secure.ANDROID_ID
+                    )
+                    device?.let {
+                        if (it.id != id) {
+                            trySend(true)
+                        } else {
+                            trySend(false)
+                        }
                     }
                 }
-            }
-
+        }
         awaitClose { }
 
     }.flowOn(Dispatchers.IO)
@@ -441,29 +460,33 @@ class RemoteRepositoryImpl @Inject constructor(
 
     @SuppressLint("HardwareIds")
     override suspend fun saveDevice() {
-        val remote = remoteDatabase.storageRef.firestore.collection(USERS)
-            .document(auth.currentUser?.uid ?: "")
-        val id: String =
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-        val device = UserDevice(
-            id = id,
-            date = System.currentTimeMillis(),
-            name = "",
-            info = "",
-        )
-        remote.collection(DEVICES).document(DEVICES).set(device).await()
-
+        if (auth.currentUser != null) {
+            val remote = remoteDatabase.storageRef.firestore.collection(USERS)
+                .document(auth.currentUser?.uid ?: "")
+            val id: String =
+                Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            val device = UserDevice(
+                id = id,
+                date = System.currentTimeMillis(),
+                name = "",
+                info = "",
+            )
+            remote.collection(DEVICES).document(DEVICES).set(device).await()
+        }
     }
 
     @SuppressLint("HardwareIds")
     override suspend fun getRemoteDevice(): UserDevice? {
         var device: UserDevice? = null
-        runBlocking {
-            remoteDatabase.storageRef.firestore.collection(USERS)
-                .document(auth.currentUser?.uid ?: "").collection(DEVICES).document(DEVICES).get()
-                .addOnSuccessListener {
-                    device = it.toObject(UserDevice::class.java)
-                }.await()
+        if (auth.currentUser != null) {
+            runBlocking {
+                remoteDatabase.storageRef.firestore.collection(USERS)
+                    .document(auth.currentUser?.uid ?: "").collection(DEVICES).document(DEVICES)
+                    .get()
+                    .addOnSuccessListener {
+                        device = it.toObject(UserDevice::class.java)
+                    }.await()
+            }
         }
         return device
     }

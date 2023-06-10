@@ -166,7 +166,9 @@ fun ShowCurrencies(
         }) { pocketDomain ->
 
             val chips =
-                walletsByOwners.filter { pocketDomain.id == it.ownerId }
+                walletsByOwners.filter {
+                    pocketDomain.id == it.ownerId
+                }
             ItemInPocket(
                 pocket = pocketDomain,
                 chipsVisibility = true,

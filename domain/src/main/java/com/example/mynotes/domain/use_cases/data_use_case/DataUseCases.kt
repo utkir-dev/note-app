@@ -9,6 +9,4 @@ class DataUseCases @Inject constructor(
     var currency: CurrencyUseCases,
     var checkAllData: CheckAllData,
     var clearDbLocal: ClearDbLocalUseCase
-
-
 )

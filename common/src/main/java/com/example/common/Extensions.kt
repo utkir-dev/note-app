@@ -1,6 +1,5 @@
 package com.example.mynotes.presentation.utils.extensions
 
-import android.annotation.SuppressLint
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
@@ -21,7 +20,6 @@ fun Double.huminize(): String {
     // return if (diff > 0) String.format("%.2f", this) else this.toLong().toString()
 }
 
-@SuppressLint("SimpleDateFormat")
 fun Long.huminize(): String {
     val diff = System.currentTimeMillis() - this
     val format = "dd.MM.yyyy hh:mm"
@@ -36,6 +34,9 @@ fun Long.huminize(): String {
     }
     return formatted
 }
+
+fun Long.huminizeForFile() =
+    SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.getDefault()).format(Date(this))
 
 fun Double.round() = Math.round(this * 100.0) / 100.0
 //fun String.huminize(): String {

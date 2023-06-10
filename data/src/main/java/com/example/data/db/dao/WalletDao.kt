@@ -2,8 +2,8 @@ package com.example.data.db.dao
 
 import androidx.room.*
 import com.example.data.db.entities.Wallet
-import com.example.data.db.database_relations.Balance
-import com.example.data.db.database_relations.WalletOwner
+import com.example.data.db.entities.database_relations.Balance
+import com.example.data.db.entities.database_relations.WalletOwner
 import kotlinx.coroutines.flow.Flow
 
 @Dao

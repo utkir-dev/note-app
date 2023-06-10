@@ -1,9 +1,8 @@
 package com.example.mynotes.di
 
-import com.example.mynotes.presentation.ui.directions.HomeDirectionImpl
-import com.example.mynotes.presentation.ui.directions.SignInDirectionImpl
-import com.example.mynotes.presentation.ui.directions.SignUpDirectionImpl
-import com.example.mynotes.presentation.ui.directions.SplashDirectionImpl
+import android.app.Application
+import android.content.Context
+import com.example.mynotes.presentation.ui.directions.*
 import com.example.mynotes.presentation.ui.directions.common.*
 import com.example.mynotes.presentation.ui.dispatcher.AppNavigator
 import com.example.mynotes.presentation.ui.screens.AppScreens
@@ -15,7 +14,7 @@ import com.example.mynotes.presentation.ui.screens.main.currencies.CurrencyDirec
 import com.example.mynotes.presentation.ui.screens.main.getcredit.GetCreditDirection
 import com.example.mynotes.presentation.ui.screens.main.givecredit.GiveCreditDirection
 import com.example.mynotes.presentation.ui.screens.main.history.HistoryDirection
-import com.example.mynotes.presentation.ui.screens.main.home.HomeDirection
+import com.example.mynotes.presentation.ui.screens.home.HomeDirection
 import com.example.mynotes.presentation.ui.screens.main.income.IncomeDirection
 import com.example.mynotes.presentation.ui.screens.main.outcome_currency.OutcomeCurrencyDirection
 import com.example.mynotes.presentation.ui.screens.main.outcome_pocket.OutcomePocketDirection
@@ -36,6 +35,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    fun provideContext(
+        app: Application
+    ): Context {
+        return app
+    }
+
     @Provides
     fun provideSignUpDirection(
         navigator: AppNavigator
@@ -61,6 +67,15 @@ object AppModule {
         navigator: AppNavigator,
     ): BalanceDirection {
         return BalanceDirectionImpl(
+            navigator
+        )
+    }
+
+    @Provides
+    fun provideBackDirection(
+        navigator: AppNavigator,
+    ): BackDirection {
+        return BackDirectionImpl(
             navigator
         )
     }

@@ -28,7 +28,7 @@ fun MyButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = "Button",
-    textSize: TextUnit = 18.sp,
+    textSize: TextUnit = 17.sp,
     background: Color = Gray,
     enabled: Boolean = true,
     shape: Shape = ButtonDefaults.shape,
@@ -82,7 +82,7 @@ fun MyButton(
         contentPadding = contentPadding,
         interactionSource = interactionSource,
     ) {
-        MyText(text = text, fontSize = textSize)
+        Text(text = text, fontSize = textSize)
         content()
     }
 

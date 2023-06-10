@@ -1,4 +1,4 @@
-package com.example.mynotes.presentation.ui.screens.main.home
+package com.example.mynotes.presentation.ui.screens.home
 
 interface HomeDirection {
     suspend fun navigateToBalance()
@@ -12,4 +12,6 @@ interface HomeDirection {
     suspend fun navigateToCurrencies()
     suspend fun navigateToHistory()
     suspend fun replaceToSignIn()
+    suspend fun navigateToSettings()
+    suspend fun navigateToShare()
 }

@@ -4,5 +4,9 @@ import javax.inject.Inject
 
 class SharedPrefUseCases @Inject constructor(
     var saveBoolen: SaveBooleanUseCase,
+    var saveString: SaveStringUseCase,
+    var saveLong: SaveLongUseCase,
+    var getLong: GetLongUseCase,
+    var getString: GetStringUseCase,
     var getBoolean: GetBooleanUseCase,
 )

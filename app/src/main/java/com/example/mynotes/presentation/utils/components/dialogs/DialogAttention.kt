@@ -28,7 +28,7 @@ import com.example.mynotes.presentation.utils.components.buttons.MyButton
 import com.example.mynotes.presentation.utils.components.image.Green
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
-import com.example.mynotes.presentation.utils.contstants.ALERT_DIALOG_TIME
+import com.example.mynotes.contstants.ALERT_DIALOG_TIME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -83,12 +83,6 @@ fun DialogAttention(
             modifier = Modifier
                 .scale(scale.value)
                 .padding(8.dp)
-                .animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
         ) {
             Column(
                 Modifier

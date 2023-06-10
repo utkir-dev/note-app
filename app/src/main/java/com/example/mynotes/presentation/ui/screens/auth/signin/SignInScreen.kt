@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -81,6 +82,7 @@ fun ShowScreen(
 //    )
     Column(
         modifier = Modifier
+            .background(MaterialTheme.customColors.backgroundBrush)
             .fillMaxSize()
             .verticalScroll(state = scrollState),
         verticalArrangement = Arrangement.Center,
@@ -91,7 +93,8 @@ fun ShowScreen(
                 .padding(24.dp),
             text = "Kirish",
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.customColors.textColor
         )
         OutlinedTextField(
             modifier = Modifier
@@ -168,7 +171,7 @@ fun ShowScreen(
                 contentColor = White
             )
         ) {
-            MyText(text = "Tasdiqlash", fontSize = 18.sp)
+            MyText(text = "Tasdiqlash", fontSize = 18.sp, color = Color.White)
         }
         Spacer(modifier = Modifier.height(25.dp))
         MyText(
@@ -176,7 +179,8 @@ fun ShowScreen(
                 vm.signUp()
             },
             text = "Agar avval ro'yxatdan o'tmagan bo'lsangiz bu yerni bosing",
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.customColors.textColor
         )
 
 

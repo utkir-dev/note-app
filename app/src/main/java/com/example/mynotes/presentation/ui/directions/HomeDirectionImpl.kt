@@ -2,7 +2,7 @@ package com.example.mynotes.presentation.ui.directions
 
 import com.example.mynotes.presentation.ui.dispatcher.AppNavigator
 import com.example.mynotes.presentation.ui.screens.AppScreens
-import com.example.mynotes.presentation.ui.screens.main.home.HomeDirection
+import com.example.mynotes.presentation.ui.screens.home.HomeDirection
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
@@ -53,5 +53,13 @@ class HomeDirectionImpl @Inject constructor(
 
     override suspend fun replaceToSignIn() {
         navigator.replaceAll(appScreens.signInScreen())
+    }
+
+    override suspend fun navigateToSettings() {
+        navigator.navigateTo(appScreens.settingsScreen())
+    }
+
+    override suspend fun navigateToShare() {
+        navigator.navigateTo(appScreens.shareScreen())
     }
 }

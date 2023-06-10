@@ -16,4 +16,6 @@ sealed class DirectionType {
     object HISTORY : DirectionType()
     object CHANGE_NIGHT_MODE : DirectionType()
     object SIGNOUT : DirectionType()
+    object SETTINGS : DirectionType()
+    object SHARE : DirectionType()
 }

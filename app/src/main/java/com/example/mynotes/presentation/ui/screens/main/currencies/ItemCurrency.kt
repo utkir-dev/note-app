@@ -1,14 +1,12 @@
 package com.example.mynotes.presentation.utils.items
 
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -49,7 +47,7 @@ fun ItemCurrency(
         Column(
             modifier = Modifier.padding(5.dp)
         ) {
-            Row() {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 MyText(
                     text = currency.name,
                     textAlign = TextAlign.Start,

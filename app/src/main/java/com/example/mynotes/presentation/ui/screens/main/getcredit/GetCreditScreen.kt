@@ -133,103 +133,65 @@ fun Show(
             }
         },
         content = {
-            Box(
-                contentAlignment = Alignment.CenterEnd,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .padding(top = toolBarHeight)
-            ) {
-                LazyColumn(
-                    Modifier
-                        .background(MaterialTheme.customColors.backgroundDialog)
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            if (pockets.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    MyText(
+                        text = "Hamyon mavjud emas",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            } else if (currencies.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    MyText(
+                        text = "Valyuta mavjud emas",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            } else
+                Box(
+                    contentAlignment = Alignment.CenterEnd,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .padding(top = toolBarHeight)
                 ) {
-                    item {
-                        MyText(
-                            text = "Kimdan qarz olmoqchisiz",
-                            fontSize = 14.sp,
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.customColors.subTextColor,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 10.dp)
-                        )
-                    }
-
-                    // Person
-                    item {
-                        ItemEmptyRow(
-                            widthBorder = 1.dp,
-                            colorBoreder = MaterialTheme.customColors.subTextColor,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            background = MaterialTheme.customColors.backgroundDialog,
-                            onItemClicked = { offs ->
-                                list = persons
-                                offs.let { offset = it }
-                                visibilityList = true
-                            }) {
-                            if (person.name.isEmpty() && persons.isNotEmpty()) {
-                                viewModel.setPerson(persons[0])
-                            }
+                    LazyColumn(
+                        Modifier
+                            .background(MaterialTheme.customColors.backgroundDialog)
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        item {
                             MyText(
-                                text = if (person.name.isNotEmpty()) person.name else if (persons.isNotEmpty()) persons[0].name else "Shaxs ismi",
-                                color = MaterialTheme.customColors.textColor,
-                                modifier = Modifier.padding(horizontal = 4.dp)
-                            )
-                            Icon(
-                                modifier = Modifier.padding(horizontal = 5.dp),
-                                painter = painterResource(id = R.drawable.ic_spinner),
-                                contentDescription = "spinner"
+                                text = "Kimdan qarz olmoqchisiz",
+                                fontSize = 14.sp,
+                                fontStyle = FontStyle.Italic,
+                                color = MaterialTheme.customColors.subTextColor,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 10.dp)
                             )
                         }
-                    }
 
-                    // Currency
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(5.dp), value = amountTransaction,
-                                onValueChange = {
-                                    amountTransaction = it
-                                },
-                                label = {
-                                    MyText(
-                                        text = "Summa kiriting",
-                                        fontStyle = FontStyle.Italic,
-                                        color = MaterialTheme.customColors.subTextColor
-                                    )
-                                },
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Decimal,
-                                    imeAction = ImeAction.Done
-                                ),
-                                shape = RoundedCornerShape(15.dp),
-                                colors = buttonColors()
-                            )
-                            EmptyRowSizeble(
-                                width = 150.dp,
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalPading = 1.dp,
-                                horizontalPading = 5.dp,
+                        // Person
+                        item {
+                            ItemEmptyRow(
+                                widthBorder = 1.dp,
+                                colorBoreder = MaterialTheme.customColors.subTextColor,
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 background = MaterialTheme.customColors.backgroundDialog,
-                                onItemClicked = {
-                                    list = currencies
-                                    offset = it
+                                onItemClicked = { offs ->
+                                    list = persons
+                                    offs.let { offset = it }
                                     visibilityList = true
                                 }) {
-                                if (curency.name.isEmpty() && currencies.isNotEmpty()) {
-                                    viewModel.setCurrency(currencies[0])
+                                if (person.name.isEmpty() && persons.isNotEmpty()) {
+                                    viewModel.setPerson(persons[0])
                                 }
                                 MyText(
-                                    text = if (curency.name.isNotEmpty()) curency.name else if (currencies.isNotEmpty()) currencies[0].name else "Dollar",
+                                    text = if (person.name.isNotEmpty()) person.name else if (persons.isNotEmpty()) persons[0].name else "Shaxs ismi",
                                     color = MaterialTheme.customColors.textColor,
                                     modifier = Modifier.padding(horizontal = 4.dp)
                                 )
@@ -241,113 +203,172 @@ fun Show(
                             }
                         }
 
-                    }
-                    // Pocket
-                    item {
-                        MyText(
-                            text = "Qaysi hamyonga",
-                            fontSize = 14.sp,
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.customColors.subTextColor,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 10.dp)
-                        )
-                    }
-                    item {
-                        ItemEmptyRow(
-                            widthBorder = 1.dp,
-                            colorBoreder = MaterialTheme.customColors.subTextColor,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalPading = 1.dp,
-                            horizontalPading = 5.dp,
-                            background = MaterialTheme.customColors.backgroundDialog,
-                            onItemClicked = {
-                                list = pockets
-                                offset = it
-                                visibilityList = true
-                            }) {
-                            if (pocket.name.isEmpty() && pockets.isNotEmpty()) {
-                                viewModel.setPocket(pockets[0])
+                        // Currency
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(5.dp), value = amountTransaction,
+                                    onValueChange = {
+                                        amountTransaction = it
+                                    },
+                                    label = {
+                                        MyText(
+                                            text = "Summa kiriting",
+                                            fontStyle = FontStyle.Italic,
+                                            color = MaterialTheme.customColors.subTextColor
+                                        )
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Decimal,
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    shape = RoundedCornerShape(15.dp),
+                                    colors = buttonColors()
+                                )
+                                EmptyRowSizeble(
+                                    width = 150.dp,
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalPading = 1.dp,
+                                    horizontalPading = 5.dp,
+                                    background = MaterialTheme.customColors.backgroundDialog,
+                                    onItemClicked = {
+                                        list = currencies
+                                        offset = it
+                                        visibilityList = true
+                                    }) {
+                                    if (curency.name.isEmpty() && currencies.isNotEmpty()) {
+                                        viewModel.setCurrency(currencies[0])
+                                    }
+                                    MyText(
+                                        text = if (curency.name.isNotEmpty()) curency.name else if (currencies.isNotEmpty()) currencies[0].name else "Dollar",
+                                        color = MaterialTheme.customColors.textColor,
+                                        modifier = Modifier.padding(horizontal = 4.dp)
+                                    )
+                                    Icon(
+                                        modifier = Modifier.padding(horizontal = 5.dp),
+                                        painter = painterResource(id = R.drawable.ic_spinner),
+                                        contentDescription = "spinner"
+                                    )
+                                }
                             }
 
-                            MyText(
-                                text = if (pocket.name.isNotEmpty()) pocket.name else if (pockets.isNotEmpty()) pockets[0].name else "Hamyon nomi",
-                                color = MaterialTheme.customColors.textColor,
-                                modifier = Modifier.padding(horizontal = 4.dp)
-                            )
-                            Icon(
-                                modifier = Modifier.padding(horizontal = 5.dp),
-                                painter = painterResource(id = R.drawable.ic_spinner),
-                                contentDescription = "spinner"
-                            )
                         }
-                    }
-
-                    // comment
-                    item {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 100.dp, max = 200.dp)
-                                .padding(5.dp),
-                            value = comment,
-                            onValueChange = {
-                                comment = it
-                            },
-                            label = {
-                                MyText(
-                                    text = "Izoh (ixtiyoriy)",
-                                    color = MaterialTheme.customColors.subTextColor
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Done
-                            ),
-                            shape = RoundedCornerShape(15.dp),
-                            colors = buttonColors()
-                        )
-                    }
-
-                    // buttons
-
-                    item {
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            MyButton(
-                                onClick = { viewModel.back() },
-                                text = "Bekor",
-                                shape = RoundedCornerShape(20.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Gray, contentColor = White
-                                ),
+                        // Pocket
+                        item {
+                            MyText(
+                                text = "Qaysi hamyonga",
+                                fontSize = 14.sp,
+                                fontStyle = FontStyle.Italic,
+                                color = MaterialTheme.customColors.subTextColor,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(8.dp)
-                                    .weight(1F)
-                            ) { }
-
-                            MyButton(
-                                onClick = {
-                                    val (isValid, amount) = isValidAmount(amountTransaction)
-                                    if (isValid) {
-                                        message =
-                                            "${person.name}dan $amount ${curency.name} qarz olishga ishonchingiz komilmi?"
-                                        visibilityConfirm = true
-                                    }
-                                }, text = "Tasdiq", colors = ButtonDefaults.buttonColors(
-                                    containerColor = Green, contentColor = White
-                                ), modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                                    .weight(1F)
-
-                            ) {}
+                                    .padding(horizontal = 10.dp)
+                            )
                         }
-                    }
+                        item {
+                            ItemEmptyRow(
+                                widthBorder = 1.dp,
+                                colorBoreder = MaterialTheme.customColors.subTextColor,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalPading = 1.dp,
+                                horizontalPading = 5.dp,
+                                background = MaterialTheme.customColors.backgroundDialog,
+                                onItemClicked = {
+                                    list = pockets
+                                    offset = it
+                                    visibilityList = true
+                                }) {
+                                if (pocket.name.isEmpty() && pockets.isNotEmpty()) {
+                                    viewModel.setPocket(pockets[0])
+                                }
 
+                                MyText(
+                                    text = if (pocket.name.isNotEmpty()) pocket.name else if (pockets.isNotEmpty()) pockets[0].name else "Hamyon nomi",
+                                    color = MaterialTheme.customColors.textColor,
+                                    modifier = Modifier.padding(horizontal = 4.dp)
+                                )
+                                Icon(
+                                    modifier = Modifier.padding(horizontal = 5.dp),
+                                    painter = painterResource(id = R.drawable.ic_spinner),
+                                    contentDescription = "spinner"
+                                )
+                            }
+                        }
+
+                        // comment
+                        item {
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = 100.dp, max = 200.dp)
+                                    .padding(5.dp),
+                                value = comment,
+                                onValueChange = {
+                                    comment = it
+                                },
+                                label = {
+                                    MyText(
+                                        text = "Izoh (ixtiyoriy)",
+                                        color = MaterialTheme.customColors.subTextColor
+                                    )
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Text,
+                                    imeAction = ImeAction.Done
+                                ),
+                                shape = RoundedCornerShape(15.dp),
+                                colors = buttonColors()
+                            )
+                        }
+
+                        // buttons
+
+                        item {
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                MyButton(
+                                    onClick = { viewModel.back() },
+                                    text = "Bekor",
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Gray,
+                                        contentColor = White
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp)
+                                        .weight(1F)
+                                ) { }
+
+                                MyButton(
+                                    onClick = {
+                                        val (isValid, amount) = isValidAmount(amountTransaction)
+                                        if (isValid) {
+                                            message =
+                                                "${person.name}dan $amount ${curency.name} qarz olishga ishonchingiz komilmi?"
+                                            visibilityConfirm = true
+                                        }
+                                    }, text = "Tasdiq",
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Green,
+                                        contentColor = White
+                                    ), modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp)
+                                        .weight(1F)
+
+                                ) {}
+                            }
+                        }
+
+                    }
                 }
-            }
 
 
         }

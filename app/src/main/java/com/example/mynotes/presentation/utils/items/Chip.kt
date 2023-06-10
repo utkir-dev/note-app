@@ -11,30 +11,32 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
 
 @Composable
 fun Chip(
     text: String = "Chip",
+    textSize: TextUnit = 14.sp,
+    corner: Dp = 8.dp,
+    padding: Dp = 4.dp
 ) {
     Surface(
         modifier = Modifier
             .padding(2.dp)
             .background(color = MaterialTheme.customColors.backgroundItem),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(corner),
         border = BorderStroke(width = 1.dp, color = MaterialTheme.customColors.subTextColor)
     ) {
         Row {
             MyText(
                 text = text,
-                fontSize = 14.sp,
+                fontSize = textSize,
                 color = MaterialTheme.customColors.subTextColor,
                 modifier = Modifier
                     .background(color = MaterialTheme.customColors.backgroundItem)
-                    .padding(horizontal = 4.dp)
+                    .padding(horizontal = padding)
             )
         }
     }

@@ -1,6 +1,6 @@
 package com.example.mynotes.domain.use_cases.transaction_use_case
 
-import com.example.data.db.database_relations.History
+import com.example.data.db.entities.database_relations.History
 import com.example.data.repositories.intrefaces.TransactionRepository
 import com.example.mynotes.domain.models.HistoryDomain
 import kotlinx.coroutines.flow.map

@@ -7,6 +7,14 @@ import javax.inject.Inject
 class SharedPrefRepositoryImpl @Inject constructor(
     val sharedPref: SharedPreferences
 ) : SharedPrefRepository {
+    override suspend fun saveString(key: String, value: String) {
+        sharedPref.edit().putString(key, value).apply()
+    }
+
+    override suspend fun getString(key: String): String {
+        return sharedPref.getString(key, "") ?: ""
+    }
+
     override suspend fun saveLong(key: String, value: Long) {
         sharedPref.edit().putLong(key, value).apply()
     }

@@ -7,8 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface RemoteRepository {
     suspend fun uploadDataAsFile(doNow: Boolean?)
-
-    // suspend fun downloadAllData()
     suspend fun checkNotLoadedDatas()
     suspend fun observeDevice(): Flow<Boolean>
     suspend fun stopObserveDevice()

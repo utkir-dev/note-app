@@ -9,11 +9,13 @@ class ClearDbLocalUseCase @Inject constructor(
     private val shared: SharedPrefRepository
 ) {
     suspend operator fun invoke() {
+        val currency = db.CurrencyDao().getById("dollar")
         shared.clearCash()
         db.CurrencyDao().clear()
         db.WalletDao().clear()
         db.PersonDao().clear()
         db.PocketDao().clear()
         db.TransactionDao().clear()
+        db.CurrencyDao().add(currency)
     }
 }

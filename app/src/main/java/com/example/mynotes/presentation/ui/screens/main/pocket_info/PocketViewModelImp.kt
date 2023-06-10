@@ -9,7 +9,7 @@ import com.example.mynotes.domain.use_cases.currency_use_case.CurrencyUseCases
 import com.example.mynotes.domain.use_cases.getcredit_use_case.person_use_case.PersonUseCases
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionUseCases
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
-import com.example.mynotes.presentation.utils.contstants.HISTORY_LIMIT
+import com.example.mynotes.contstants.HISTORY_LIMIT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

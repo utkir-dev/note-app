@@ -1,6 +1,7 @@
 package com.example.mynotes.presentation.ui.screens.auth.signup
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -88,12 +90,15 @@ fun SignUp(
                 text = "Ro'yxatdan o'tish",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.customColors.textColor
             )
         }
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .background(MaterialTheme.customColors.backgroundBrush)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -205,7 +210,7 @@ fun SignUp(
                     contentColor = White
                 )
             ) {
-                MyText(text = "Registraciya", fontSize = 18.sp)
+                MyText(text = "Registraciya", fontSize = 18.sp, color = Color.White)
             }
         }
     }

@@ -3,12 +3,14 @@ package com.example.mynotes.presentation.ui.screens.auth.signin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.ResponseResult
+import com.example.mynotes.contstants.obj
 import com.example.mynotes.domain.use_cases.auth_use_case.SignInUseCase
 import com.example.mynotes.domain.use_cases.data_use_case.DataUseCases
 import com.example.mynotes.domain.use_cases.device_use_case.DeviceUseCases
 import com.example.mynotes.presentation.ui.directions.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -18,6 +20,8 @@ import javax.inject.Inject
 class SignInViewModelImp @Inject constructor(
     private val direction: SignInDirection,
     private val useCase: SignInUseCase,
+    private val dataUseCases: DataUseCases,
+
     private val deviceUseCases: DeviceUseCases,
 ) : ViewModel(), SignInViewModel {
     override var uiState = MutableStateFlow<UiState>(UiState.Default)
@@ -36,8 +40,14 @@ class SignInViewModelImp @Inject constructor(
                     uiState.value = UiState.Error("Xatolik")
                 }
                 is ResponseResult.Success<*> -> {
-                    runBlocking { deviceUseCases.saveDevice.invoke() }
-                    direction.replaceToHome()
+                    viewModelScope.launch {
+                        deviceUseCases.saveDevice.invoke()
+                        dataUseCases.download.invoke().collect { ch ->
+                            if (ch) {
+                                direction.replaceToHome()
+                            }
+                        }
+                    }
                 }
                 else -> {}
             }

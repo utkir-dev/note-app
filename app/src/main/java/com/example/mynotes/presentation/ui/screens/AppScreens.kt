@@ -11,7 +11,7 @@ import com.example.mynotes.presentation.ui.screens.main.currencies.CurrencyScree
 import com.example.mynotes.presentation.ui.screens.main.getcredit.GetCreditScreen
 import com.example.mynotes.presentation.ui.screens.main.givecredit.GiveCreditScreen
 import com.example.mynotes.presentation.ui.screens.main.history.HistoryScreen
-import com.example.mynotes.presentation.ui.screens.main.home.HomeScreen
+import com.example.mynotes.presentation.ui.screens.home.HomeScreen
 import com.example.mynotes.presentation.ui.screens.main.income.IncomeScreen
 import com.example.mynotes.presentation.ui.screens.main.outcome_currency.OutcomeCurrencyScreen
 import com.example.mynotes.presentation.ui.screens.main.outcome_pocket.OutcomePocketScreen
@@ -19,11 +19,15 @@ import com.example.mynotes.presentation.ui.screens.main.person_info.PersonScreen
 import com.example.mynotes.presentation.ui.screens.main.persons.PersonsScreen
 import com.example.mynotes.presentation.ui.screens.main.pocket_info.PocketScreen
 import com.example.mynotes.presentation.ui.screens.main.pockets.PocketsScreen
+import com.example.mynotes.presentation.ui.screens.main.share.ShareScreen
+import com.example.mynotes.presentation.ui.screens.settings.SettingsScreen
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AppScreens @Inject constructor() {
+    fun settingsScreen(): SettingsScreen = SettingsScreen()
+    fun shareScreen(): ShareScreen = ShareScreen()
     fun signInScreen(): SignInScreen = SignInScreen()
     fun signUpScreen(): SignUpScreen = SignUpScreen()
     fun homeScreen(): HomeScreen = HomeScreen()

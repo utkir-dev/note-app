@@ -133,7 +133,23 @@ fun Show(
             }
         },
         content = {
-            Box(
+            if (pockets.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    MyText(
+                        text = "Hamyon mavjud emas",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            } else if (currencies.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    MyText(
+                        text = "Valyuta mavjud emas",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            } else Box(
                 contentAlignment = Alignment.CenterEnd,
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
@@ -355,7 +371,8 @@ fun Show(
                                 text = "Bekor",
                                 shape = RoundedCornerShape(20.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Gray, contentColor = White
+                                    containerColor = Gray,
+                                    contentColor = White
                                 ),
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -381,7 +398,9 @@ fun Show(
                                     } else {
                                         visibilityValidationAmount = true
                                     }
-                                }, text = "Tasdiq", colors = ButtonDefaults.buttonColors(
+                                }, text = "Tasdiq",
+                                shape = RoundedCornerShape(20.dp),
+                                colors = ButtonDefaults.buttonColors(
                                     containerColor = Green, contentColor = White
                                 ), modifier = Modifier
                                     .fillMaxWidth()

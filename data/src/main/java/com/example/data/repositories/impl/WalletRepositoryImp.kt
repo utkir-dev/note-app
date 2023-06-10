@@ -5,8 +5,8 @@ import com.example.data.constants.Const.USERS
 import com.example.data.constants.Const.WALLETS
 import com.example.data.db.dao.WalletDao
 import com.example.data.db.entities.Wallet
-import com.example.data.db.database_relations.Balance
-import com.example.data.db.database_relations.WalletOwner
+import com.example.data.db.entities.database_relations.Balance
+import com.example.data.db.entities.database_relations.WalletOwner
 import com.example.data.repositories.intrefaces.AuthRepository
 import com.example.data.repositories.intrefaces.RemoteDatabase
 import com.example.data.repositories.intrefaces.WalletRepository

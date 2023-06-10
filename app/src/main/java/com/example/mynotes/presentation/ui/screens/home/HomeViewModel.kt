@@ -1,4 +1,4 @@
-package com.example.mynotes.presentation.ui.screens.main.home
+package com.example.mynotes.presentation.ui.screens.home
 
 import com.example.mynotes.domain.models.BalanceDomain
 import com.example.mynotes.domain.models.CurrencyDomain

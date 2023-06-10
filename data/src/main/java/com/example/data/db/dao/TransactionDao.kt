@@ -2,7 +2,7 @@ package com.example.data.db.dao
 
 import androidx.room.*
 import com.example.data.db.entities.Transaction
-import com.example.data.db.database_relations.History
+import com.example.data.db.entities.database_relations.History
 import kotlinx.coroutines.flow.Flow
 
 @Dao

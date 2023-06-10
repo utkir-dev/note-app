@@ -5,7 +5,7 @@ import com.example.data.constants.Const.TRANSACTIONS
 import com.example.data.constants.Const.USERS
 import com.example.data.db.dao.TransactionDao
 import com.example.data.db.entities.Transaction
-import com.example.data.db.database_relations.History
+import com.example.data.db.entities.database_relations.History
 import com.example.data.repositories.intrefaces.AuthRepository
 import com.example.data.repositories.intrefaces.RemoteDatabase
 import com.example.data.repositories.intrefaces.RemoteRepository

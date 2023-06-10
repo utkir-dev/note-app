@@ -1,4 +1,4 @@
-package com.example.mynotes.presentation.ui.screens.main.home
+package com.example.mynotes.presentation.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,9 +13,9 @@ import com.example.mynotes.domain.use_cases.shared_pref_use_case.SharedPrefUseCa
 import com.example.mynotes.domain.use_cases.transaction_use_case.TransactionUseCases
 import com.example.mynotes.domain.use_cases.wallet_use_case.WalletUseCases
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
-import com.example.mynotes.presentation.utils.contstants.HISTORY_LIMIT
-import com.example.mynotes.presentation.utils.contstants.KEY_NIGHT_MODE
-import com.example.mynotes.presentation.utils.contstants.obj
+import com.example.mynotes.contstants.HISTORY_LIMIT
+import com.example.mynotes.contstants.KEY_NIGHT_MODE
+import com.example.mynotes.contstants.obj
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -36,16 +36,16 @@ class HomeViewModelImp @Inject constructor(
     private val dataUseCases: DataUseCases,
     private val shared: SharedPrefUseCases
 ) : ViewModel(), HomeViewModel {
-    var isLoading = MutableStateFlow(false)
-
+    //  var isLoading = MutableStateFlow(true)
     fun checkData() {
         viewModelScope.launch(Dispatchers.IO) {
-            dataUseCases.download.invoke().collect { ch ->
-                if (ch) {
-                    obj.firstShown = true
-                    isLoading.let { it.value = ch }
-                }
-            }
+            obj.firstShown = true
+//            dataUseCases.download.invoke().collect { ch ->
+//                if (ch) {
+//                    obj.firstShown = true
+//                    isLoading.let { it.value = ch }
+//                }
+//            }
         }
     }
 
@@ -116,6 +116,12 @@ class HomeViewModelImp @Inject constructor(
 
                 DirectionType.BACK -> {
                 }
+                DirectionType.SETTINGS -> {
+                    direction.navigateToSettings()
+                }
+                DirectionType.SHARE -> {
+                    direction.navigateToShare()
+                }
                 else -> {}
             }
         }
@@ -130,4 +136,6 @@ class HomeViewModelImp @Inject constructor(
         dataUseCases.clearDbLocal.invoke()
         direction.replaceToSignIn()
     }
+
+
 }
