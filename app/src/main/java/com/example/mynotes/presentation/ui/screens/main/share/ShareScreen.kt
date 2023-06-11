@@ -22,6 +22,7 @@ import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.dialogs.DialogBoxLoading
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
+import com.example.mynotes.presentation.utils.extensions.huminize
 
 class ShareScreen : AppScreen() {
     @Composable
@@ -42,6 +43,10 @@ fun Show(
     var type by remember {
         mutableStateOf(-1)
     }
+    val txtSize by vm.txtBytes.collectAsStateWithLifecycle()
+    val htmlSize by vm.htmlBytes.collectAsStateWithLifecycle()
+    val pdfSize by vm.pdfBytes.collectAsStateWithLifecycle()
+
     when (type) {
         1 -> {
             ShareFile(shareTye = ShareType.HTML)
@@ -116,7 +121,7 @@ fun Show(
                 MyText(
                     modifier = Modifier
                         .padding(start = 12.dp),
-                    text = "Web brauzerlar uchun",
+                    text = "Web brauzerlar uchun (${htmlSize.huminize()})",
                     color = MaterialTheme.customColors.subTextColor,
                     fontSize = 12.sp
                 )
@@ -137,7 +142,7 @@ fun Show(
                 MyText(
                     modifier = Modifier
                         .padding(start = 12.dp),
-                    text = "Oddiy text",
+                    text = "Oddiy text (${txtSize.huminize()})",
                     color = MaterialTheme.customColors.subTextColor,
                     fontSize = 12.sp
                 )
@@ -157,7 +162,7 @@ fun Show(
                 MyText(
                     modifier = Modifier
                         .padding(start = 12.dp),
-                    text = "Rasmli fayl",
+                    text = "Rasmli fayl (${pdfSize.huminize()})",
                     color = MaterialTheme.customColors.subTextColor,
                     fontSize = 12.sp
                 )

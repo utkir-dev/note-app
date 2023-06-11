@@ -36,7 +36,7 @@ class HomeViewModelImp @Inject constructor(
     private val dataUseCases: DataUseCases,
     private val shared: SharedPrefUseCases
 ) : ViewModel(), HomeViewModel {
-    //  var isLoading = MutableStateFlow(true)
+  //  var isLoading = MutableStateFlow(true)
     fun checkData() {
         viewModelScope.launch(Dispatchers.IO) {
             obj.firstShown = true
@@ -128,7 +128,9 @@ class HomeViewModelImp @Inject constructor(
     }
 
     override fun checkNotUploads() {
-        dataUseCases.checkAllData
+        viewModelScope.launch {
+            dataUseCases.checkAllData.invoke()
+        }
     }
 
     private suspend fun exit() {

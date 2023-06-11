@@ -203,7 +203,7 @@ fun ItemHistory(
                 }
             }
             MyText(
-                text = "oldingi balans: ${item.balance} $$izoh",
+                text = "oldingi balans: ${item.balance.huminize()} $$izoh",
                 color = MaterialTheme.customColors.subTextColor,
                 fontSize = 12.sp
             )

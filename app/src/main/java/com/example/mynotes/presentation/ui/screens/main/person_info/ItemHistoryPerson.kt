@@ -160,7 +160,7 @@ fun ItemHistoryPerson(
 
         if (visibilityComment) {
             MyText(
-                text = "oldingi balans: " + item.balance + " $",
+                text = "oldingi balans: " + item.balance.huminize() + " $",
                 fontSize = 12.sp,
                 color = MaterialTheme.customColors.subTextColor,
             )

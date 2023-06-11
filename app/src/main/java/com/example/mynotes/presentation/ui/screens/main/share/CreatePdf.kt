@@ -2,21 +2,23 @@ package com.example.mynotes.presentation.ui.screens.main.share
 
 import android.content.Context
 import android.graphics.*
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RectShape
 import android.graphics.pdf.PdfDocument
 import androidx.core.content.ContextCompat
 import com.example.mynotes.R
 import com.example.mynotes.contstants.FILE_NAME
 import com.example.mynotes.contstants.FOLDER_NAME
 import com.example.mynotes.presentation.utils.extensions.huminizeForFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.io.File
 import java.io.FileOutputStream
 
-fun CreatePDF(
+suspend fun CreatePDF(
     context: Context,
     mapData: LinkedHashMap<String, LinkedHashMap<String, List<String>>>
-): Boolean {
+): Flow<ByteArray> = flow {
 
     val list = ArrayList<PdfModel>()
     var result = false
@@ -48,13 +50,13 @@ fun CreatePDF(
     }
     val pageWidth = 600
     val pageHeight = 1100
-    val stepY = 30F
+    val step = 30F
     val xBegin = 20F
     val xPadding = 6F
     val yPadding = 6F
     val xEnd = pageWidth - xBegin
     val xCenter = (pageWidth - 2 * xBegin) * 0.45F
-    val yTop = 30F
+    val yTop = 20F
     val yBottom = pageHeight - yTop
 
 
@@ -62,14 +64,14 @@ fun CreatePDF(
 
     // for image and first page
     val paintFirstPage: Paint = Paint()
-    paintFirstPage.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
+    paintFirstPage.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
     paintFirstPage.color = ContextCompat.getColor(context, R.color.blue)
     paintFirstPage.textSize = 40F
     paintFirstPage.textAlign = Paint.Align.CENTER
 
     // for title
     val paintTitle = Paint()
-    paintTitle.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
+    paintTitle.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
     paintTitle.color = ContextCompat.getColor(context, R.color.black)
     paintTitle.textSize = 24F
     paintTitle.textAlign = Paint.Align.CENTER
@@ -101,13 +103,15 @@ fun CreatePDF(
     canvasFirst.drawText(textFirstPage2, 300F, 750F, paintFirstPage)
     pdfDocument.finishPage(firstPage)
 
+
+    // other pages
+
     var pageNumber = 1
     var index = -1
 
     while (index <= list.size - 1) {
-        var y = 0F
+        var y = yTop + step
         pageNumber++
-
 
         val myPageInfo: PdfDocument.PageInfo? =
             PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
@@ -115,16 +119,15 @@ fun CreatePDF(
         val canvas: Canvas = myPage.canvas
 
         while (y < yBottom) {
-            y += stepY
             index++
             if (index == list.size) {
                 break
             }
             when (list[index].priority) {
                 1 -> {
-                    y += stepY
+                    y += step
                     // background
-                    canvas.drawRect(xBegin, y - stepY, xEnd, y, paintBackground)
+                    canvas.drawRect(xBegin, y - step, xEnd, y, paintBackground)
 //                    var shapeDrawable: ShapeDrawable
 //                    val left = 100
 //                    val top = 100
@@ -138,51 +141,50 @@ fun CreatePDF(
 //                    shapeDrawable.draw(canvas)
 
                     canvas.drawText(list[index].text, xCenter + xPadding, y - yPadding, paintTitle)
-                    canvas.drawLine(xBegin, y - stepY, xBegin, y, paint)
-                    canvas.drawLine(xEnd, y - stepY, xEnd, y, paint)
-                    canvas.drawLine(xBegin, y - stepY, xEnd, y - stepY, paint)
+                    canvas.drawLine(xBegin, y - step, xBegin, y, paint)
+                    canvas.drawLine(xEnd, y - step, xEnd, y, paint)
+                    canvas.drawLine(xBegin, y - step, xEnd, y - step, paint)
                     canvas.drawLine(xBegin, y, xEnd, y, paint)
                 }
                 2 -> {
                     canvas.drawText(list[index].text, xBegin + xPadding, y - yPadding, paint)
-                    canvas.drawLine(xBegin, y - stepY, xBegin, y, paint)
-                    canvas.drawLine(xEnd, y - stepY, xEnd, y, paint)
-                    canvas.drawLine(xCenter, y - stepY, xCenter, y, paint)
+                    canvas.drawLine(xBegin, y - step, xEnd, y - step, paint)
+                    canvas.drawLine(xBegin, y - step, xBegin, y, paint)
+                    canvas.drawLine(xEnd, y - step, xEnd, y, paint)
+                    canvas.drawLine(xCenter, y - step, xCenter, y, paint)
+                    continue
                 }
                 3 -> {
-                    y -= stepY
+                    //  y -= step
                     canvas.drawText(list[index].text, xCenter + xPadding, y - yPadding, paint)
+                    //
                 }
                 4 -> {
                     canvas.drawText(list[index].text, xCenter + xPadding, y - yPadding, paint)
-                    canvas.drawLine(xBegin, y - stepY, xBegin, y, paint)
-                    canvas.drawLine(xEnd, y - stepY, xEnd, y, paint)
-                    canvas.drawLine(xCenter, y - stepY, xCenter, y, paint)
+                    canvas.drawLine(xBegin, y - step, xBegin, y, paint)
+                    canvas.drawLine(xEnd, y - step, xEnd, y, paint)
+                    canvas.drawLine(xCenter, y - step, xCenter, y, paint)
                 }
                 5 -> {
                     canvas.drawText(list[index].text, xCenter + xPadding, y - yPadding, paint)
                     canvas.drawLine(xBegin, y, xEnd, y, paint)
-                    canvas.drawLine(xBegin, y - stepY, xBegin, y, paint)
-                    canvas.drawLine(xEnd, y - stepY, xEnd, y, paint)
-                    canvas.drawLine(xCenter, y - stepY, xCenter, y, paint)
+                    canvas.drawLine(xBegin, y - step, xBegin, y, paint)
+                    canvas.drawLine(xEnd, y - step, xEnd, y, paint)
+                    canvas.drawLine(xCenter, y - step, xCenter, y, paint)
                 }
             }
+            y += step
         }
         pdfDocument.finishPage(myPage)
     }
-
 
     val folder: File? = context.getExternalFilesDir(FOLDER_NAME)
     val file = File(folder, "$FILE_NAME.pdf")
     try {
         pdfDocument.writeTo(FileOutputStream(file))
-        result = true
+        emit(file.readBytes())
     } catch (e: Exception) {
         e.printStackTrace()
     }
     pdfDocument.close()
-
-
-
-    return result
-}
+}.flowOn(Dispatchers.IO)

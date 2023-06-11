@@ -1,22 +1,23 @@
 package com.example.mynotes.presentation.ui.screens.main.share
 
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import com.example.mynotes.contstants.FILE_NAME
 import com.example.mynotes.contstants.FOLDER_NAME
 import com.example.mynotes.presentation.utils.extensions.huminizeForFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.charset.Charset
 
 
-fun CreateHtml(
+suspend fun CreateHtml(
     context: Context,
     mapData: LinkedHashMap<String, LinkedHashMap<String, List<String>>>
-): Boolean {
-    var result = false
+): Flow<ByteArray> = flow {
     val builder = StringBuilder()
     val title = "<!DOCTYPE html>\n" +
             "<html>\n" +
@@ -50,7 +51,6 @@ fun CreateHtml(
             val subTitle = "<tr><td >${subItem.key}</td>\n"   // masalan: Vali
             builder.append(subTitle)
             builder.append("<td>")
-
             subItem.value.forEach {
                 builder.append("<li>$it</li>")    // qolgan ma'lumotlar
             }
@@ -61,8 +61,6 @@ fun CreateHtml(
         builder.append("<br><br>")
     }
     builder.append("</html>")
-
-    // val data = builder.toString().toByteArray(Charset.forName("UTF-8"))
     val data = builder.toString().toByteArray(Charset.forName("UTF-8"))
 
     val folder: File? = context.getExternalFilesDir(FOLDER_NAME)
@@ -71,7 +69,7 @@ fun CreateHtml(
     try {
         fileOutputStream = FileOutputStream(file)
         fileOutputStream.write(data)
-        result = true
+        emit(file.readBytes())
     } catch (e: Exception) {
         e.printStackTrace()
     } finally {
@@ -83,5 +81,4 @@ fun CreateHtml(
             }
         }
     }
-    return result
-}
+}.flowOn(Dispatchers.IO)

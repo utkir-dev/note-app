@@ -7,6 +7,7 @@ class TransactionUseCases @Inject constructor(
     var getByOwner: TransactionGetByOwner,
     var getAll: TransactionGetAll,
     var getHistory: TransactionGetHistory,
+    var getHistoryForPaging: TransactionGetForPaging,
     var getHistoryForHome: TransactionGetForHome,
     var getHistoryById: TransactionsByOwnerId,
     var getConvertation: TransactionConvertation,

@@ -79,5 +79,9 @@ internal class TransactionRepositoryImp @Inject constructor(
         return local.getHistory()
     }
 
+    override suspend fun getHistory(limit: Int, page: Int): Flow<List<History>> {
+        return local.getHistory(limit, page)
+    }
+
 
 }

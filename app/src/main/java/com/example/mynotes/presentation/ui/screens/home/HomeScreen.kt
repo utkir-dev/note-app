@@ -34,10 +34,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
+import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.presentation.MainActivity
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
+import com.example.mynotes.presentation.utils.components.dialogs.DialogConfirm
 import com.example.mynotes.presentation.utils.components.image.Green
 import com.example.mynotes.presentation.utils.components.image.Red
 import com.example.mynotes.presentation.utils.components.image.White
@@ -71,6 +73,9 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
     var pressed by remember {
         mutableStateOf(0)
     }
+    var visibilityDialog by remember {
+        mutableStateOf(false)
+    }
 
     val scope = rememberCoroutineScope()
     when (pressed) {
@@ -79,8 +84,20 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
             dispatcher.invoke(DirectionType.SETTINGS)
         }
         3 -> {
-
             dispatcher.invoke(DirectionType.SHARE)
+        }
+    }
+    if (visibilityDialog) {
+        DialogConfirm(
+            CurrencyDomain("", name = "☝ Diqqat !!!"),
+            message = "Akkauntdan chiqib ketmoqchimisiz?. Qaytib kirish uchun login va parollaringiz esingizdami ? Ma'lumotlar serverga saqlandimi ? ",
+            onDismiss = {
+                visibilityDialog = false
+            }) {
+            if (true) {
+                dispatcher.invoke(DirectionType.SIGNOUT)
+            }
+            visibilityDialog = false
         }
     }
 
@@ -146,9 +163,8 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
                     color = Red,
                     rotate = true,
                     onItemClick = {
-                        scope.launch {
-                            dispatcher.invoke(DirectionType.SIGNOUT)
-                        }
+                        visibilityDialog = true
+
                     }
                 )
             }

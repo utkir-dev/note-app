@@ -10,5 +10,6 @@ interface TransactionRepository {
     suspend fun getForHome(count: Int): Flow<List<History>>
     suspend fun getAll(): Flow<List<Transaction>>
     suspend fun getHistory(): Flow<List<History>>
+    suspend fun getHistory(limit: Int, page: Int): Flow<List<History>>
     suspend fun getByOwnerId(ownerId: String): Flow<List<History>>
 }

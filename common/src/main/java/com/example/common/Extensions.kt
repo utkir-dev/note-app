@@ -20,6 +20,12 @@ fun Double.huminize(): String {
     // return if (diff > 0) String.format("%.2f", this) else this.toLong().toString()
 }
 
+fun Double.roundTen(): String {
+    val dec =
+        DecimalFormat("###,###,###,###,###.0", DecimalFormatSymbols(Locale.ENGLISH))
+    return dec.format(this).replace(",", " ")
+}
+
 fun Long.huminize(): String {
     val diff = System.currentTimeMillis() - this
     val format = "dd.MM.yyyy hh:mm"
@@ -36,7 +42,7 @@ fun Long.huminize(): String {
 }
 
 fun Long.huminizeForFile() =
-    SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.getDefault()).format(Date(this))
+    SimpleDateFormat("dd.MM.yyyy  hh:mm:ss", Locale.getDefault()).format(Date(this))
 
 fun Double.round() = Math.round(this * 100.0) / 100.0
 //fun String.huminize(): String {
@@ -47,3 +53,18 @@ fun Double.round() = Math.round(this * 100.0) / 100.0
 //    }
 //    return text
 //}
+
+fun ByteArray.huminize(): String {
+    val kbyte = 1024
+    val mbyte = 1024 * 1024
+    val gbyte = 1024 * 1024 * 1024
+    val value = if (this.size < kbyte) "${this} byte"
+    else if (this.size < 700 * kbyte) "${(this.size.toDouble() / kbyte).roundTen()} Kb"
+    else if (this.size < 700 * mbyte) "${(this.size.toDouble() / mbyte).roundTen()} Mb"
+    else "${(this.size.toDouble() / gbyte).roundTen()} Gb"
+    return value
+}
+
+
+
+
