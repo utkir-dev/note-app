@@ -3,6 +3,7 @@ package com.example.mynotes.presentation
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,10 +26,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.*
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
@@ -38,9 +42,8 @@ import com.example.mynotes.domain.use_cases.shared_pref_use_case.SharedPrefUseCa
 import com.example.mynotes.presentation.ui.dispatcher.NavigationHandler
 import com.example.mynotes.presentation.ui.screens.splash.SplashScreen
 import com.example.mynotes.presentation.utils.components.buttons.AnimatedTextButton
-import com.example.mynotes.presentation.utils.components.image.MyNotesTheme
-import com.example.mynotes.presentation.utils.components.image.Purple
-import com.example.mynotes.presentation.utils.components.image.White
+import com.example.mynotes.presentation.utils.components.buttons.MyButton
+import com.example.mynotes.presentation.utils.components.image.*
 import com.example.mynotes.presentation.utils.components.text.MyText
 import com.example.mynotes.presentation.utils.theme.ThemeState
 import com.karumi.dexter.Dexter
@@ -84,16 +87,27 @@ class MainActivity : ComponentActivity() {
 //            AppCompatDelegate.MODE_NIGHT_YES -> true
 //            else -> false
 //        }
-        requestPermissions(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) {
-            setContent {
-                val opened by isOpen.collectAsState()
-                if (!opened) {
-                    Block()
-                }
+        val apiVersion = Build.VERSION.SDK_INT
+
+        val permission = MutableStateFlow(false)
+        if (apiVersion < Build.VERSION_CODES.Q) {
+            requestPermissions(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) {
+                permission.value = it
+            }
+        }
+
+        setContent {
+            val isPermitted by permission.collectAsStateWithLifecycle()
+
+            if ((apiVersion < Build.VERSION_CODES.Q && isPermitted) || apiVersion >= Build.VERSION_CODES.Q) {
                 MyNotesTheme(darkTheme = ThemeState.darkModeState.value) {
+                    val opened by isOpen.collectAsState()
+                    if (!opened) {
+                        Block()
+                    }
                     Navigator(SplashScreen()) { navigator ->
                         LaunchedEffect(key1 = navigator) {
                             navigationHandler.navigationBuffer.onEach {
@@ -102,16 +116,16 @@ class MainActivity : ComponentActivity() {
                         }
                         CurrentScreen()
                     }
-//
+
 //                val modifier = if (opened) Modifier.fillMaxSize() else Modifier.size(0.dp)
 //                Box(modifier = modifier) {
 //
 //                }
                 }
-
+            } else {
+                ShowSettings()
             }
         }
-
     }
 
     private fun createPeriodicWorkRequest() {
@@ -142,13 +156,12 @@ class MainActivity : ComponentActivity() {
             isOpen.value = false
         }
     }
-
     override fun onStop() {
         super.onStop()
         TIME_OUT = System.currentTimeMillis()
     }
 
-    fun requestPermissions(vararg permissions: String, function: () -> Unit) {
+    fun requestPermissions(vararg permissions: String, function: (Boolean) -> Unit) {
         Dexter.withContext(this)
             .withPermissions(
                 *permissions
@@ -157,7 +170,7 @@ class MainActivity : ComponentActivity() {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                     report?.let {
                         if (report.areAllPermissionsGranted()) {
-                            function()
+                            function(true)
                         } else {
                             showSettingsDialog(*permissions)
                         }
@@ -215,6 +228,68 @@ class MainActivity : ComponentActivity() {
         val isOpen = MutableStateFlow(false)
     }
 
+}
+
+@Composable
+fun ShowSettings() {
+    val context = LocalContext.current as MainActivity
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(modifier = Modifier.padding(5.dp)) {
+            MyText(
+                text = "Ruxsat kerak!",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
+                textAlign = TextAlign.Center,
+                fontSize = 18.sp,
+                color = MaterialTheme.customColors.textColor
+            )
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 3.dp)
+                    .height(2.dp)
+                    .background(MaterialTheme.customColors.borderColor)
+            )
+            MyText(
+                text = "Ma'lumotlarni faylga saqlash va ularni o'qish uchun xotiraga ruxsat kerak",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
+                textAlign = TextAlign.Justify,
+                fontSize = 16.sp,
+                color = MaterialTheme.customColors.textColor
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                MyButton(
+                    text = "Bekor",
+                    textSize = 16.sp,
+                    onClick = {
+                        context.finish()
+
+                    }) {
+
+                }
+                MyButton(
+                    text = "Sozlamalar",
+                    background = Green,
+                    textSize = 16.sp,
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val uri = Uri.fromParts("package", context.packageName, null)
+                        intent.data = uri
+                        context.startActivity(intent)
+                    })
+                {
+                }
+            }
+        }
+
+    }
 }
 
 @Composable

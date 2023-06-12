@@ -96,7 +96,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
 
     //permission
-    implementation 'com.karumi:dexter:6.2.3'
+    implementation 'com.karumi:dexter:6.2.2'
 }
 kapt {
     correctErrorTypes = true
