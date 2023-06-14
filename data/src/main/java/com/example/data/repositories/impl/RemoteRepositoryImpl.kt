@@ -495,6 +495,28 @@ class RemoteRepositoryImpl @Inject constructor(
     override suspend fun getLocalDeviceId() =
         Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 
+    override suspend fun getNotUploadedDataCount(): Flow<Int> = callbackFlow {
+        coroutineScope {
+            launch(Dispatchers.IO) {
+                val count1 = persons.getNotUploadedCount(false)
+                val count2 = pockets.getNotUploadedCount(false)
+                val count3 = currencies.getNotUploadedCount(false)
+                val count4 = wallets.getNotUploadedCount(false)
+                val count5 = transactions.getNotUploadedCount(false)
+                combine(
+                    count1,
+                    count2,
+                    count3,
+                    count4,
+                    count5
+                ) { c1, c2, c3, c4, c5 ->
+                    trySend(c1 + c2 + c3 + c4 + c5)
+                }.collect()
+            }
+        }
+        awaitClose { }
+    }.flowOn(Dispatchers.IO)
+
     private fun compress(data: String): ByteArray? {
         val bos = ByteArrayOutputStream(data.length)
         val gzip = GZIPOutputStream(bos)

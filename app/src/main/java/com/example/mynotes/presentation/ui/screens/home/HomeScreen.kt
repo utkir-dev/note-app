@@ -1,7 +1,5 @@
 package com.example.mynotes.presentation.ui.screens.home
 
-import android.Manifest
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,7 +17,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -35,7 +32,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.domain.models.CurrencyDomain
-import com.example.mynotes.presentation.MainActivity
 import com.example.mynotes.presentation.ui.directions.common.DirectionType
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
 import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
@@ -67,9 +63,8 @@ class HomeScreen() : AppScreen() {
 @Composable
 fun ShowDrawer(viewModel: HomeViewModelImp) {
     val dispatcher = viewModel::onEventDispatcher
+    val unloadedCount by viewModel.notUploadedDataCount.collectAsStateWithLifecycle(0)
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val conf = LocalConfiguration.current
-
     var pressed by remember {
         mutableStateOf(0)
     }
@@ -78,85 +73,67 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
     }
 
     val scope = rememberCoroutineScope()
-    when (pressed) {
-        1 -> {}
-        2 -> {
-            dispatcher.invoke(DirectionType.SETTINGS)
-        }
-        3 -> {
-            dispatcher.invoke(DirectionType.SHARE)
-        }
-    }
+
+
     if (visibilityDialog) {
-        DialogConfirm(
-            CurrencyDomain("", name = "☝ Diqqat !!!"),
-            message = "Akkauntdan chiqib ketmoqchimisiz?. Qaytib kirish uchun login va parollaringiz esingizdami ? Ma'lumotlar serverga saqlandimi ? ",
-            onDismiss = {
+        if (unloadedCount > 0) {
+            DialogAttention(
+                time = 10,
+                message = "$unloadedCount ta ma'lumot serverga yuklanmagan. Internetni yo'qib tepadagi \uD83D\uDD04 tugmani bosing"
+            ) {
                 visibilityDialog = false
-            }) {
-            if (true) {
-                dispatcher.invoke(DirectionType.SIGNOUT)
             }
-            visibilityDialog = false
-        }
+        } else
+            DialogConfirm(
+                CurrencyDomain("", name = "☝ Diqqat !!!"),
+                message = "Akkauntdan chiqib ketmoqchimisiz?. Qaytib kirish uchun login va parollaringiz esingizdami ?",
+                onDismiss = {
+                    visibilityDialog = false
+                }) {
+                if (true) {
+                    dispatcher.invoke(DirectionType.SIGNOUT)
+                }
+                visibilityDialog = false
+            }
     }
+    val items = listOf(
+        R.drawable.ic_home,
+        R.drawable.ic_settings,
+        androidx.appcompat.R.drawable.abc_ic_menu_share_mtrl_alpha
+    )
+    val menus = listOf("Asosiy oyna", "Sozlashlar", "Ulashish")
+    val selectedItem = remember { mutableStateOf(items[0]) }
+
+    if (pressed == 0 && drawerState.isClosed) {
+        ShowHome(viewModel, drawerState, scope)
+    }
+    if (pressed == 1 && drawerState.isClosed) {
+        dispatcher.invoke(DirectionType.SETTINGS)
+    }
+    if (pressed == 2 && drawerState.isClosed) {
+        dispatcher.invoke(DirectionType.SHARE)
+    }
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            Column(
-                modifier = Modifier
-                    .background(MaterialTheme.customColors.backgroundBrush)
-                    .fillMaxHeight()
-                    .fillMaxWidth(
-                        if (conf.orientation == Configuration.ORIENTATION_LANDSCAPE) 0f else
-                            0.7f
-                    )
-            ) {
+            ModalDrawerSheet {
                 DrawerHeader()
-                DrawerMenuItem(
-                    iconDrawableId = R.drawable.ic_home,
-                    text = "Asosiy oyna",
-                    onItemClick = {
-                        scope.launch {
-                            async {
-                                pressed = 1
-                                drawerState.close()
-
-                            }
-
-                        }
-
-                    }
-                )
-                DrawerMenuItem(
-                    iconDrawableId = R.drawable.ic_settings,
-                    text = "Sozlashlar",
-                    onItemClick = {
-                        scope.launch {
-                            async {
-                                drawerState.close()
-
-                            }
-                            async { pressed = 2 }
-                        }
-                    }
-                )
-
-                DrawerMenuItem(
-                    iconDrawableId = androidx.appcompat.R.drawable.abc_ic_menu_share_mtrl_alpha,
-                    text = "Ulashish",
-                    onItemClick = {
-                        scope.launch {
-                            async {
-                                drawerState.close()
-
-                            }
-                            async { pressed = 3 }
+                for (i in 0..2) {
+                    DrawerMenuItem(
+                        iconDrawableId = items[i],
+                        text = menus[i],
+                        color = MaterialTheme.customColors.textColor,
+                        rotate = false,
+                        onItemClick = {
+                            scope.launch { drawerState.close() }
+                            pressed = i
+                            selectedItem.value = items[i]
 
                         }
-                    }
-                )
+                    )
+                }
                 DrawerMenuItem(
                     iconDrawableId = R.drawable.ic_exit,
                     text = "Chiqish",
@@ -164,11 +141,11 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
                     rotate = true,
                     onItemClick = {
                         visibilityDialog = true
-
                     }
                 )
             }
         },
+
         content = {
             ShowHome(viewModel, drawerState, scope)
         }
@@ -176,32 +153,41 @@ fun ShowDrawer(viewModel: HomeViewModelImp) {
 }
 
 @Composable
-fun ShowHome(viewModel: HomeViewModelImp, drawerState: DrawerState, scope: CoroutineScope) {
+fun ShowHome(
+    viewModel: HomeViewModelImp,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+) {
     val context = LocalContext.current
-    val network by remember {
-        mutableStateOf(context.networkState)
-    }
-    if (network == NetworkState.AVAILABLE) {
-        viewModel.checkData()
-    }
-
 
     val dispatcher = viewModel::onEventDispatcher
     val balanceList by viewModel.balances.collectAsStateWithLifecycle(emptyList())
     val history by viewModel.history.collectAsStateWithLifecycle(emptyList())
-    // val dialogProgress = viewModel.isLoading.collectAsStateWithLifecycle(false)
+    val unloadedCount by viewModel.notUploadedDataCount.collectAsStateWithLifecycle(0)
+
     var visibilityAlert by remember {
         mutableStateOf(false)
     }
+
 
     if (visibilityAlert) {
         DialogAttention("Bu ma'lumot serverga saqlanmagan. Internetni yo'qib qaytadan bosing !") {
             visibilityAlert = false
         }
     }
-//    if (!dialogProgress.value && !firstShown && (network == NetworkState.AVAILABLE)) {
-//        DialogBoxLoading()
-//    }
+
+    var messageNotUploaded by remember {
+        mutableStateOf("")
+    }
+    var visibilityCaution by remember {
+        mutableStateOf(false)
+    }
+
+    if (visibilityCaution) {
+        DialogAttention(message = messageNotUploaded) {
+            visibilityCaution = false
+        }
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -215,8 +201,6 @@ fun ShowHome(viewModel: HomeViewModelImp, drawerState: DrawerState, scope: Corou
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
-                    // BlockScreen()
-                    //dispatcher(DirectionType.SIGNOUT)
                     scope.launch { drawerState.open() }
                 }) {
                     Icon(
@@ -232,6 +216,25 @@ fun ShowHome(viewModel: HomeViewModelImp, drawerState: DrawerState, scope: Corou
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+                IconButton(onClick = {
+                    if (unloadedCount == 0) {
+                        messageNotUploaded = "\uD83D\uDC4D Hamma ma'lumotlar serverga saqlangan"
+                        visibilityCaution = true
+                    } else if (context.networkState is NetworkState.AVAILABLE) {
+                        viewModel.checkNotUploads()
+
+                    } else {
+                        messageNotUploaded = "Internetni yo'qib keyin bosing"
+                        visibilityCaution = true
+                    }
+                }) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_sync),
+                        contentDescription = "sync icon",
+                        tint = MaterialTheme.customColors.iconColor
+                    )
+                }
                 Spacer(modifier = Modifier.padding(horizontal = 10.dp))
                 IconButton(onClick = {
                     dispatcher(DirectionType.CHANGE_NIGHT_MODE)

@@ -10,4 +10,6 @@ interface HomeViewModel {
     fun checkNotUploads()
     val balances: Flow<List<BalanceDomain>>
     val currencies: Flow<List<CurrencyDomain>>
+    val notUploadedDataCount: Flow<Int>
+
 }

@@ -38,6 +38,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE uploaded=:uploaded")
     fun getNotUploaded(uploaded: Boolean): Flow<List<Transaction>>
 
+    @Query("SELECT COUNT(*) FROM transactions WHERE uploaded=:uploaded")
+    fun getNotUploadedCount(uploaded: Boolean): Flow<Int>
+
     @Query(
         "SELECT transactions.type AS title, " +
                 "transactions.amount AS amount,\n" +

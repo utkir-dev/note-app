@@ -13,5 +13,6 @@ interface RemoteRepository {
     suspend fun saveDevice()
     suspend fun getRemoteDevice(): UserDevice?
     suspend fun getLocalDeviceId(): String
+    suspend fun getNotUploadedDataCount(): Flow<Int>
     suspend fun downloadAllData(): Flow<Boolean>
 }

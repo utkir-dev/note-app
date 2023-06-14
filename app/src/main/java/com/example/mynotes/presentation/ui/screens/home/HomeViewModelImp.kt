@@ -36,19 +36,6 @@ class HomeViewModelImp @Inject constructor(
     private val dataUseCases: DataUseCases,
     private val shared: SharedPrefUseCases
 ) : ViewModel(), HomeViewModel {
-  //  var isLoading = MutableStateFlow(true)
-    fun checkData() {
-        viewModelScope.launch(Dispatchers.IO) {
-            obj.firstShown = true
-//            dataUseCases.download.invoke().collect { ch ->
-//                if (ch) {
-//                    obj.firstShown = true
-//                    isLoading.let { it.value = ch }
-//                }
-//            }
-        }
-    }
-
     fun observeDevice() {
         viewModelScope.launch(Dispatchers.IO) {
             deviceUseCases.observeDevice.invoke().collect {
@@ -65,6 +52,9 @@ class HomeViewModelImp @Inject constructor(
     }
     override val currencies: Flow<List<CurrencyDomain>> = flow {
         emitAll(currencyUseCases.getAll.invoke())
+    }
+    override val notUploadedDataCount: Flow<Int> = flow {
+        emitAll(dataUseCases.notUploadedDataCount.invoke())
     }
 
     val history: Flow<List<HistoryDomain>> = flow {
@@ -128,6 +118,7 @@ class HomeViewModelImp @Inject constructor(
     }
 
     override fun checkNotUploads() {
+        dataUseCases.upload
         viewModelScope.launch {
             dataUseCases.checkAllData.invoke()
         }
@@ -138,6 +129,4 @@ class HomeViewModelImp @Inject constructor(
         dataUseCases.clearDbLocal.invoke()
         direction.replaceToSignIn()
     }
-
-
 }

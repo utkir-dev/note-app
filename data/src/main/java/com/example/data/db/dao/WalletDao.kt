@@ -44,6 +44,9 @@ interface WalletDao {
     @Query("SELECT * FROM wallets WHERE uploaded=:uploaded")
     fun getNotUploaded(uploaded: Boolean): Flow<List<Wallet>>
 
+    @Query("SELECT COUNT(*) FROM wallets WHERE uploaded=:uploaded")
+    fun getNotUploadedCount(uploaded: Boolean): Flow<Int>
+
     @Query(
         "SELECT currencies.name as name,\n" +
                 "SUM(wallets.balance) as amount,\n" +

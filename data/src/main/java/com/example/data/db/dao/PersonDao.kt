@@ -40,4 +40,7 @@ interface PersonDao {
     @Query("SELECT * FROM persons WHERE  uploaded=:uploaded")
     fun getNotUploaded(uploaded: Boolean): Flow<List<Person>>
 
+    @Query("SELECT COUNT(*) FROM persons WHERE  uploaded=:uploaded")
+    fun getNotUploadedCount(uploaded: Boolean): Flow<Int>
+
 }

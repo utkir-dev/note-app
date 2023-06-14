@@ -42,4 +42,7 @@ interface PocketDao {
     @Query("SELECT * FROM pockets WHERE uploaded=:uploaded")
     fun getNotUploaded(uploaded: Boolean): Flow<List<Pocket>>
 
+    @Query("SELECT COUNT(*) FROM pockets WHERE uploaded=:uploaded")
+    fun getNotUploadedCount(uploaded: Boolean): Flow<Int>
+
 }

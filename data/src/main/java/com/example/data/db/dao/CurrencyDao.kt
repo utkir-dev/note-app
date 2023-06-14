@@ -46,5 +46,7 @@ interface CurrencyDao {
     @Query("SELECT * FROM currencies WHERE uploaded=:uploaded")
     fun getNotUploaded(uploaded: Boolean): Flow<List<Currency>>
 
+    @Query("SELECT COUNT(*) FROM currencies WHERE uploaded=:uploaded")
+    fun getNotUploadedCount(uploaded: Boolean): Flow<Int>
 
 }
