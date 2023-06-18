@@ -32,6 +32,9 @@ interface TransactionDao {
     @Query("SELECT MAX(date) FROM transactions")
     fun getLastUpdatedTime(): Long
 
+    @Query("SELECT MIN(date) FROM transactions")
+    fun getMinDateTime(): Long
+
     @Query("SELECT * FROM transactions WHERE date>:date order by date desc")
     fun getFromDate(date: Long): Flow<List<Transaction>>
 
@@ -135,5 +138,11 @@ interface TransactionDao {
                 "LIMIT :limit OFFSET :page"
     )
     fun getHistory(limit: Int, page: Int): Flow<List<History>>
+
+    @Query("SELECT COUNT(*) FROM transactions")
+    fun getHistoryCount(): Flow<Int>
+
+    @Query("SELECT MIN(date) FROM transactions")
+    fun getLastDate(): Long
 }
 

@@ -71,14 +71,15 @@ class GetCreditViewModelImp @Inject constructor(
 
     override fun addTransaction(amountTransaction: Double, comment: String, balance: Double) {
         viewModelScope.launch(Dispatchers.IO) {
+            val time = System.currentTimeMillis()
             val transaction = TransactionDomain(
-                id = UUID.randomUUID().toString(),
+                id = time.toString(),
                 type = getTypeNumber(Type.CREDIT),
                 fromId = person.value.id,
                 toId = pocket.value.id,
                 currencyId = currency.value.id,
                 amount = amountTransaction,
-                date = System.currentTimeMillis(),
+                date = time,
                 comment = comment,
 
                 isFromPocket = false,

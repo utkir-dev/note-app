@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.hilt.getViewModel
 import com.example.mynotes.R
 import com.example.mynotes.presentation.ui.dispatcher.AppScreen
+import com.example.mynotes.presentation.utils.components.buttons.MyButton
 import com.example.mynotes.presentation.utils.components.dialogs.DialogAttention
 import com.example.mynotes.presentation.utils.components.image.customColors
 import com.example.mynotes.presentation.utils.components.text.MyText
@@ -99,7 +100,9 @@ fun Show(viewModel: HistoryViewModelImp) {
             }
         }
 
-        items(items = historyListPaging, key = { it.hashCode() }) { historyItem ->
+        items(
+            items = historyListPaging.sortedByDescending { it.date },
+            key = { it.hashCode() }) { historyItem ->
             ItemHistory(
                 item = historyItem,
             ) {
@@ -147,9 +150,7 @@ fun Show(viewModel: HistoryViewModelImp) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        Icon(imageVector = Icons.Rounded.Face, contentDescription = "")
-
-                        MyText(text = "Tugadi")
+                        MyButton(text = "Yana yuklash", onClick = { viewModel.downloadNext() }) {}
 
                         TextButton(
                             modifier = Modifier
@@ -164,17 +165,7 @@ fun Show(viewModel: HistoryViewModelImp) {
                                     horizontalArrangement = Arrangement.Center,
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.KeyboardArrowUp,
-                                        contentDescription = ""
-                                    )
-
                                     MyText(text = "Boshiga qaytish")
-
-                                    Icon(
-                                        imageVector = Icons.Rounded.KeyboardArrowUp,
-                                        contentDescription = ""
-                                    )
                                 }
                             }
                         )

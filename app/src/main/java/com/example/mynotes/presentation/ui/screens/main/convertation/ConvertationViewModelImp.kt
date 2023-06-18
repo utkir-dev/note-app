@@ -78,8 +78,9 @@ class ConvertationViewModelImp @Inject constructor(
         balance: Double
     ) {
         viewModelScope.launch(Dispatchers.IO) {
+            val time = System.currentTimeMillis()
             val transaction = TransactionDomain(
-                id = UUID.randomUUID().toString(),
+                id = time.toString(),
                 type = getTypeNumber(Type.CONVERTATION),
                 fromId = pocketFrom.value.id,
                 toId = pocketTo.value.id,
@@ -87,7 +88,7 @@ class ConvertationViewModelImp @Inject constructor(
                 amount = amountTransaction,
                 currencyFrom = currencyFrom.value.id,
                 currencyTo = currencyTo.value.id,
-                date = System.currentTimeMillis(),
+                date = time,
                 comment = comment,
 
                 isFromPocket = true,

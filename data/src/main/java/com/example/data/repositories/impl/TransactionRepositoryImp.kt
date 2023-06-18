@@ -1,14 +1,13 @@
 package com.example.data.repositories.impl
 
-import com.example.data.constants.Const
 import com.example.data.constants.Const.TRANSACTIONS
 import com.example.data.constants.Const.USERS
 import com.example.data.db.dao.TransactionDao
 import com.example.data.db.entities.Transaction
 import com.example.data.db.entities.database_relations.History
+import com.example.data.db.remote_models.TransactionRemote
 import com.example.data.repositories.intrefaces.AuthRepository
 import com.example.data.repositories.intrefaces.RemoteDatabase
-import com.example.data.repositories.intrefaces.RemoteRepository
 import com.example.data.repositories.intrefaces.TransactionRepository
 import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.async
@@ -31,13 +30,12 @@ internal class TransactionRepositoryImp @Inject constructor(
             .collection(TRANSACTIONS)
 
         dbRemote.document(transaction.id)
-            .set(transaction.toRemote().copy(date = System.currentTimeMillis()))
+            .set(transaction.toRemote())
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     runBlocking {
                         local.add(
                             transaction.copy(
-                                date = System.currentTimeMillis(),
                                 uploaded = true
                             )
                         )
@@ -70,6 +68,30 @@ internal class TransactionRepositoryImp @Inject constructor(
         return local.getForHome(count)
     }
 
+    override suspend fun download(count: Int) {
+        val lastDate = local.getLastDate()
+        val remote = remote.storageRef.firestore.collection(
+            USERS
+        ).document(auth.currentUser?.uid ?: "").collection(TRANSACTIONS)
+        remote.orderBy("date")
+            .endBefore(lastDate)
+            .limitToLast(count.toLong())
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.isEmpty) try {
+                    val list = snapshot.map {
+                        it.toObject(
+                            TransactionRemote::class.java
+                        )
+                    }
+                    runBlocking {
+                        local.addTransactions(list.map { it.toLocal() })
+                    }
+                } catch (_: Exception) {
+                }
+            }
+    }
+
     override suspend fun getByOwnerId(ownerId: String): Flow<List<History>> {
         return local.getByOwnerId(ownerId)
     }
@@ -83,5 +105,8 @@ internal class TransactionRepositoryImp @Inject constructor(
         return local.getHistory(limit, page)
     }
 
+    override suspend fun getHistoryCount(): Flow<Int> {
+        return local.getHistoryCount()
+    }
 
 }

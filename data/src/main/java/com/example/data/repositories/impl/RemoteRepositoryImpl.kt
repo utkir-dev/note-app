@@ -144,105 +144,107 @@ class RemoteRepositoryImpl @Inject constructor(
 
     override suspend fun downloadAllData(): Flow<Boolean> = callbackFlow {
         if (auth.currentUser != null) {
-            val storage = remoteStorage.storage.child("${auth.currentUser?.uid}/$PATH")
+//           val storage = remoteStorage.storage.child("${auth.currentUser?.uid}/$PATH")
             if (isDownloadAvialable()) {
-                Log.d("HomeViewModelImp", "isDownloadAvialable: TRUE")
-
-                coroutineScope {
-                    launch(Dispatchers.IO) {
-                        storage.listAll().addOnSuccessListener { listResult ->
-                            if (listResult.items.isEmpty()) {
-                                runBlocking {
-                                    downloadByNodes(0) {
-                                        channel.trySend(it)
-                                    }
-                                }
-
-                            } else {
-                                listResult.items.filter { !it.name.startsWith(COPY) }
-                                    .forEach { fileRemote ->
-                                        var size = 0L
-                                        var copyFileSize = 0L
-                                        runBlocking {
-                                            size = fileRemote.metadata.addOnSuccessListener {
-                                                it.sizeBytes
-                                            }.await().sizeBytes
-                                            copyFileSize =
-                                                storage.child("$COPY${fileRemote.name}").metadata.addOnSuccessListener {
-                                                    it.sizeBytes
-                                                }.await().sizeBytes
-                                        }
-                                        val file = if (copyFileSize > size) {
-                                            storage.child("$COPY${fileRemote.name}")
-                                        } else {
-                                            fileRemote
-                                        }
-                                        runBlocking {
-                                            file.getBytes(10_000_000)
-                                                .addOnSuccessListener { byteArray ->
-                                                    val gson = Gson()
-                                                    val jsonString =
-                                                        JsonParser.parseString(decompress(byteArray))
-                                                    val type = object : TypeToken<AllData>() {}.type
-                                                    var date = 0L
-                                                    try {
-                                                        val allData: AllData =
-                                                            gson.fromJson(jsonString, type)
-                                                        date = allData.date
-                                                        runBlocking {
-                                                            val r5 = async {
-                                                                transactions.addTransactions(allData.transaction.map { it.toLocal() })
-                                                            }
-
-                                                            val r1 =
-                                                                async { persons.addPersons(allData.person.map { it.toLocal() }) }
-                                                            val r2 =
-                                                                async { pockets.addPockets(allData.pocket.map { it.toLocal() }) }
-                                                            val r3 = async {
-                                                                currencies.addCurrencies(allData.currency.map { it.toLocal() })
-                                                            }
-                                                            val r4 =
-                                                                async { wallets.addWallets(allData.wallet.map { it.toLocal() }) }
-
-                                                            r1.await()
-                                                            r2.await()
-                                                            r3.await()
-                                                            r4.await()
-                                                            r5.await()
-                                                        }
-                                                    } catch (_: Exception) {
-                                                        date = 0L
-                                                    }
-                                                    runBlocking {
-                                                        downloadByNodes(date) {
-                                                            trySend(it)
-                                                        }
-                                                    }
-                                                }.await()
-
-                                        }
-                                        trySend(true)
-                                    }
-                            }
-
-                        }.addOnFailureListener {
-                            runBlocking {
-                                downloadByNodes(0) {
-                                    channel.trySend(it)
-                                }
-                                awaitClose { channel.close() }
-                            }
-                        }.addOnCanceledListener {
-                            runBlocking {
-                                downloadByNodes(0) {
-                                    channel.trySend(it)
-                                }
-                            }
-                        }
-                        Log.d("HomeViewModelImp", "HomeViewModelImp finish")
-
-                    }
+                downloadByNodes(0) {
+                    channel.trySend(it)
                 }
+//
+//                coroutineScope {
+//                    launch(Dispatchers.IO) {
+//                        storage.listAll().addOnSuccessListener { listResult ->
+//                            if (listResult.items.isEmpty()) {
+//                                runBlocking {
+//                                    downloadByNodes(0) {
+//                                        channel.trySend(it)
+//                                    }
+//                                }
+//
+//                            } else {
+//                                listResult.items.filter { !it.name.startsWith(COPY) }
+//                                    .forEach { fileRemote ->
+//                                        var size = 0L
+//                                        var copyFileSize = 0L
+//                                        runBlocking {
+//                                            size = fileRemote.metadata.addOnSuccessListener {
+//                                                it.sizeBytes
+//                                            }.await().sizeBytes
+//                                            copyFileSize =
+//                                                storage.child("$COPY${fileRemote.name}").metadata.addOnSuccessListener {
+//                                                    it.sizeBytes
+//                                                }.await().sizeBytes
+//                                        }
+//                                        val file = if (copyFileSize > size) {
+//                                            storage.child("$COPY${fileRemote.name}")
+//                                        } else {
+//                                            fileRemote
+//                                        }
+//                                        runBlocking {
+//                                            file.getBytes(10_000_000)
+//                                                .addOnSuccessListener { byteArray ->
+//                                                    val gson = Gson()
+//                                                    val jsonString =
+//                                                        JsonParser.parseString(decompress(byteArray))
+//                                                    val type = object : TypeToken<AllData>() {}.type
+//                                                    var date = 0L
+//                                                    try {
+//                                                        val allData: AllData =
+//                                                            gson.fromJson(jsonString, type)
+//                                                        date = allData.date
+//                                                        runBlocking {
+//                                                            val r5 = async {
+//                                                                transactions.addTransactions(allData.transaction.map { it.toLocal() })
+//                                                            }
+//
+//                                                            val r1 =
+//                                                                async { persons.addPersons(allData.person.map { it.toLocal() }) }
+//                                                            val r2 =
+//                                                                async { pockets.addPockets(allData.pocket.map { it.toLocal() }) }
+//                                                            val r3 = async {
+//                                                                currencies.addCurrencies(allData.currency.map { it.toLocal() })
+//                                                            }
+//                                                            val r4 =
+//                                                                async { wallets.addWallets(allData.wallet.map { it.toLocal() }) }
+//
+//                                                            r1.await()
+//                                                            r2.await()
+//                                                            r3.await()
+//                                                            r4.await()
+//                                                            r5.await()
+//                                                        }
+//                                                    } catch (_: Exception) {
+//                                                        date = 0L
+//                                                    }
+//                                                    runBlocking {
+//                                                        downloadByNodes(date) {
+//                                                            trySend(it)
+//                                                        }
+//                                                    }
+//                                                }.await()
+//
+//                                        }
+//                                        trySend(true)
+//                                    }
+//                            }
+//
+//                        }.addOnFailureListener {
+//                            runBlocking {
+//                                downloadByNodes(0) {
+//                                    channel.trySend(it)
+//                                }
+//                                awaitClose { channel.close() }
+//                            }
+//                        }.addOnCanceledListener {
+//                            runBlocking {
+//                                downloadByNodes(0) {
+//                                    channel.trySend(it)
+//                                }
+//                            }
+//                        }
+//                        Log.d("HomeViewModelImp", "HomeViewModelImp finish")
+//
+//                    }
+//                }
             } else {
                 trySend(true)
             }
@@ -261,19 +263,18 @@ class RemoteRepositoryImpl @Inject constructor(
                             USERS
                         ).document(auth.currentUser?.uid ?: "")
 
-                        remote.collection(Const.TRANSACTIONS).whereGreaterThanOrEqualTo(
-                            DATE, date
-                        ).orderBy(DATE).limitToLast(10_000).get().addOnSuccessListener { snapshot ->
-                            if (!snapshot.isEmpty) try {
-                                val list = snapshot.map {
-                                    it.toObject(
-                                        TransactionRemote::class.java
-                                    )
-                                }
-                                runBlocking {
-                                    transactions.addTransactions(list.map { it.toLocal() })
-                                }
-                            } catch (_: Exception) {
+                        remote.collection(Const.TRANSACTIONS).orderBy("date").limitToLast(100).get()
+                            .addOnSuccessListener { snapshot ->
+                                if (!snapshot.isEmpty) try {
+                                    val list = snapshot.map {
+                                        it.toObject(
+                                            TransactionRemote::class.java
+                                        )
+                                    }
+                                    runBlocking {
+                                        transactions.addTransactions(list.map { it.toLocal() })
+                                    }
+                                } catch (_: Exception) {
                             }
                         }.await()
 

@@ -1,6 +1,5 @@
 package com.example.mynotes.domain.use_cases.transaction_use_case
 
-import android.util.Log
 import com.example.data.db.entities.Wallet
 import com.example.data.repositories.intrefaces.TransactionRepository
 import com.example.data.repositories.intrefaces.WalletRepository
@@ -8,7 +7,6 @@ import com.example.mynotes.domain.models.CurrencyDomain
 import com.example.mynotes.domain.models.TransactionDomain
 import com.example.mynotes.domain.models.WalletDomain
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import java.util.*
 import javax.inject.Inject

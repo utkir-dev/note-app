@@ -9,10 +9,9 @@ const val HISTORY_LIMIT = 5 // count
 const val ALERT_DIALOG_TIME = 6  // secund
 
 
-const val ID_BLOCK_SCREEN = "id_block_screen"
 
 const val DEFAULT_BLOCK_SCREEN_TIME = 5000 // mills
-const val KEY_BLOCK_SCREEN_TIME = "key_block_screen_time"
+
 
 const val KEY_PINCODE = "key_block_screen_pincode"
 const val DEFAULT_PINCODE = "1234"

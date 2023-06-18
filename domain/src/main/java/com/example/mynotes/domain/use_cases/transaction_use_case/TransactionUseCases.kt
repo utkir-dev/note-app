@@ -11,4 +11,6 @@ class TransactionUseCases @Inject constructor(
     var getHistoryForHome: TransactionGetForHome,
     var getHistoryById: TransactionsByOwnerId,
     var getConvertation: TransactionConvertation,
+    var getHistoryCount: TransactionsCount,
+    var download: TransactionDownload,
 )
