@@ -141,6 +141,14 @@ fun Show(
                         fontWeight = FontWeight.Bold
                     )
                 }
+            } else if (persons.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    MyText(
+                        text = "Shaxslar mavjud emas",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             } else if (currencies.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     MyText(
@@ -348,7 +356,7 @@ fun Show(
                                 MyButton(
                                     onClick = {
                                         val (isValid, amount) = isValidAmount(amountTransaction)
-                                        if (isValid) {
+                                        if (isValid && person.name.isNotEmpty()) {
                                             message =
                                                 "${person.name}dan $amount ${curency.name} qarz olishga ishonchingiz komilmi?"
                                             visibilityConfirm = true

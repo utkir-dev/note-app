@@ -111,6 +111,9 @@ fun ShowCurrencies(
                 if (wallets.filter { it.currencyId == viewModel.getCurrency().id }.size > 0) {
                     alertMessage = "Bu valyuta orqali qilingan ishlar bor. O'chirish mumkin emas !"
                     visibilityAlert = true
+                } else if (viewModel.getCurrency().id == "dollar") {
+                    alertMessage = "Dollarni o'chirish mumkin emas !"
+                    visibilityAlert = true
                 } else {
                     viewModel.delete()
                 }
