@@ -343,19 +343,6 @@ class RemoteRepositoryImpl @Inject constructor(
                             } catch (_: Exception) {
                             }
                         }.await()
-
-//
-//                    if (currencies.getCount() == 0) {
-//                        currencies.add(
-//                            Currency(
-//                                id = UUID.randomUUID().toString(),
-//                                name = "dollar",
-//                                rate = 1.0,
-//                                date = System.currentTimeMillis()
-//                            )
-//                        )
-//                    }
-
                         shared.saveBoolean(KEY_DOWNLOADED_DATE, true)
                     }
                 function(true)

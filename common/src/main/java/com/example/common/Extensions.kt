@@ -28,7 +28,7 @@ fun Double.roundTen(): String {
 
 fun Long.huminize(): String {
     val diff = System.currentTimeMillis() - this
-    val format = "dd.MM.yyyy hh:mm"
+    val format = "dd.MM.yyyy  HH:mm"
     val formatted = if (diff < 180_000) {
         "hozirgina"
     } else if (diff < 3600_000) {
@@ -42,7 +42,7 @@ fun Long.huminize(): String {
 }
 
 fun Long.huminizeForFile() =
-    SimpleDateFormat("dd.MM.yyyy  hh:mm:ss", Locale.getDefault()).format(Date(this))
+    SimpleDateFormat("dd.MM.yyyy  HH:mm:ss", Locale.getDefault()).format(Date(this))
 
 fun Double.round() = Math.round(this * 100.0) / 100.0
 //fun String.huminize(): String {
